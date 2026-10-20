@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>templateZen</title>
-    <meta name="description" content="Template reutilizável de cabeçalho, rodapé, temas e CI/CD para começar novos projetos web a partir de uma base pronta e acessível.">
+    <title>BuscaBanca</title>
+    <meta name="description" content="Indica, a partir de currículos Lattes, as pessoas com maior proximidade temática a um trabalho de mestrado, para convite como membro externo da banca de defesa.">
 
     <!-- Compartilhamento (Open Graph / Twitter). O %SITE_URL% é substituído
          pelo build.mjs pela URL real (env/variável SITE_URL) — deixando og:url
@@ -12,13 +12,13 @@
     <link rel="canonical" href="%SITE_URL%/">
     <meta property="og:type" content="website">
     <meta property="og:url" content="%SITE_URL%/">
-    <meta property="og:title" content="templateZen">
-    <meta property="og:description" content="Base pronta e acessível (cabeçalho, rodapé, temas e CI/CD) para novos projetos web.">
+    <meta property="og:title" content="BuscaBanca">
+    <meta property="og:description" content="Indicação de membros externos de banca a partir de currículos Lattes.">
     <meta property="og:image" content="%SITE_URL%/logo.svg">
     <meta property="og:locale" content="pt_BR">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="templateZen">
-    <meta name="twitter:description" content="Base pronta e acessível (cabeçalho, rodapé, temas e CI/CD) para novos projetos web.">
+    <meta name="twitter:title" content="BuscaBanca">
+    <meta name="twitter:description" content="Indicação de membros externos de banca a partir de currículos Lattes.">
     <meta name="twitter:image" content="%SITE_URL%/logo.svg">
 
     <!-- Favicon: sempre o logo do projeto, em SVG. Troque src/logo.svg pela
@@ -55,10 +55,10 @@
         <div class="flex items-center justify-between px-4 py-3 bg-brand-600 dark:bg-gray-900 transition-colors duration-300">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded bg-white dark:bg-gradient-to-br dark:from-accent-600 dark:to-accent-900 flex items-center justify-center text-brand-600 dark:text-white font-bold transition-colors duration-300">
-                    <i aria-hidden="true" class="fa-solid fa-star"></i>
+                    <i aria-hidden="true" class="fa-solid fa-users-viewfinder"></i>
                 </div>
                 <div class="flex items-center gap-2 overflow-hidden">
-                    <h1 id="headerAppName" class="font-bold text-white leading-none whitespace-nowrap">TemplateZen</h1>
+                    <h1 id="headerAppName" class="font-bold text-white leading-none whitespace-nowrap">BuscaBanca</h1>
                     <span class="text-xl text-white/30 dark:text-gray-700 font-light hidden">|</span>
                     <span id="headerSigla" class="font-bold text-white/90 dark:text-accent-400 leading-none whitespace-nowrap hidden"></span>
                     <!-- Nome definido pelo usuário na aba Configurações (| nome) -->
@@ -82,8 +82,11 @@
         <!-- Abas de navegação: adicione/remova .tab-btn e o .tab-panel correspondente -->
         <nav class="bg-white dark:bg-gray-800 border-t border-brand-700/20 dark:border-gray-700 px-2" role="tablist" aria-label="Seções">
             <div class="max-w-5xl mx-auto flex gap-1 overflow-x-auto">
-                <button id="tab-inicio-btn" aria-controls="tab-inicio" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="true" data-tab="inicio">
-                    <i aria-hidden="true" class="fa-solid fa-house mr-1"></i> Início
+                <button id="tab-banca-btn" aria-controls="tab-banca" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="true" data-tab="banca">
+                    <i aria-hidden="true" class="fa-solid fa-user-check mr-1"></i> Indicar banca
+                </button>
+                <button id="tab-curriculos-btn" aria-controls="tab-curriculos" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="curriculos">
+                    <i aria-hidden="true" class="fa-solid fa-address-card mr-1"></i> Currículos
                 </button>
             </div>
         </nav>
@@ -91,57 +94,114 @@
 
     <!-- ============================ CONTEÚDO ============================ -->
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
-        <div id="tab-inicio" class="tab-panel" role="tabpanel" aria-labelledby="tab-inicio-btn" tabindex="0">
+        <!-- Indicar banca: título, resumo e palavras-chave -> 10 pessoas mais próximas -->
+        <div id="tab-banca" class="tab-panel" role="tabpanel" aria-labelledby="tab-banca-btn" tabindex="0">
             <div class="max-w-3xl mx-auto space-y-6">
-                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5">
-                    <p class="font-semibold text-brand-800 dark:text-accent-400 mb-1">
-                        <i aria-hidden="true" class="fa-solid fa-circle-info mr-1"></i> Este site é um modelo (template)
-                    </p>
+                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-2">
+                    <h2 class="text-lg font-bold text-brand-800 dark:text-accent-400">Membro externo para a banca de defesa</h2>
                     <p>
-                        O que você está vendo — cabeçalho, abas, rodapé com tema claro/escuro,
-                        alto contraste e ajuste de fonte — não é o produto final de um projeto:
-                        é o ponto de partida reutilizável (<strong>templateZen</strong>) para
-                        montar novas aplicações web com essa mesma base pronta. Substitua este
-                        texto e as abas ao lado pelo conteúdo real do seu projeto.
+                        Informe o título, o resumo e as palavras-chave do seu trabalho. A ferramenta compara esses
+                        dados com os currículos Lattes disponíveis e lista as 10 pessoas com maior proximidade
+                        temática, numa escala de 0 a 1.
                     </p>
+                    <p id="corpusStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Carregando os currículos…</p>
                 </div>
 
-                <div>
-                    <h2 class="text-lg font-bold mb-2">Como usar este repositório como modelo no GitHub</h2>
-                    <ol class="list-decimal list-inside space-y-2">
-                        <li>
-                            No repositório do GitHub, abra <strong>Settings</strong> e marque a
-                            opção <strong>Template repository</strong> (só precisa ser feito uma
-                            vez, pelo dono do repositório).
-                        </li>
-                        <li>
-                            Com isso ativado, o botão verde <strong>Use this template</strong>
-                            passa a aparecer no topo da página do repositório, ao lado de
-                            "Code".
-                        </li>
-                        <li>
-                            Clique em <strong>Use this template → Create a new repository</strong>,
-                            escolha o nome do novo projeto e crie-o — você recebe uma cópia
-                            limpa (sem o histórico de commits deste repositório).
-                        </li>
-                        <li>
-                            Clone o novo repositório e edite <code>src/js/config.js</code> com os
-                            dados do seu projeto (nome, autor, links, licença).
-                        </li>
-                        <li>
-                            Configure a publicação automática via SSH seguindo o
-                            <code>DEPLOY.md</code>, e ajuste <code>CLAUDE.md</code>,
-                            <code>CHANGELOG.md</code> e <code>VERSION</code> conforme o projeto
-                            evoluir.
-                        </li>
-                    </ol>
-                </div>
+                <form id="buscaForm" class="space-y-4" novalidate>
+                    <div>
+                        <label for="tituloInput" class="block text-sm font-medium mb-1">Título do trabalho</label>
+                        <input id="tituloInput" type="text" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    </div>
+                    <div>
+                        <label for="resumoInput" class="block text-sm font-medium mb-1">Resumo</label>
+                        <textarea id="resumoInput" rows="7" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400"></textarea>
+                    </div>
+                    <div>
+                        <label for="palavrasInput" class="block text-sm font-medium mb-1">Palavras-chave</label>
+                        <input id="palavrasInput" type="text" aria-describedby="palavrasAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <p id="palavrasAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separe por ponto e vírgula ou vírgula. Ex.: governança pública; transparência; controle social</p>
+                    </div>
+                    <fieldset class="border border-gray-200 dark:border-gray-700 rounded p-4 space-y-3">
+                        <legend class="text-sm font-semibold px-1">Critérios para membro externo</legend>
+                        <div>
+                            <label for="excluirInput" class="block text-sm mb-1">Desconsiderar pessoas desta instituição (a do seu programa)</label>
+                            <input id="excluirInput" type="text" placeholder="Ex.: Universidade Federal de São Paulo" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input id="doutoresInput" type="checkbox" checked> Somente pessoas com doutorado concluído
+                        </label>
+                    </fieldset>
+                    <p id="buscaErro" class="text-sm text-red-700 dark:text-red-400 hidden" role="alert"></p>
+                    <button type="submit" id="buscarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">
+                        <i aria-hidden="true" class="fa-solid fa-magnifying-glass"></i> Indicar membros externos
+                    </button>
+                </form>
 
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Prefere não usar "Use this template"? Também funciona clonar o repositório
-                    normalmente ou baixar o ZIP — o <code>README.md</code> tem o passo a passo
-                    completo de customização.
-                </p>
+                <section id="resultado" class="space-y-3 hidden" aria-labelledby="resultadoTitulo" tabindex="-1">
+                    <h2 id="resultadoTitulo" class="text-lg font-bold">Pessoas mais próximas do tema</h2>
+                    <p id="resultadoResumo" class="text-sm text-gray-600 dark:text-gray-400"></p>
+                    <ol id="resultadoLista" class="list-none p-0 space-y-3"></ol>
+                    <details class="text-sm text-gray-600 dark:text-gray-400">
+                        <summary class="cursor-pointer font-medium">Como a proximidade é calculada</summary>
+                        <div class="mt-2 space-y-2">
+                            <p>
+                                Cada currículo é descrito pelos termos do resumo, das linhas de pesquisa, das áreas do
+                                conhecimento, das palavras-chave, dos títulos da formação, dos projetos, das produções e
+                                das orientações. O seu trabalho é descrito da mesma forma, com peso maior para as
+                                palavras-chave e o título.
+                            </p>
+                            <p>
+                                Termos raros entre os currículos valem mais do que termos comuns a todos (TF-IDF), e
+                                produções com mais de 10 anos pesam menos. A proximidade é o cosseno entre os dois
+                                perfis: 0 indica nenhum termo em comum e 1 indica o mesmo perfil de termos. A lista
+                                ajuda a encontrar nomes; a escolha da banca segue as regras do seu programa.
+                            </p>
+                        </div>
+                    </details>
+                </section>
+            </div>
+        </div>
+
+        <!-- Currículos: o que foi carregado do servidor + XML/ZIP locais -->
+        <div id="tab-curriculos" class="tab-panel" role="tabpanel" aria-labelledby="tab-curriculos-btn" tabindex="0" hidden>
+            <div class="max-w-5xl mx-auto space-y-6">
+                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-3">
+                    <h2 class="text-lg font-bold text-brand-800 dark:text-accent-400">Currículos considerados</h2>
+                    <p>
+                        Os currículos publicados com o site vêm da pasta <code>lattes/</code> do repositório. Você também
+                        pode acrescentar arquivos XML (ou o ZIP exportado pela Plataforma Lattes) do seu computador: eles
+                        são lidos só no seu navegador e não são enviados a nenhum servidor.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                            <i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i> Adicionar arquivos
+                            <input id="arquivosInput" type="file" accept=".xml,.zip" multiple class="sr-only">
+                        </label>
+                        <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                            <i aria-hidden="true" class="fa-solid fa-folder-open"></i> Adicionar pasta
+                            <input id="pastaInput" type="file" webkitdirectory multiple class="sr-only">
+                        </label>
+                        <button type="button" id="limparLocaisBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium hidden">
+                            <i aria-hidden="true" class="fa-solid fa-trash-can"></i> Remover os adicionados
+                        </button>
+                    </div>
+                    <p id="cargaStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite"></p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <caption class="sr-only">Currículos carregados</caption>
+                        <thead class="border-b border-gray-300 dark:border-gray-600">
+                            <tr>
+                                <th scope="col" class="py-2 pr-3">Nome</th>
+                                <th scope="col" class="py-2 pr-3">Titulação</th>
+                                <th scope="col" class="py-2 pr-3">Instituição</th>
+                                <th scope="col" class="py-2 pr-3">Atualização</th>
+                                <th scope="col" class="py-2">Origem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="curriculosTabela"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div id="tab-config" class="tab-panel" role="tabpanel" aria-labelledby="headerConfigBtn" tabindex="0" hidden>
@@ -197,5 +257,8 @@
     <script src="js/config.js"></script>
     <script src="js/chrome.js"></script>
     <script src="js/layout.js"></script>
+    <script src="js/lattes-corpus.js"></script>
+    <script src="js/similaridade.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

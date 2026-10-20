@@ -32,6 +32,9 @@ jobs:
       - name: Verificar sintaxe dos módulos JS
         run: for f in src/js/*.js; do node --check "$f"; done
 
+      - name: Testar o extrator Lattes e a proximidade temática
+        run: node tools/testar-similaridade.mjs
+
       - name: Auditar contraste dos temas (WCAG AA)
         run: node tools/contrast-check.mjs
 
@@ -48,6 +51,7 @@ jobs:
           test -f dist/css/styles.css || { echo "ERRO: dist/css/ ausente.";        exit 1; }
           test -f dist/404.html       || { echo "ERRO: dist/404.html ausente.";    exit 1; }
           test -f dist/sitemap.xml    || { echo "ERRO: dist/sitemap.xml ausente."; exit 1; }
+          test -f dist/data/corpus.json || { echo "ERRO: dist/data/corpus.json ausente."; exit 1; }
           # Todas as páginas de apoio devem ser publicadas.
           for p in termodeuso politicadeprivacidade ajuda sobre doeumcafe historico; do
             test -f "dist/$p.html" || { echo "ERRO: dist/$p.html ausente."; exit 1; }

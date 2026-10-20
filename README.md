@@ -1,11 +1,37 @@
-# templateZen
+# BuscaBanca
 
-Template de cabeçalho, rodapé e estrutura de arquivos para aplicações web
-estáticas (HTML + Tailwind via CDN + JS puro), extraído e generalizado a
-partir do [lattesZen](https://github.com/alexsandroccarv/latteszen).
+Aplicação web que indica **membros externos para banca de defesa de
+mestrado** a partir de currículos Lattes.
 
-Use este repositório como ponto de partida para novos projetos que
-precisem de um layout pronto, acessível e com tema claro/escuro.
+1. Os currículos (XML exportado pela Plataforma Lattes, ou o ZIP que a
+   contém) ficam na pasta [`lattes/`](lattes/README.md).
+2. O build (`node build.mjs`) processa a pasta e gera
+   `dist/data/corpus.json`.
+3. Na página, a pessoa informa **título**, **resumo** e **palavras-chave** do
+   trabalho e recebe as **10 pessoas** com maior proximidade temática, numa
+   escala de **0 a 1**, em ordem decrescente, com os termos em comum, a
+   titulação, a instituição e o número de bancas de mestrado registradas.
+
+Também é possível acrescentar XML/ZIP do próprio computador na aba
+**Currículos**; esses arquivos são lidos só no navegador.
+
+**Como a proximidade é calculada.** Cada currículo vira um vetor de termos
+(resumo, linhas de pesquisa, áreas do conhecimento, palavras-chave, títulos
+da formação, dos projetos, das produções e das orientações), com pesos por
+campo e peso menor para produções com mais de 10 anos. O trabalho informado
+vira outro vetor (palavras-chave e título pesam mais que o resumo). Os
+termos passam por remoção de acentos e de palavras vazias, radical leve e
+bigramas; a ponderação é TF-IDF e a proximidade é o cosseno entre os
+vetores (0 a 1). Filtros opcionais: desconsiderar a instituição do programa
+e manter só doutores. Código: `src/js/lattes-corpus.js` (extrator, schema
+`CurriculoLattes`, o mesmo do [lattesZen](https://github.com/alexsandroccarv/latteszen)),
+`src/js/similaridade.js` e `src/js/app.js`. Teste:
+`node tools/testar-similaridade.mjs`.
+
+---
+
+O restante deste documento descreve a base herdada do modelo **templateZen**
+(cabeçalho, rodapé, temas, CI/CD).
 
 ## O que vem pronto
 

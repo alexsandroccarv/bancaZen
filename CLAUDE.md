@@ -1,9 +1,20 @@
-# Projeto: templateZen
+# Projeto: BuscaBanca (PROFIAP)
 
 ## Visão geral
-Template reutilizável de cabeçalho, rodapé, estrutura de arquivos e CI/CD
-(build + deploy via SSH) para começar novos projetos web a partir de uma
-base pronta.
+Aplicação web estática que indica membros externos para banca de defesa de
+mestrado: processa currículos Lattes (XML/ZIP em `lattes/`) e, a partir do
+título, resumo e palavras-chave do trabalho, lista as 10 pessoas com maior
+proximidade temática (0 a 1, ordem decrescente). Base: modelo templateZen.
+
+## Lattes e proximidade
+- Extrator do XML Lattes: `src/js/lattes-corpus.js` (mesmo arquivo no
+  navegador e no `build.mjs`; tags do schema `CurriculoLattes`, o mesmo do
+  lattesZen). Não extrair dados de contato.
+- Proximidade (TF-IDF + cosseno, pesos por campo e por recência):
+  `src/js/similaridade.js`. Interface: `src/js/app.js`.
+- Ao mudar extrator ou pesos, rodar `node tools/testar-similaridade.mjs`
+  (currículos fictícios em `tools/fixtures/`). Currículos reais não entram
+  em `tools/fixtures/`.
 
 ## Padrões de UI
 - Cabeçalho/rodapé (site estático HTML+JS): fonte única em `src/js/chrome.js`
@@ -60,8 +71,9 @@ base pronta.
 
 ## Comandos úteis
 - `node build.mjs` — monta a pasta `dist/` a partir de `src/` (injeta
-  versão/data, substitui `%SITE_URL%` e gera `sitemap.xml`).
+  versão/data, substitui `%SITE_URL%`, gera `sitemap.xml` e processa
+  `lattes/` em `dist/data/corpus.json`).
+- `node tools/testar-similaridade.mjs` — testa o extrator e a proximidade.
 - `node scripts/setup.mjs` — setup do novo projeto (placeholders).
 - `node tools/contrast-check.mjs` — audita o contraste (WCAG) dos temas.
 - `node --check src/js/*.js` — valida a sintaxe dos módulos JS.
-- (sem suíte de testes de comportamento configurada ainda)

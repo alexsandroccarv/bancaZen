@@ -7,6 +7,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Indicação de membros externos para banca de defesa de mestrado a partir de
+  currículos Lattes: os XML (ou ZIP exportados pela Plataforma Lattes) da
+  pasta `lattes/` são processados no build (`dist/data/corpus.json`); a
+  pessoa usuária informa título, resumo e palavras-chave e a aplicação lista
+  as 10 pessoas com maior proximidade temática (TF-IDF com cosseno, de 0 a 1),
+  em ordem decrescente, com os termos em comum. Filtros para desconsiderar a
+  instituição do programa e manter só doutores. Aba **Currículos** para
+  conferir os currículos e acrescentar XML/ZIP do computador (lidos só no
+  navegador). Teste em `tools/testar-similaridade.mjs`, executado na CI.
+  Projeto renomeado para **BuscaBanca**. [issue #1](../../issues/1)
+
 ### Alterado
 - Seção de temas reorganizada: de 16 paletas + "Padrão" para 9 temas
   nomeados — Catppuccin Latte, Catppuccin Mocha, Drácula, GitHub Light,
