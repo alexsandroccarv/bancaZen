@@ -5,8 +5,10 @@
    2. Permite acrescentar XML/ZIP do computador (lidos só no navegador).
    3. Recebe título, resumo e palavras-chave e exibe as 10 pessoas com maior
       proximidade temática (0 a 1), em ordem decrescente.
-   Depende de: lattes-corpus.js (window.LattesCorpus) e similaridade.js
-   (window.Similaridade).
+   4. Conformidade ética: recebe o Lattes da pessoa discente e da orientação
+      e retira da lista quem tem vínculo com elas (exibido à parte).
+   Depende de: lattes-corpus.js (window.LattesCorpus), similaridade.js
+   (window.Similaridade) e vinculos.js (window.Vinculos).
    ========================================================================== */
 (function () {
     const LIMITE = 10;
@@ -15,6 +17,13 @@
     let doServidor = [];
     let locais = [];
     let indice = null;
+    // Currículos lidos de arquivo para a verificação de vínculos.
+    const ENVOLVIDOS = [
+        { chave: 'discente', papel: 'Discente', obrigatorio: true },
+        { chave: 'orientador', papel: 'Orientador(a)', obrigatorio: true },
+        { chave: 'coorientador', papel: 'Coorientador(a)', obrigatorio: false },
+    ];
+    const lidosDeArquivo = {};
 
     function todos() {
         // O mesmo currículo em duas fontes: vale a atualização mais recente.
@@ -102,6 +111,41 @@
         reindexar();
     }
 
+    /* ------------------------- discente e orientação ---------------------- */
+    async function lerEnvolvido(env, file) {
+        const status = $(`#${env.chave}Status`);
+        delete lidosDeArquivo[env.chave];
+        if (!file) { status.textContent = ''; return; }
+        try {
+            const [p] = await window.LattesCorpus.lerArquivo(file.name, await file.arrayBuffer());
+            lidosDeArquivo[env.chave] = p;
+            status.textContent = `Currículo lido: ${p.nome}.`;
+        } catch (e) {
+            status.textContent = `Não foi possível ler ${file.name} (${e.message}).`;
+        }
+    }
+
+    // Arquivo enviado tem prioridade; senão, procura o link/ID na base.
+    function resolverEnvolvidos() {
+        const lista = [];
+        const faltando = [];
+        for (const env of ENVOLVIDOS) {
+            let pessoa = lidosDeArquivo[env.chave] || null;
+            const texto = $(`#${env.chave}Id`).value.trim();
+            if (!pessoa && texto) {
+                const id = (texto.match(/\d{16}/) || [])[0];
+                pessoa = id ? todos().find((p) => p.id === id) || null : null;
+                $(`#${env.chave}Status`).textContent = pessoa
+                    ? `Currículo encontrado na base: ${pessoa.nome}.`
+                    : 'Currículo não encontrado na base. Envie o arquivo XML ou ZIP do Lattes.';
+                if (!pessoa) { faltando.push(env.papel); continue; }
+            }
+            if (pessoa) lista.push({ papel: env.papel, pessoa });
+            else if (env.obrigatorio) faltando.push(env.papel);
+        }
+        return { lista, faltando };
+    }
+
     /* -------------------------------- busca ------------------------------- */
     function separarPalavras(s) {
         return String(s || '').split(/[;,\n]/).map((x) => x.trim()).filter(Boolean);
@@ -122,21 +166,72 @@
             $('#tituloInput').focus();
             return;
         }
+        const envolvidos = resolverEnvolvidos();
+        if (envolvidos.faltando.length) {
+            erro.textContent = `Informe o currículo Lattes de: ${envolvidos.faltando.join(', ')}.`;
+            erro.classList.remove('hidden');
+            $(`#${ENVOLVIDOS.find((e) => envolvidos.faltando.includes(e.papel)).chave}Arquivo`).focus();
+            return;
+        }
         if (!indice) return;
-        const { resultados, avaliados } = window.Similaridade.buscar(indice, consulta, {
-            limite: LIMITE,
+        const { resultados: ranking, avaliados } = window.Similaridade.buscar(indice, consulta, {
+            limite: Infinity,
             excluirInstituicao: $('#excluirInput').value,
             somenteDoutores: $('#doutoresInput').checked,
         });
+        // Percorre o ranking completo: quem tem vínculo sai da lista (e é
+        // exibido à parte) até completar as 10 pessoas sem vínculo.
+        const periodo = parseInt($('#periodoInput').value, 10);
+        const desdeAno = periodo ? new Date().getFullYear() - periodo + 1 : 0;
+        const resultados = [];
+        const retirados = [];
+        for (const r of ranking) {
+            if (resultados.length >= LIMITE) break;
+            const vinculos = window.Vinculos.verificar(r.pessoa, envolvidos.lista, { desdeAno });
+            if (vinculos.length) retirados.push({ ...r, vinculos });
+            else resultados.push(r);
+        }
         renderResultados(resultados, avaliados);
+        renderRetirados(retirados);
+    }
+
+    function descreverVinculo(v) {
+        const det = v.detalhes || [];
+        if (v.tipo === 'mesma pessoa') return `${v.papel}: é o currículo da própria pessoa.`;
+        if (v.tipo === 'coautoria') {
+            const anos = det.map((d) => parseInt(d.a, 10)).filter(Boolean);
+            const titulos = det.slice(0, 3).map((d) => `“${d.t}”${d.a ? ` (${d.a})` : ''}`).join('; ');
+            return `${v.papel}: coautoria em ${det.length} ${det.length === 1 ? 'publicação' : 'publicações'}` +
+                (anos.length ? `, a mais recente em ${Math.max(...anos)}` : '') +
+                `. ${titulos}${det.length > 3 ? '; …' : ''}`;
+        }
+        return `${v.papel}: ${det.map((d) => d.t + (d.a ? ` (${d.a})` : '')).join('; ')}.`;
+    }
+
+    function renderRetirados(retirados) {
+        const box = $('#retirados');
+        box.classList.toggle('hidden', !retirados.length);
+        $('#retiradosLista').innerHTML = retirados.map((r) => {
+            const url = urlLattes(r.pessoa);
+            const nome = url
+                ? `<a href="${url}" target="_blank" rel="noopener" class="hover:underline">${esc(r.pessoa.nome)}</a>`
+                : esc(r.pessoa.nome);
+            const itens = r.vinculos.map((v) => `<li>
+                <span class="badge ${v.certeza === 'confirmado' ? 'vinculo-confirmado' : 'vinculo-provavel'}">${v.certeza === 'confirmado' ? 'confirmado' : 'provável'}</span>
+                ${esc(descreverVinculo(v))}</li>`).join('');
+            return `<li>
+                <p class="font-semibold">${nome} <span class="font-mono font-normal text-sm">(${fmt.format(r.score)})</span></p>
+                <ul class="text-sm space-y-1 mt-1">${itens}</ul>
+            </li>`;
+        }).join('');
     }
 
     function renderResultados(resultados, avaliados) {
         const sec = $('#resultado');
         sec.classList.remove('hidden');
         $('#resultadoResumo').textContent = resultados.length
-            ? `${resultados.length} de ${avaliados} currículo(s) avaliado(s), da maior para a menor proximidade (0 a 1).`
-            : `Nenhum dos ${avaliados} currículo(s) avaliado(s) tem termos em comum com o trabalho informado.`;
+            ? `${resultados.length} de ${avaliados} currículo(s) avaliado(s), da maior para a menor proximidade (0 a 1), sem vínculo identificado.`
+            : `Nenhum dos ${avaliados} currículo(s) avaliado(s) tem termos em comum com o trabalho informado sem ter vínculo com a pessoa discente ou com a orientação.`;
         $('#resultadoLista').innerHTML = resultados.map((r, i) => {
             const p = r.pessoa;
             const url = urlLattes(p);
@@ -174,6 +269,12 @@
         $('#buscaForm').addEventListener('submit', buscar);
         for (const id of ['#arquivosInput', '#pastaInput']) {
             $(id).addEventListener('change', (e) => { adicionarArquivos(e.target.files); e.target.value = ''; });
+        }
+        for (const env of ENVOLVIDOS) {
+            $(`#${env.chave}Arquivo`).addEventListener('change', (e) => lerEnvolvido(env, e.target.files[0]));
+            $(`#${env.chave}Id`).addEventListener('input', () => {
+                if (!lidosDeArquivo[env.chave]) $(`#${env.chave}Status`).textContent = '';
+            });
         }
         $('#limparLocaisBtn').addEventListener('click', () => {
             locais = [];

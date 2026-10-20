@@ -12,8 +12,13 @@ proximidade temática (0 a 1, ordem decrescente). Base: modelo templateZen.
   lattesZen). Não extrair dados de contato.
 - Proximidade (TF-IDF + cosseno, pesos por campo e por recência):
   `src/js/similaridade.js`. Interface: `src/js/app.js`.
+- Conformidade ética (vínculos por coautoria, orientação ou mesma pessoa
+  com discente/orientação): `src/js/vinculos.js`. Pessoa com vínculo nunca
+  entra nas 10; aparece à parte com o motivo. "Confirmado" = ID Lattes ou
+  nome completo; "provável" = sobrenome + ao menos duas iniciais.
 - Ao mudar extrator ou pesos, rodar `node tools/testar-similaridade.mjs`
-  (currículos fictícios em `tools/fixtures/`). Currículos reais não entram
+  (currículos fictícios em `tools/fixtures/`; discente e orientadora em
+  `tools/fixtures/envolvidos/`). Currículos reais não entram
   em `tools/fixtures/`.
 
 ## Padrões de UI

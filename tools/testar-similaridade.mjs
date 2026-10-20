@@ -3,7 +3,9 @@
    --------------------------------------------------------------------------
    Processa os currículos fictícios de tools/fixtures/ (XML e ZIP) e confere:
    extração dos campos, faixa da proximidade (0 a 1), ordenação, limite de
-   resultados e filtros. Uso: node tools/testar-similaridade.mjs
+   resultados, filtros e a verificação de vínculos (coautoria, orientação e
+   mesma pessoa) com a aluna e a orientadora de tools/fixtures/envolvidos/.
+   Uso: node tools/testar-similaridade.mjs
    ========================================================================== */
 import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -14,10 +16,11 @@ import assert from 'node:assert/strict';
 const require = createRequire(import.meta.url);
 const LattesCorpus = require('../src/js/lattes-corpus.js');
 const Similaridade = require('../src/js/similaridade.js');
+const Vinculos = require('../src/js/vinculos.js');
 
 const dir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
 const pessoas = [];
-for (const f of readdirSync(dir).sort()) {
+for (const f of readdirSync(dir).filter((f) => /\.(xml|zip)$/.test(f)).sort()) {
     pessoas.push(...await LattesCorpus.lerArquivo(f, readFileSync(join(dir, f))));
 }
 
@@ -54,6 +57,29 @@ assert.ok(semInst.every((r) => !/Federal Exemplo/.test(r.pessoa.instituicao)), '
 const doutores = Similaridade.buscar(indice, consulta, { somenteDoutores: true }).resultados;
 assert.ok(doutores.every((r) => r.pessoa.nivel >= 5), 'somente doutores');
 
+// Vínculos
+const ler = async (f) => (await LattesCorpus.lerArquivo(f, readFileSync(join(dir, 'envolvidos', f))))[0];
+const aluna = await ler('aluna.xml');
+const orientadora = await ler('orientadora.xml');
+assert.deepEqual(orientadora.citacoes, ['PRADO, O. O.', 'Prado, Olga Orientadora']);
+assert.equal(orientadora.producoes[0].au.length, 2, 'autores da produção');
+assert.equal(orientadora.orientacoes[0].o, 'Maria Discente Rocha', 'orientando da orientação em andamento');
+assert.equal(aluna.orientadores[0].n, 'Diego Suposto Alves', 'orientador da graduação');
+
+const envolvidos = [{ papel: 'Aluna', pessoa: aluna }, { papel: 'Orientadora', pessoa: orientadora }];
+const porId = (id) => pessoas.find((p) => p.id === id);
+const tipos = (v) => v.map((x) => `${x.papel}:${x.tipo}:${x.certeza}`).sort();
+
+assert.deepEqual(tipos(Vinculos.verificar(porId('0000000000000001'), envolvidos)), ['Orientadora:coautoria:confirmado'], 'coautoria pelo ID Lattes');
+assert.deepEqual(tipos(Vinculos.verificar(porId('0000000000000005'), envolvidos)), [], 'ID diferente: sem vínculo, mesmo com nome parecido');
+assert.deepEqual(tipos(Vinculos.verificar(porId('0000000000000003'), envolvidos)), ['Orientadora:coautoria:provável'], 'coautoria pelo nome em citação');
+assert.deepEqual(tipos(Vinculos.verificar(porId('0000000000000004'), envolvidos)), ['Aluna:orientação:confirmado'], 'orientação na graduação');
+assert.deepEqual(tipos(Vinculos.verificar(porId('0000000000000002'), envolvidos)), ['Orientadora:coautoria:confirmado'], 'coautoria pelo nome completo');
+assert.deepEqual(tipos(Vinculos.verificar(porId('0000000000000002'), envolvidos, { desdeAno: 2021 })), [], 'coautoria antiga fora do período');
+assert.deepEqual(tipos(Vinculos.verificar(orientadora, envolvidos)), ['Aluna:orientação:confirmado', 'Orientadora:mesma pessoa:confirmado'], 'a própria orientadora');
+assert.ok(!Vinculos.chavesCombinam(Vinculos.chave('SILVA, J.'), Vinculos.chave('João Pedro Silva')), 'uma inicial só não basta');
+assert.ok(Vinculos.chavesCombinam(Vinculos.chave('SILVA, J. P.'), Vinculos.chave('João Pedro da Silva Junior')), 'partículas e sufixos');
+
 console.log('Ranking da consulta de teste:');
 for (const r of resultados) console.log(`  ${r.score.toFixed(3)}  ${r.pessoa.nome}  [${r.termos.join(', ')}]`);
-console.log('OK: extrator e proximidade conferidos.');
+console.log('OK: extrator, proximidade e vínculos conferidos.');

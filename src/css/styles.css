@@ -194,6 +194,10 @@ html.tz-theme .cafe-doc {
 html.tz-theme .score-bar { background: var(--tz-border); }
 html.tz-theme .score-bar > span { background: var(--tz-accent); }
 
+/* Selos de certeza do vínculo (conformidade ética). */
+.vinculo-confirmado { background: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
+.vinculo-provavel { background: #fef3c7; color: #78350f; border: 1px solid #fcd34d; }
+
 /* Oculto na tela, disponível para leitores de tela (também sem o Tailwind). */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
            clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

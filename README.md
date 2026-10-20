@@ -12,6 +12,17 @@ mestrado** a partir de currículos Lattes.
    escala de **0 a 1**, em ordem decrescente, com os termos em comum, a
    titulação, a instituição e o número de bancas de mestrado registradas.
 
+**Conformidade ética.** A pessoa discente informa o próprio currículo
+Lattes e o da orientação (orientador(a) obrigatório, coorientador(a)
+opcional), por arquivo XML/ZIP ou pelo link/ID de um currículo que já está
+na base. Quem tem coautoria em publicações (procurada nos currículos dos
+dois lados), relação de orientação com alguma dessas pessoas, ou é uma
+delas, sai da lista das 10 e aparece à parte, com o motivo. O vínculo é
+"confirmado" quando a pessoa é identificada pelo ID Lattes ou pelo nome
+completo, e "provável" quando só o sobrenome e as iniciais coincidem (pode
+ser homônimo). O período das coautorias é configurável (todo o período, 10
+ou 5 anos). Código: `src/js/vinculos.js`.
+
 Também é possível acrescentar XML/ZIP do próprio computador na aba
 **Currículos**; esses arquivos são lidos só no navegador.
 
@@ -25,7 +36,7 @@ bigramas; a ponderação é TF-IDF e a proximidade é o cosseno entre os
 vetores (0 a 1). Filtros opcionais: desconsiderar a instituição do programa
 e manter só doutores. Código: `src/js/lattes-corpus.js` (extrator, schema
 `CurriculoLattes`, o mesmo do [lattesZen](https://github.com/alexsandroccarv/latteszen)),
-`src/js/similaridade.js` e `src/js/app.js`. Teste:
+`src/js/similaridade.js`, `src/js/vinculos.js` e `src/js/app.js`. Teste:
 `node tools/testar-similaridade.mjs`.
 
 ---

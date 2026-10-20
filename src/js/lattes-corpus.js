@@ -12,6 +12,10 @@
    o que permite usar este mesmo arquivo no navegador e no Node (build.mjs),
    sem DOMParser e sem dependências.
 
+   Para a verificação de vínculos (js/vinculos.js) também são guardados os
+   autores de cada produção, quem orientou a pessoa na formação e quem ela
+   orientou (nome e identificador Lattes, quando informados).
+
    Dados de contato (e-mail, telefone, endereço) NÃO são extraídos.
    ========================================================================== */
 (function (root, factory) {
@@ -103,6 +107,11 @@
         while ((m = ATTR_RE.exec(src))) o[m[1]] = unescapeXml(m[2] ?? m[3] ?? '');
         return o;
     }
+    // Remove campos vazios (o corpus.json fica menor).
+    function compacto(o) {
+        for (const k of Object.keys(o)) if (o[k] == null || o[k] === '') delete o[k];
+        return o;
+    }
     function pick(o, keys) {
         for (const k of keys) if (o[k]) return o[k];
         return '';
@@ -142,12 +151,15 @@
     // Recebe o texto do XML e devolve um registro compacto da pessoa.
     function parse(xml, origem) {
         const p = {
-            id: '', nome: '', origem: origem || '', atualizacao: '',
+            id: '', nome: '', citacoes: [], origem: origem || '', atualizacao: '',
             instituicao: '', unidade: '', cidade: '', uf: '',
             titulacao: '', nivel: 0, bancasMestrado: 0, bancasDoutorado: 0,
             resumo: '', linhas: [], projetos: [], areas: [], palavrasChave: [],
-            formacao: [], producoes: [], orientacoes: [],
+            formacao: [], producoes: [], orientacoes: [], orientadores: [],
         };
+        // Produção/orientação aberta: recebe os AUTORES e o DETALHAMENTO que
+        // vêm logo depois do DADOS-BASICOS no mesmo elemento.
+        let ultimo = null;
         const stack = [];
         const areas = new Set();
         const pcs = new Set();
@@ -172,6 +184,7 @@
                 if (d.length === 8) p.atualizacao = `${d.slice(4, 8)}-${d.slice(2, 4)}-${d.slice(0, 2)}`;
             } else if (tag === 'DADOS-GERAIS') {
                 p.nome = a['NOME-COMPLETO'] || '';
+                p.citacoes = (a['NOME-EM-CITACOES-BIBLIOGRAFICAS'] || '').split(';').map(x => x.trim()).filter(Boolean);
             } else if (tag === 'RESUMO-CV') {
                 p.resumo = stripHtml(a['TEXTO-RESUMO-CV-RICO'] || '');
             } else if (tag === 'ENDERECO-PROFISSIONAL') {
@@ -187,6 +200,14 @@
                 }
                 const titulo = a['TITULO-DA-DISSERTACAO-TESE'] || a['TITULO-DO-TRABALHO-DE-CONCLUSAO-DE-CURSO'] || a['TITULO-DO-TRABALHO'] || '';
                 if (titulo) p.formacao.push({ t: titulo, a: a['ANO-DE-CONCLUSAO'] || '' });
+                const nivel = TITULACOES.find(([t]) => t === tag)[1];
+                const orientador = a['NOME-COMPLETO-DO-ORIENTADOR'] || a['NOME-DO-ORIENTADOR'] || '';
+                if (orientador || a['NUMERO-ID-ORIENTADOR']) {
+                    p.orientadores.push(compacto({ n: orientador, id: a['NUMERO-ID-ORIENTADOR'], a: a['ANO-DE-CONCLUSAO'], nivel }));
+                }
+                if (a['NOME-DO-CO-ORIENTADOR']) {
+                    p.orientadores.push(compacto({ n: a['NOME-DO-CO-ORIENTADOR'], a: a['ANO-DE-CONCLUSAO'], nivel, co: 1 }));
+                }
             } else if (tag === 'LINHA-DE-PESQUISA') {
                 const t = [a['TITULO-DA-LINHA-DE-PESQUISA'], a['OBJETIVOS-LINHA-DE-PESQUISA']].filter(Boolean).join('. ');
                 if (t) p.linhas.push(t);
@@ -210,7 +231,18 @@
             } else if (tag.indexOf('DADOS-BASICOS') === 0) {
                 const secao = secaoDaProducao(stack);
                 const titulo = pick(a, TITLE_KEYS);
-                if (secao && titulo) p[secao].push({ t: titulo, a: pick(a, YEAR_KEYS) });
+                ultimo = null;
+                if (secao && titulo) {
+                    ultimo = { t: titulo, a: pick(a, YEAR_KEYS) };
+                    p[secao].push(ultimo);
+                }
+            } else if (tag === 'AUTORES' && ultimo) {
+                (ultimo.au = ultimo.au || []).push(compacto({
+                    n: a['NOME-COMPLETO-DO-AUTOR'], c: a['NOME-PARA-CITACAO'], id: a['NRO-ID-CNPQ'],
+                }));
+            } else if (tag.indexOf('DETALHAMENTO') === 0 && ultimo) {
+                const orientado = a['NOME-DO-ORIENTADO'] || a['NOME-DO-ORIENTANDO'];
+                if (orientado) { ultimo.o = orientado; if (a['NUMERO-ID-ORIENTADO']) ultimo.oid = a['NUMERO-ID-ORIENTADO']; }
             }
 
             if (!selfClosing) stack.push(tag);

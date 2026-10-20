@@ -102,7 +102,7 @@
                     <p>
                         Informe o título, o resumo e as palavras-chave do seu trabalho. A ferramenta compara esses
                         dados com os currículos Lattes disponíveis e lista as 10 pessoas com maior proximidade
-                        temática, numa escala de 0 a 1.
+                        temática, numa escala de 0 a 1, sem vínculo com você nem com a sua orientação.
                     </p>
                     <p id="corpusStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Carregando os currículos…</p>
                 </div>
@@ -121,6 +121,65 @@
                         <input id="palavrasInput" type="text" aria-describedby="palavrasAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <p id="palavrasAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separe por ponto e vírgula ou vírgula. Ex.: governança pública; transparência; controle social</p>
                     </div>
+                    <fieldset class="border border-gray-200 dark:border-gray-700 rounded p-4 space-y-4">
+                        <legend class="text-sm font-semibold px-1">Conformidade ética: vínculos</legend>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Informe o currículo Lattes da pessoa discente e da orientação. Pessoas com coautoria em
+                            publicações ou relação de orientação com alguma delas são retiradas da lista e aparecem
+                            à parte, com o motivo.
+                        </p>
+                        <div class="envolvido space-y-1" data-papel="discente">
+                            <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-red-700 dark:text-red-400" aria-hidden="true">*</span></p>
+                            <div class="grid gap-2 sm:grid-cols-2">
+                                <div>
+                                    <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
+                                    <input id="discenteArquivo" type="file" accept=".xml,.zip" aria-describedby="discenteRotulo discenteStatus" class="block w-full text-sm">
+                                </div>
+                                <div>
+                                    <label for="discenteId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
+                                    <input id="discenteId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="discenteRotulo discenteStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                </div>
+                            </div>
+                            <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
+                        </div>
+                        <div class="envolvido space-y-1" data-papel="orientador">
+                            <p class="text-sm font-medium" id="orientadorRotulo">Orientador(a) <span class="text-red-700 dark:text-red-400" aria-hidden="true">*</span></p>
+                            <div class="grid gap-2 sm:grid-cols-2">
+                                <div>
+                                    <label for="orientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
+                                    <input id="orientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="orientadorRotulo orientadorStatus" class="block w-full text-sm">
+                                </div>
+                                <div>
+                                    <label for="orientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
+                                    <input id="orientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="orientadorRotulo orientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                </div>
+                            </div>
+                            <p id="orientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
+                        </div>
+                        <div class="envolvido space-y-1" data-papel="coorientador">
+                            <p class="text-sm font-medium" id="coorientadorRotulo">Coorientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                            <div class="grid gap-2 sm:grid-cols-2">
+                                <div>
+                                    <label for="coorientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
+                                    <input id="coorientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="coorientadorRotulo coorientadorStatus" class="block w-full text-sm">
+                                </div>
+                                <div>
+                                    <label for="coorientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
+                                    <input id="coorientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                </div>
+                            </div>
+                            <p id="coorientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
+                        </div>
+                        <div>
+                            <label for="periodoInput" class="block text-sm mb-1">Coautorias consideradas</label>
+                            <select id="periodoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <option value="0">Todo o período</option>
+                                <option value="10">Últimos 10 anos</option>
+                                <option value="5">Últimos 5 anos</option>
+                            </select>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Relações de orientação valem em qualquer período.</p>
+                        </div>
+                    </fieldset>
                     <fieldset class="border border-gray-200 dark:border-gray-700 rounded p-4 space-y-3">
                         <legend class="text-sm font-semibold px-1">Critérios para membro externo</legend>
                         <div>
@@ -141,6 +200,15 @@
                     <h2 id="resultadoTitulo" class="text-lg font-bold">Pessoas mais próximas do tema</h2>
                     <p id="resultadoResumo" class="text-sm text-gray-600 dark:text-gray-400"></p>
                     <ol id="resultadoLista" class="list-none p-0 space-y-3"></ol>
+                    <div id="retirados" class="hidden rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-gray-800 p-4 space-y-2">
+                        <h3 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Retiradas por vínculo (conformidade ética)</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Estas pessoas teriam proximidade suficiente para a lista, mas têm vínculo com a pessoa discente
+                            ou com a orientação. Vínculo "provável" foi identificado só pelo nome em citação e pode ser
+                            homônimo: confira no Lattes antes de descartar.
+                        </p>
+                        <ul id="retiradosLista" class="space-y-3"></ul>
+                    </div>
                     <details class="text-sm text-gray-600 dark:text-gray-400">
                         <summary class="cursor-pointer font-medium">Como a proximidade é calculada</summary>
                         <div class="mt-2 space-y-2">
@@ -155,6 +223,13 @@
                                 produções com mais de 10 anos pesam menos. A proximidade é o cosseno entre os dois
                                 perfis: 0 indica nenhum termo em comum e 1 indica o mesmo perfil de termos. A lista
                                 ajuda a encontrar nomes; a escolha da banca segue as regras do seu programa.
+                            </p>
+                            <p>
+                                Conformidade ética: a pessoa é retirada da lista quando há coautoria em publicação
+                                (procurada nos currículos dos dois lados) ou relação de orientação com a pessoa discente,
+                                o(a) orientador(a) ou o(a) coorientador(a). O vínculo é "confirmado" quando a pessoa é
+                                identificada pelo ID Lattes ou pelo nome completo, e "provável" quando só o sobrenome e
+                                as iniciais coincidem.
                             </p>
                         </div>
                     </details>
@@ -259,6 +334,7 @@
     <script src="js/layout.js"></script>
     <script src="js/lattes-corpus.js"></script>
     <script src="js/similaridade.js"></script>
+    <script src="js/vinculos.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

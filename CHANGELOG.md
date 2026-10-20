@@ -18,6 +18,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   conferir os currículos e acrescentar XML/ZIP do computador (lidos só no
   navegador). Teste em `tools/testar-similaridade.mjs`, executado na CI.
   Projeto renomeado para **BuscaBanca**. [issue #1](../../issues/1)
+- Conformidade ética: a pessoa discente informa o próprio Lattes e o da
+  orientação (orientador(a) obrigatório, coorientador(a) opcional), por
+  arquivo XML/ZIP ou link/ID de currículo já na base. Pessoas com coautoria
+  em publicações (procurada nos dois currículos), relação de orientação ou
+  que sejam a própria envolvida saem da lista e aparecem à parte com o
+  motivo, e a lista é completada com as próximas sem vínculo. Identificação
+  "confirmada" (ID Lattes ou nome completo) ou "provável" (sobrenome e
+  iniciais); período de coautoria configurável. Novo `src/js/vinculos.js`.
+  [issue #2](../../issues/2)
 
 ### Alterado
 - Seção de temas reorganizada: de 16 paletas + "Padrão" para 9 temas
