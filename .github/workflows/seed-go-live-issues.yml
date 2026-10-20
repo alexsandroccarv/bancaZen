@@ -1,0 +1,56 @@
+name: Semear issues de Go-Live (v1.0.0)
+
+# Cria, no repositório atual, as tarefas obrigatórias antes do lançamento da
+# v1.0.0 (a partir de .github/go-live-issues.json). Como issues não são
+# copiadas pelo "Use this template", rode este workflow UMA VEZ no novo
+# repositório: aba Actions → "Semear issues de Go-Live (v1.0.0)" → Run workflow.
+# É idempotente: pula issues cujo título já exista (aberta ou fechada).
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Criar as issues de Go-Live
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const items = JSON.parse(fs.readFileSync('.github/go-live-issues.json', 'utf8'));
+            const { owner, repo } = context.repo;
+
+            // Garante que os rótulos existam (ignora se já existirem).
+            const colors = { 'go-live': '0e8a16', juridico: '5319e7', documentacao: '1d76db', suporte: 'fbca04', engenharia: 'b60205' };
+            const labels = [...new Set(items.flatMap(i => i.labels))];
+            for (const name of labels) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name, color: colors[name] || 'ededed' });
+                core.info(`Rótulo criado: ${name}`);
+              } catch (e) {
+                if (e.status !== 422) throw e; // 422 = já existe
+              }
+            }
+
+            // Índice de títulos existentes (abertas + fechadas) para não duplicar.
+            const existing = new Set();
+            for await (const res of github.paginate.iterator(github.rest.issues.listForRepo, { owner, repo, state: 'all', per_page: 100 })) {
+              for (const it of res.data) if (!it.pull_request) existing.add(it.title);
+            }
+
+            let criadas = 0, puladas = 0;
+            for (const it of items) {
+              if (existing.has(it.title)) { core.info(`Pulada (já existe): ${it.title}`); puladas++; continue; }
+              await github.rest.issues.create({ owner, repo, title: it.title, body: it.body, labels: it.labels });
+              core.info(`Criada: ${it.title}`);
+              criadas++;
+            }
+            core.notice(`Go-Live: ${criadas} issue(s) criada(s), ${puladas} pulada(s).`);

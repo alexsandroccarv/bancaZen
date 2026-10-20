@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo de uso — templateZen</title>
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        (function () {
+            const htmlEl = document.documentElement;
+            try {
+                if (localStorage.getItem('altoContraste') === '1') htmlEl.classList.add('high-contrast');
+                const fs = parseInt(localStorage.getItem('fontScale') || '100', 10);
+                if (fs && fs !== 100) htmlEl.style.fontSize = fs + '%';
+            } catch (e) { /* storage indisponível */ }
+        })();
+    </script>
+    <script src="js/cdn.js"></script>
+</head>
+<body data-page-title="Termo de uso" class="font-sans bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+    <div id="app-header"></div>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
+        <div class="max-w-3xl mx-auto space-y-6">
+            <h1 class="text-xl font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-file-contract text-brand-600 dark:text-accent-400"></i> Termo de uso</h1>
+            <p class="text-gray-600 dark:text-gray-400">As condições de uso do TemplateZen — o que você pode esperar da ferramenta e o que é de sua responsabilidade ao utilizá-la.</p>
+
+            <div class="border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-950/30 rounded p-3 text-sm">
+                <strong>Modelo a personalizar:</strong> este texto veio do template
+                (<strong>TemplateZen</strong> é um placeholder — substitua pelo nome do seu
+                produto) e deve ser <strong>revisado juridicamente</strong> antes de publicar.
+            </div>
+
+            <nav aria-label="Nesta página" class="text-sm">
+                <h2 class="font-semibold mb-1">Nesta página</h2>
+                <ol class="list-decimal list-inside space-y-0.5 text-brand-600 dark:text-accent-400">
+                    <li><a href="#aceitacao" class="hover:underline">Aceitação destes termos</a></li>
+                    <li><a href="#descricao" class="hover:underline">O que é o TemplateZen</a></li>
+                    <li><a href="#licenca" class="hover:underline">Software livre, sem garantia</a></li>
+                    <li><a href="#responsabilidade" class="hover:underline">Sua responsabilidade</a></li>
+                    <li><a href="#uso" class="hover:underline">Uso adequado</a></li>
+                    <li><a href="#dados" class="hover:underline">Dados pessoais</a></li>
+                    <li><a href="#terceiros" class="hover:underline">Serviços e links de terceiros</a></li>
+                    <li><a href="#propriedade" class="hover:underline">Propriedade intelectual</a></li>
+                    <li><a href="#alteracoes" class="hover:underline">Alterações deste termo</a></li>
+                    <li><a href="#legislacao" class="hover:underline">Legislação aplicável</a></li>
+                    <li><a href="#contato" class="hover:underline">Contato</a></li>
+                </ol>
+            </nav>
+
+            <section id="aceitacao" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-handshake text-brand-600 dark:text-accent-400"></i> 1. Aceitação destes termos</h2>
+                <p>Ao acessar e usar o TemplateZen, você concorda com as condições descritas neste Termo de Uso. Se não concordar com algum ponto, a recomendação é não utilizar a ferramenta.</p>
+            </section>
+
+            <section id="descricao" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-circle-info text-brand-600 dark:text-accent-400"></i> 2. O que é o TemplateZen</h2>
+                <p>O TemplateZen é um aplicativo web que roda inteiramente no seu navegador.
+                   <em>(Descreva aqui, ao personalizar, a finalidade real do seu produto.)</em></p>
+            </section>
+
+            <section id="licenca" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced text-brand-600 dark:text-accent-400"></i> 3. Software livre, sem garantia</h2>
+                <p>O TemplateZen é distribuído sob a licença indicada no arquivo
+                   <a href="https://github.com" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">LICENSE</a>
+                   do projeto e fornecido <strong>“no estado em que se encontra”</strong> (<em>as is</em>),
+                   <strong>sem garantias de qualquer tipo</strong>, expressas ou implícitas — inclusive quanto a
+                   adequação a uma finalidade específica, ausência de erros ou disponibilidade contínua.</p>
+            </section>
+
+            <section id="responsabilidade" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-triangle-exclamation text-brand-600 dark:text-accent-400"></i> 4. Sua responsabilidade</h2>
+                <p>Como o processamento ocorre localmente no seu navegador (veja a
+                   <a href="politicadeprivacidade.html" class="text-brand-600 dark:text-accent-400 hover:underline">Política de Privacidade</a>),
+                   <strong>você é responsável pela guarda e integridade dos seus dados</strong>. O mantenedor não se responsabiliza por:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Perda de dados ou preferências salvas no navegador.</li>
+                    <li>Erros, omissões ou inconsistências em qualquer conteúdo/documento produzido pela ferramenta — <strong>confira sempre</strong> antes de usar.</li>
+                </ul>
+            </section>
+
+            <section id="uso" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-circle-check text-brand-600 dark:text-accent-400"></i> 5. Uso adequado</h2>
+                <p>Use a ferramenta para os fins a que se destina. Não é permitido usá-la para fins ilícitos, para inserir informações falsas com intenção de fraude, ou para tentar comprometer a segurança/funcionamento do software ou de seu código-fonte.</p>
+            </section>
+
+            <section id="dados" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-lock text-brand-600 dark:text-accent-400"></i> 6. Dados pessoais</h2>
+                <p>O tratamento de dados está descrito na
+                   <a href="politicadeprivacidade.html" class="text-brand-600 dark:text-accent-400 hover:underline">Política de Privacidade</a>
+                   — em resumo, o app não tem servidor e as preferências que você define ficam no seu navegador.</p>
+            </section>
+
+            <section id="terceiros" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square text-brand-600 dark:text-accent-400"></i> 7. Serviços e links de terceiros</h2>
+                <p>O TemplateZen carrega bibliotecas públicas de terceiros (Tailwind CSS, Font Awesome e Google Fonts) e pode conter links externos — o repositório do projeto e, na página <a href="doeumcafe.html" class="text-brand-600 dark:text-accent-400 hover:underline">Doe um café</a>, um gerador de QR code Pix e links de parceiros/afiliados. O uso desses serviços está sujeito aos termos de cada um — o TemplateZen não tem controle sobre seu conteúdo, disponibilidade ou práticas.</p>
+            </section>
+
+            <section id="propriedade" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-code text-brand-600 dark:text-accent-400"></i> 8. Propriedade intelectual</h2>
+                <p>O código-fonte do TemplateZen está disponível no repositório do projeto, sob a licença indicada no <code>LICENSE</code>: qualquer pessoa pode ler, usar, modificar e redistribuir o código respeitando os termos dessa licença. Os dados que você inserir na ferramenta continuam sendo seus.</p>
+            </section>
+
+            <section id="alteracoes" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-clock-rotate-left text-brand-600 dark:text-accent-400"></i> 9. Alterações deste termo</h2>
+                <p>Qualquer alteração deste Termo fica registrada no histórico do repositório. A versão e a data no rodapé indicam a última atualização. O uso continuado após uma alteração implica concordância com o termo atualizado.</p>
+            </section>
+
+            <section id="legislacao" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-gavel text-brand-600 dark:text-accent-400"></i> 10. Legislação aplicável</h2>
+                <p>Este Termo é regido pelas leis da República Federativa do Brasil, incluindo a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018) no que se refere ao tratamento de dados pessoais.</p>
+            </section>
+
+            <section id="contato" class="space-y-2">
+                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-envelope text-brand-600 dark:text-accent-400"></i> 11. Contato</h2>
+                <p>Dúvidas sobre este Termo podem ser enviadas como uma issue no repositório do projeto — o mesmo canal usado para reportar bugs e sugerir funcionalidades.</p>
+            </section>
+        </div>
+    </main>
+
+    <div id="toasts" class="fixed bottom-16 right-4 z-50 flex flex-col gap-2" aria-live="polite"></div>
+    <div id="app-footer"></div>
+
+    <script src="js/version.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/chrome.js"></script>
+    <script src="js/layout.js"></script>
+</body>
+</html>

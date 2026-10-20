@@ -1,0 +1,47 @@
+[
+  {
+    "title": "[Jurídico e Compliance] - Termos de Uso (ToS) e Acordo de Licença (EULA)",
+    "labels": ["go-live", "juridico"],
+    "body": "**Descrição:**\nDocumento legal que define as regras de uso do produto pelos usuários finais, direitos e responsabilidades de ambas as partes e, se aplicável, os termos de licenciamento (EULA). Cobrir, no mínimo: identificação da empresa/responsável, descrição do serviço, uso aceitável, limitação de responsabilidade, propriedade intelectual, cancelamento/suspensão e foro/legislação (Brasil).\n\nO rodapé já reserva o link (`src/js/config.js` → `links.termsOfUse` → `termodeuso.html`) — falta redigir o conteúdo real e publicar.\n\n**Critérios de Aceite (DoD):**\n- [ ] Documento revisado por advogado(a)/consultoria jurídica\n- [ ] Cobre: identificação da empresa, uso aceitável, limitação de responsabilidade, propriedade intelectual e foro\n- [ ] Página `termodeuso.html` publicada e acessível pelo rodapé em produção\n- [ ] Data de vigência/última atualização visível\n- [ ] Processo definido para comunicar futuras alterações"
+  },
+  {
+    "title": "[Jurídico e Compliance] - Política de Privacidade (adequada à LGPD)",
+    "labels": ["go-live", "juridico"],
+    "body": "**Descrição:**\nComo o produto coleta, usa, armazena e compartilha dados pessoais, conforme a LGPD (Lei 13.709/2018). Identificar controlador, finalidade e base legal de cada tratamento, dados coletados (incl. preferências no `localStorage` — tema, alto contraste, escala de fonte — e cadastro/analytics futuros), prazo de retenção, direitos do titular e canal do encarregado (DPO).\n\nO rodapé já reserva o link (`links.privacyPolicy` → `politicadeprivacidade.html`).\n\n**Critérios de Aceite (DoD):**\n- [ ] Mapeamento dos dados pessoais tratados (incl. dados salvos no navegador)\n- [ ] Base legal de cada tratamento documentada\n- [ ] Canal do encarregado (DPO) definido e publicado\n- [ ] Documento revisado juridicamente à luz da LGPD\n- [ ] Página `politicadeprivacidade.html` publicada e acessível em produção"
+  },
+  {
+    "title": "[Jurídico e Compliance] - Aviso de Licenças de Terceiros (Open Source)",
+    "labels": ["go-live", "juridico"],
+    "body": "**Descrição:**\nInventário das bibliotecas/recursos de terceiros (ex.: Tailwind CSS e Font Awesome via CDN, e dependências futuras) com nome, versão, link e texto da licença. Cumprir atribuição (MIT, Apache 2.0 etc.) e verificar compatibilidade com a licença do projeto (ver `LICENSE`).\n\n**Critérios de Aceite (DoD):**\n- [ ] Inventário completo (diretas, via CDN e embutidas no `dist/`)\n- [ ] Texto/link da licença de cada dependência\n- [ ] Compatibilidade de licenças verificada (sem conflito)\n- [ ] Arquivo `THIRD-PARTY-NOTICES.md` criado e acessível\n- [ ] Processo para atualizar o aviso a cada nova dependência"
+  },
+  {
+    "title": "[Documentação para o Usuário Final] - Guia de Início Rápido (Quick Start) e Manual do Usuário",
+    "labels": ["go-live", "documentacao"],
+    "body": "**Descrição:**\nMaterial para usuário final (não dev): Quick Start (1 página) + Manual completo (índice e capturas), cobrindo os recursos da interface (abas, tema, alto contraste, ajuste de fonte).\n\n**Critérios de Aceite (DoD):**\n- [ ] Quick Start em no máximo 1 página / 5 passos\n- [ ] Manual cobre todas as funcionalidades visíveis\n- [ ] Capturas/GIFs atualizados com a interface atual\n- [ ] Linguagem revisada para público não técnico\n- [ ] Publicado e acessível a partir do produto (aba Sobre ou rodapé)"
+  },
+  {
+    "title": "[Documentação para o Usuário Final] - Notas de Versão (Release Notes da v1.0)",
+    "labels": ["go-live", "documentacao"],
+    "body": "**Descrição:**\nComunicado público das mudanças da v1.0 em linguagem acessível (diferente do `CHANGELOG.md` técnico): principais funcionalidades, mudanças de comportamento e problemas conhecidos, consistente com `VERSION`.\n\n**Critérios de Aceite (DoD):**\n- [ ] Release Notes em linguagem não técnica\n- [ ] Principais funcionalidades e known issues documentados\n- [ ] Consistência com `CHANGELOG.md` e `VERSION`\n- [ ] Publicadas nos canais com usuários\n- [ ] Aprovadas pelo PM/responsável"
+  },
+  {
+    "title": "[Suporte e Operações] - Base de Conhecimento Interna (Troubleshooting Nível 1 e 2)",
+    "labels": ["go-live", "suporte"],
+    "body": "**Descrição:**\nArtigos de solução de problemas para N1 (uso comum) e N2 (técnicos — ex.: tema/alto contraste não persistindo, fonte não aplicando, falha de publicação no CI/CD). Cada artigo: sintomas, causas, diagnóstico, solução e critério de escalonamento.\n\n**Critérios de Aceite (DoD):**\n- [ ] Pelo menos 10 artigos dos problemas mais prováveis\n- [ ] Organizados por categoria e nível (N1 vs N2)\n- [ ] Critério claro de quando N1 vira N2\n- [ ] Base revisada pelas equipes de suporte\n- [ ] Local de acesso definido e divulgado"
+  },
+  {
+    "title": "[Suporte e Operações] - Definição de SLA e Matriz de Escalonamento (Nível 1, 2 e 3)",
+    "labels": ["go-live", "suporte"],
+    "body": "**Descrição:**\nSLA (tempo de resposta/resolução por severidade) e caminho de escalonamento (N1 → N2 → N3/Engenharia), com responsáveis, canais e horário de cobertura (on-call).\n\n**Critérios de Aceite (DoD):**\n- [ ] Tempos de resposta/resolução por severidade\n- [ ] Matriz de escalonamento (responsáveis e canais) para N1/N2/N3\n- [ ] Horário de cobertura (on-call) por nível\n- [ ] Documento aprovado por Suporte e Engenharia\n- [ ] Escalonamento testado em simulado (dry-run)"
+  },
+  {
+    "title": "[Engenharia e Infraestrutura] - Plano de Rollback",
+    "labels": ["go-live", "engenharia"],
+    "body": "**Descrição:**\nProcedimento para reverter rapidamente uma versão em produção em caso de falha crítica, considerando o pipeline atual (`deploy.yml` + `deploy.sh`, que publica `dist/` via `rsync --delete`). Definir critérios de acionamento, passos técnicos, tempo estimado e responsáveis.\n\n**Critérios de Aceite (DoD):**\n- [ ] Critérios objetivos para acionar rollback\n- [ ] Passo a passo técnico (ex.: reverter para a tag/commit anterior e reexecutar o workflow)\n- [ ] Backup da versão anterior do `DEPLOY_PATH` antes de cada deploy\n- [ ] Rollback testado em homologação\n- [ ] Responsáveis e RTO definidos e comunicados"
+  },
+  {
+    "title": "[Engenharia e Infraestrutura] - Plano de Recuperação de Desastres (DRP - Backup e Restauração)",
+    "labels": ["go-live", "engenharia"],
+    "body": "**Descrição:**\nContinuidade em caso de perda de dados, indisponibilidade ou desastre — backup do servidor onde o `DEPLOY_PATH` é publicado (código, configs Nginx/Apache, certificados e eventuais dados de usuário) e restauração completa do zero.\n\n**Critérios de Aceite (DoD):**\n- [ ] Estratégia de backup definida (o quê, frequência, onde, retenção)\n- [ ] RTO e RPO definidos e aprovados\n- [ ] Procedimento de restauração completo documentado\n- [ ] Teste de restauração executado e registrado\n- [ ] Plano revisado e aprovado pela liderança"
+  }
+]

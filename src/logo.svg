@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="templateZen">
+  <!-- Logo do template (usado também como favicon). Troque pela sua marca. -->
+  <rect width="32" height="32" rx="6" fill="#1d4ed8"/>
+  <path d="M16 7 L18.1 13.1 L24.6 13.2 L19.4 17.1 L21.3 23.3 L16 19.6 L10.7 23.3 L12.6 17.1 L7.4 13.2 L13.9 13.1 Z" fill="#ffffff"/>
+</svg>

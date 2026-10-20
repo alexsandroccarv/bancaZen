@@ -1,0 +1,44 @@
+name: Version bump (PATCH)
+
+# Incrementa automaticamente o PATCH do arquivo VERSION a cada push na
+# branch principal (ex.: 0.0.0 -> 0.0.1). Não roda para o próprio commit
+# de bump, evitando loop infinito.
+on:
+  push:
+    branches: ['main']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: version-bump
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    if: "!contains(github.event.head_commit.message, '[version bump]')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Incrementar o PATCH em VERSION
+        id: bump
+        run: |
+          set -euo pipefail
+          CURRENT="$(tr -d '[:space:]' < VERSION)"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+          echo "$NEW_VERSION" > VERSION
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Versão: ${CURRENT} -> ${NEW_VERSION}"
+
+      - name: Commitar e enviar o novo VERSION
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add VERSION
+          git commit -m "[version bump] v${{ steps.bump.outputs.new_version }}"
+          git push

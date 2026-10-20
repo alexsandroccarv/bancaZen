@@ -1,0 +1,18 @@
+# Normaliza finais de linha: texto sempre com LF no repositório.
+* text=auto eol=lf
+
+# Arquivos binários (não devem sofrer normalização de EOL nem diff textual).
+*.woff2 binary
+*.woff  binary
+*.ttf   binary
+*.otf   binary
+*.eot   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+
+# Tratar SVG como texto (diff/merge legíveis).
+*.svg text

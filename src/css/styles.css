@@ -1,0 +1,230 @@
+/* ==========================================================================
+   templateZen — estilos de apoio (complementam o Tailwind via CDN)
+   ========================================================================== */
+
+/* ---- Acessibilidade: link "pular para o conteúdo" ---- */
+.skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 100;
+    background: #1d4ed8; color: #fff; padding: 8px 14px; border-radius: 6px;
+    font-size: .875rem; font-weight: 600; text-decoration: none;
+    transition: top .15s ease;
+}
+.skip-link:focus { top: 8px; outline: 2px solid #fff; outline-offset: 2px; }
+html.tz-theme .skip-link { background: var(--tz-accent); color: var(--tz-bg); }
+
+/* ---- Acessibilidade: respeitar "reduzir movimento" ---- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ---- Alto contraste ---- */
+html.high-contrast body * {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffeb3b !important;
+}
+html.high-contrast a,
+html.high-contrast button {
+    color: #ffeb3b !important;
+    text-decoration: underline;
+}
+
+/* ---- Abas ---- */
+.tab-btn { position: relative; }
+/* Ícones da barra de abas (segunda linha do cabeçalho): 50% maiores. */
+.tab-btn i { font-size: 1.5em; vertical-align: -0.1em; }
+.tab-btn[aria-selected="true"] {
+    color: #1d4ed8;
+    border-bottom-color: #1d4ed8;
+}
+.dark .tab-btn[aria-selected="true"] {
+    color: #60a5fa;
+    border-bottom-color: #60a5fa;
+}
+.tab-panel[hidden] { display: none; }
+
+/* ==========================================================================
+   Temas prontos (selecionados em Configurações)
+   --------------------------------------------------------------------------
+   Ao escolher um tema, o <html> recebe a classe .tz-theme e o atributo
+   data-tz-theme="<id>". As paletas definem as variáveis --tz-*; as regras
+   genéricas (html.tz-theme ...) aplicam essas variáveis ao cabeçalho, barra
+   de abas, rodapé, fundo, superfícies e cor de destaque, com !important
+   (vencem as utilidades do Tailwind, claras ou escuras). Sem tema
+   selecionado, o visual padrão permanece intacto.
+   ========================================================================== */
+
+/* ---- Paletas ---- */
+html[data-tz-theme="catppuccin-latte"]{--tz-bg:#eff1f5;--tz-surface:#e6e9ef;--tz-text:#4c4f69;--tz-muted:#6c6f85;--tz-border:#ccd0da;--tz-header:#1e66f5;--tz-header-text:#ffffff;--tz-nav:#e6e9ef;--tz-nav-text:#4c4f69;--tz-footer:#dce0e8;--tz-footer-text:#4c4f69;--tz-accent:#8538ea}
+html[data-tz-theme="catppuccin-mocha"]{--tz-bg:#1e1e2e;--tz-surface:#313244;--tz-text:#cdd6f4;--tz-muted:#a6adc8;--tz-border:#313244;--tz-header:#181825;--tz-header-text:#cdd6f4;--tz-nav:#181825;--tz-nav-text:#cdd6f4;--tz-footer:#11111b;--tz-footer-text:#cdd6f4;--tz-accent:#cba6f7}
+html[data-tz-theme="dracula"]{--tz-bg:#282a36;--tz-surface:#44475a;--tz-text:#f8f8f2;--tz-muted:#aab3dc;--tz-border:#44475a;--tz-header:#21222c;--tz-header-text:#f8f8f2;--tz-nav:#21222c;--tz-nav-text:#f8f8f2;--tz-footer:#191a21;--tz-footer-text:#f8f8f2;--tz-accent:#bd93f9}
+html[data-tz-theme="github-light"]{--tz-bg:#ffffff;--tz-surface:#f6f8fa;--tz-text:#24292f;--tz-muted:#57606a;--tz-border:#d0d7de;--tz-header:#24292f;--tz-header-text:#ffffff;--tz-nav:#f6f8fa;--tz-nav-text:#24292f;--tz-footer:#24292f;--tz-footer-text:#ffffff;--tz-accent:#0969da}
+html[data-tz-theme="github-dark"]{--tz-bg:#0d1117;--tz-surface:#161b22;--tz-text:#c9d1d9;--tz-muted:#8b949e;--tz-border:#30363d;--tz-header:#161b22;--tz-header-text:#e6edf3;--tz-nav:#0d1117;--tz-nav-text:#c9d1d9;--tz-footer:#010409;--tz-footer-text:#c9d1d9;--tz-accent:#58a6ff}
+html[data-tz-theme="govbr"]{--tz-bg:#f8f9fa;--tz-surface:#ffffff;--tz-text:#1c1c1c;--tz-muted:#555555;--tz-border:#cccccc;--tz-header:#1351b4;--tz-header-text:#ffffff;--tz-nav:#ffffff;--tz-nav-text:#1351b4;--tz-footer:#071d41;--tz-footer-text:#ffffff;--tz-accent:#1351b4}
+html[data-tz-theme="rose-pine-dawn"]{--tz-bg:#faf4ed;--tz-surface:#fffaf3;--tz-text:#464261;--tz-muted:#797593;--tz-border:#f2e9e1;--tz-header:#286983;--tz-header-text:#faf4ed;--tz-nav:#fffaf3;--tz-nav-text:#464261;--tz-footer:#f2e9e1;--tz-footer-text:#464261;--tz-accent:#286983}
+html[data-tz-theme="solarized-light"]{--tz-bg:#fdf6e3;--tz-surface:#eee8d5;--tz-text:#4a5d63;--tz-muted:#5e7377;--tz-border:#d9d2b8;--tz-header:#1a6aa8;--tz-header-text:#ffffff;--tz-nav:#eee8d5;--tz-nav-text:#4a5d63;--tz-footer:#073642;--tz-footer-text:#eee8d5;--tz-accent:#0f5a94}
+html[data-tz-theme="solarized-dark"]{--tz-bg:#002b36;--tz-surface:#073642;--tz-text:#93a1a1;--tz-muted:#93a1a1;--tz-border:#0d4552;--tz-header:#073642;--tz-header-text:#eee8d5;--tz-nav:#002b36;--tz-nav-text:#93a1a1;--tz-footer:#073642;--tz-footer-text:#93a1a1;--tz-accent:#4aa3dd}
+
+/* ---- Segundo destaque por tema (--tz-accent-2): estados positivos/sucesso
+        (ex.: confirmação "copiado"). Baseado na paleta ampla de cada tema. ---- */
+html[data-tz-theme="catppuccin-latte"]{--tz-accent-2:#40a02b}
+html[data-tz-theme="catppuccin-mocha"]{--tz-accent-2:#a6e3a1}
+html[data-tz-theme="dracula"]{--tz-accent-2:#50fa7b}
+html[data-tz-theme="github-light"]{--tz-accent-2:#1a7f37}
+html[data-tz-theme="github-dark"]{--tz-accent-2:#3fb950}
+html[data-tz-theme="govbr"]{--tz-accent-2:#168821}
+html[data-tz-theme="rose-pine-dawn"]{--tz-accent-2:#56949f}
+html[data-tz-theme="solarized-light"]{--tz-accent-2:#6c7a00}
+html[data-tz-theme="solarized-dark"]{--tz-accent-2:#859900}
+
+/* ---- Rawline (gov.br) — self-hospedada em src/fonts/rawline/ (100–900) ---- */
+@font-face{font-family:'Rawline';font-weight:100;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-100.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:200;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-200.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:300;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-300.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:400;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-400.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:500;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-500.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:600;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-600.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:700;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-700.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:800;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-800.woff2') format('woff2')}
+@font-face{font-family:'Rawline';font-weight:900;font-style:normal;font-display:swap;src:url('../fonts/rawline/rawline-900.woff2') format('woff2')}
+
+/* ---- Fontes por tema (Google Fonts carregadas sob demanda pelo cdn.js;
+        gov.br usa a Rawline local acima) ---- */
+html[data-tz-theme="catppuccin-latte"]{--tz-font:'Nunito',system-ui,sans-serif}
+html[data-tz-theme="catppuccin-mocha"]{--tz-font:'Nunito',system-ui,sans-serif}
+html[data-tz-theme="dracula"]{--tz-font:'Fira Sans',system-ui,sans-serif}
+html[data-tz-theme="govbr"]{--tz-font:'Rawline',system-ui,sans-serif}
+html[data-tz-theme="rose-pine-dawn"]{--tz-font:'Quicksand',system-ui,sans-serif}
+html[data-tz-theme="solarized-light"]{--tz-font:'Source Sans 3',system-ui,sans-serif}
+html[data-tz-theme="solarized-dark"]{--tz-font:'Source Sans 3',system-ui,sans-serif}
+
+/* ---- Aplicação genérica das variáveis do tema ---- */
+html.tz-theme body { background-color: var(--tz-bg) !important; color: var(--tz-text) !important; }
+html.tz-theme body { font-family: var(--tz-font, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif) !important; }
+html.tz-theme header,
+html.tz-theme header > div:first-child { background-color: var(--tz-header) !important; }
+html.tz-theme header #headerAppName,
+html.tz-theme header #headerConfigBtn,
+html.tz-theme header a[aria-label="Configurações"] { color: var(--tz-header-text) !important; }
+html.tz-theme nav { background-color: var(--tz-nav) !important; border-color: var(--tz-border) !important; }
+html.tz-theme .tab-btn { color: var(--tz-nav-text) !important; }
+html.tz-theme .tab-btn[aria-selected="true"] { color: var(--tz-accent) !important; border-bottom-color: var(--tz-accent) !important; }
+/* Nome/sigla ficam no cabeçalho: usam a cor de texto do cabeçalho (que
+   contrasta com o fundo), não a cor de destaque — que em alguns temas é
+   igual ao fundo do cabeçalho e deixaria o texto invisível. */
+html.tz-theme #headerUserName,
+html.tz-theme #headerSigla { color: var(--tz-header-text) !important; }
+/* Separadores "|" do cabeçalho: cor de texto do cabeçalho (esmaecida),
+   legível em cabeçalhos claros ou escuros. */
+html.tz-theme header [class*="text-white/30"] { color: var(--tz-header-text) !important; opacity: .35; }
+html.tz-theme footer { background-color: var(--tz-footer) !important; color: var(--tz-footer-text) !important; }
+html.tz-theme footer a,
+html.tz-theme footer button { color: var(--tz-footer-text) !important; }
+/* Hover no rodapé: mantém a cor de texto do rodapé (sempre legível) e
+   sublinha para feedback — evita usar o accent, que em alguns temas é
+   escuro demais sobre o rodapé. */
+html.tz-theme footer a:hover,
+html.tz-theme footer button:hover { color: var(--tz-footer-text) !important; text-decoration: underline; }
+html.tz-theme .bg-brand-50 { background-color: var(--tz-surface) !important; }
+html.tz-theme .border-brand-100 { border-color: var(--tz-border) !important; }
+html.tz-theme .text-brand-800 { color: var(--tz-accent) !important; }
+
+/* (2) Links de conteúdo e ícones de destaque acompanham a cor do tema. */
+html.tz-theme .text-brand-600 { color: var(--tz-accent) !important; }
+
+/* (1) Campos de formulário: superfície/borda/texto do tema; a cor de
+   marcação de radios/checkboxes usa o destaque. */
+html.tz-theme input,
+html.tz-theme select,
+html.tz-theme textarea { accent-color: var(--tz-accent); }
+html.tz-theme input[type="text"],
+html.tz-theme input[type="number"],
+html.tz-theme input[type="search"],
+html.tz-theme input[type="email"],
+html.tz-theme select,
+html.tz-theme textarea {
+    background-color: var(--tz-surface) !important;
+    color: var(--tz-text) !important;
+    border-color: var(--tz-border) !important;
+}
+html.tz-theme input::placeholder,
+html.tz-theme textarea::placeholder { color: var(--tz-muted) !important; }
+
+/* (3) Seleção de texto na cor de destaque do tema. */
+html.tz-theme ::selection { background: var(--tz-accent); color: var(--tz-bg); }
+
+/* (4) Foco visível na cor de destaque (recolore também o "ring" do Tailwind). */
+html.tz-theme :focus { --tw-ring-color: var(--tz-accent); }
+html.tz-theme a:focus-visible,
+html.tz-theme button:focus-visible,
+html.tz-theme [role="tab"]:focus-visible {
+    outline: 2px solid var(--tz-accent);
+    outline-offset: 2px;
+}
+
+/* (7) Segundo destaque em estados de sucesso (confirmação "copiado"). */
+html.tz-theme .cafe-doc .copied { color: var(--tz-accent-2) !important; border-color: var(--tz-accent-2) !important; }
+
+/* (6) Barra de rolagem na paleta do tema (Firefox + WebKit). */
+html.tz-theme { scrollbar-color: var(--tz-accent) var(--tz-surface); }
+html.tz-theme ::-webkit-scrollbar { width: 12px; height: 12px; }
+html.tz-theme ::-webkit-scrollbar-track { background: var(--tz-surface); }
+html.tz-theme ::-webkit-scrollbar-thumb { background: var(--tz-accent); border-radius: 6px; border: 3px solid var(--tz-surface); }
+
+/* Página "Doe um café": mapeia as variáveis locais para o tema selecionado. */
+html.tz-theme .cafe-doc {
+    --cafe-surface: var(--tz-surface); --cafe-text: var(--tz-text);
+    --cafe-muted: var(--tz-muted); --cafe-line: var(--tz-border);
+    --cafe-accent: var(--tz-accent); --cafe-code: var(--tz-bg);
+}
+
+/* ---- Badges de status ---- */
+.badge { display: inline-flex; align-items: center; gap: .25rem; font-size: .68rem;
+         padding: .1rem .45rem; border-radius: 9999px; font-weight: 600; white-space: nowrap; }
+
+/* ---- Rolagem suave em listas longas ---- */
+.scroll-area { scrollbar-width: thin; }
+
+/* ==========================================================================
+   Fallback mínimo (caso o Tailwind da CDN demore ou falhe a carregar).
+   São seletores de ELEMENTO (baixa especificidade): quando o Tailwind carrega,
+   suas classes utilitárias têm precedência e assumem o controle do visual.
+   Garante que a aplicação continue LEGÍVEL e UTILIZÁVEL mesmo sem CDN.
+   ========================================================================== */
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; }
+button { cursor: pointer; }
+.hidden { display: none; }
+header { background: #1d4ed8; color: #ffffff; }
+header a, header h1, header span { color: #ffffff; }
+nav { background: #ffffff; }
+footer { background: #0f172a; color: #dbeafe; }
+footer a, footer button { color: #dbeafe; background: none; border: 0; }
+main { padding: 16px; }
+.tab-btn { padding: 10px 14px; }
+
+/* ==========================================================================
+   Alto contraste vence qualquer tema selecionado (.tz-theme) — especificidade
+   maior (classe .high-contrast dobrada) para ganhar no empate + source order.
+   ========================================================================== */
+html.high-contrast.high-contrast body * {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffeb3b !important;
+}
+html.high-contrast.high-contrast body,
+html.high-contrast.high-contrast header,
+html.high-contrast.high-contrast nav,
+html.high-contrast.high-contrast footer {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+html.high-contrast.high-contrast a,
+html.high-contrast.high-contrast button {
+    color: #ffeb3b !important;
+    text-decoration: underline;
+}

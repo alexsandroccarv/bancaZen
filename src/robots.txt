@@ -1,0 +1,6 @@
+# Permite indexação de todo o site por padrão. Ajuste conforme o projeto.
+User-agent: *
+Allow: /
+
+# O %SITE_URL% é substituído pelo build.mjs (env/variável SITE_URL).
+Sitemap: %SITE_URL%/sitemap.xml

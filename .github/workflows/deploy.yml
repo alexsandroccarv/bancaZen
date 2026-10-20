@@ -1,0 +1,66 @@
+name: Publicar
+
+# Quando roda:
+#  - a cada push na branch principal do projeto (ajuste abaixo se necessário);
+#  - quando você clica em "Run workflow" na aba Actions (execução manual).
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# Evita dois deploys simultâneos pisando um no outro.
+concurrency:
+  group: publicar
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    name: Validar, construir e publicar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verificar sintaxe dos módulos JS
+        run: for f in src/js/*.js; do node --check "$f"; done
+
+      - name: Auditar contraste dos temas (WCAG AA)
+        run: node tools/contrast-check.mjs
+
+      - name: Montar a pasta publicável (dist/)
+        run: node build.mjs
+        env:
+          # Defina em Settings → Secrets and variables → Actions → Variables.
+          SITE_URL: ${{ vars.SITE_URL }}
+
+      - name: Conferir a estrutura do dist/
+        run: |
+          test -f dist/index.html     || { echo "ERRO: dist/index.html ausente.";  exit 1; }
+          test -f dist/js/layout.js   || { echo "ERRO: dist/js/ ausente.";         exit 1; }
+          test -f dist/css/styles.css || { echo "ERRO: dist/css/ ausente.";        exit 1; }
+          test -f dist/404.html       || { echo "ERRO: dist/404.html ausente.";    exit 1; }
+          test -f dist/sitemap.xml    || { echo "ERRO: dist/sitemap.xml ausente."; exit 1; }
+          # Todas as páginas de apoio devem ser publicadas.
+          for p in termodeuso politicadeprivacidade ajuda sobre doeumcafe historico; do
+            test -f "dist/$p.html" || { echo "ERRO: dist/$p.html ausente."; exit 1; }
+          done
+
+      # Publica no servidor via rsync sobre SSH. O script PULA automaticamente
+      # (sem falhar) se os secrets ainda não estiverem configurados — então o
+      # CI fica verde mesmo antes de você cadastrar os dados do servidor.
+      - name: Publicar no servidor (rsync/SSH)
+        run: bash .github/scripts/deploy.sh
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}

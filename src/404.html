@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página não encontrada — templateZen</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        (function () {
+            const htmlEl = document.documentElement;
+            try {
+                if (localStorage.getItem('altoContraste') === '1') htmlEl.classList.add('high-contrast');
+                const fs = parseInt(localStorage.getItem('fontScale') || '100', 10);
+                if (fs && fs !== 100) htmlEl.style.fontSize = fs + '%';
+            } catch (e) { /* storage indisponível */ }
+        })();
+    </script>
+    <script src="js/cdn.js"></script>
+</head>
+<body data-page-title="Página não encontrada" class="font-sans bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+    <div id="app-header"></div>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
+        <div class="max-w-3xl mx-auto space-y-6 text-center py-10">
+            <p class="text-6xl font-bold text-brand-600 dark:text-accent-400">404</p>
+            <h1 class="text-xl font-bold">Página não encontrada</h1>
+            <p class="text-gray-600 dark:text-gray-400">
+                O endereço que você tentou acessar não existe ou foi movido.
+            </p>
+            <p>
+                <a href="index.html" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 dark:bg-accent-700 text-white font-semibold hover:opacity-90">
+                    <i aria-hidden="true" class="fa-solid fa-house"></i> Voltar ao início
+                </a>
+            </p>
+        </div>
+    </main>
+
+    <div id="toasts" class="fixed bottom-16 right-4 z-50 flex flex-col gap-2" aria-live="polite"></div>
+    <div id="app-footer"></div>
+
+    <script src="js/version.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/chrome.js"></script>
+    <script src="js/layout.js"></script>
+</body>
+</html>

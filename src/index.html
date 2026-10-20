@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>templateZen</title>
+    <meta name="description" content="Template reutilizável de cabeçalho, rodapé, temas e CI/CD para começar novos projetos web a partir de uma base pronta e acessível.">
+
+    <!-- Compartilhamento (Open Graph / Twitter). O %SITE_URL% é substituído
+         pelo build.mjs pela URL real (env/variável SITE_URL) — deixando og:url
+         e og:image ABSOLUTAS, como exigido pelas redes sociais. -->
+    <link rel="canonical" href="%SITE_URL%/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="%SITE_URL%/">
+    <meta property="og:title" content="templateZen">
+    <meta property="og:description" content="Base pronta e acessível (cabeçalho, rodapé, temas e CI/CD) para novos projetos web.">
+    <meta property="og:image" content="%SITE_URL%/logo.svg">
+    <meta property="og:locale" content="pt_BR">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="templateZen">
+    <meta name="twitter:description" content="Base pronta e acessível (cabeçalho, rodapé, temas e CI/CD) para novos projetos web.">
+    <meta name="twitter:image" content="%SITE_URL%/logo.svg">
+
+    <!-- Favicon: sempre o logo do projeto, em SVG. Troque src/logo.svg pela
+         sua marca (mantendo o mesmo nome) e o favicon acompanha. -->
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+
+    <!-- Estilos da aplicação (local — carrega sempre, mesmo offline) -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Alto contraste e escala de fonte: aplicar cedo para evitar "flash".
+         O tema (paleta com nome) tem seu próprio anti-flash em js/cdn.js. -->
+    <script>
+        (function () {
+            const htmlEl = document.documentElement;
+            // localStorage pode lançar (aba anônima/bloqueado): não deixe uma
+            // exceção impedir a renderização da página.
+            try {
+                if (localStorage.getItem('altoContraste') === '1') htmlEl.classList.add('high-contrast');
+                // Escala de fonte (acessibilidade): aplica cedo p/ evitar "flash".
+                const fs = parseInt(localStorage.getItem('fontScale') || '100', 10);
+                if (fs && fs !== 100) htmlEl.style.fontSize = fs + '%';
+            } catch (e) { /* storage indisponível */ }
+        })();
+    </script>
+
+    <!-- Recursos externos (Tailwind, Font Awesome): carregador único e
+         tolerante a falha, compartilhado com as páginas de apoio. -->
+    <script src="js/cdn.js"></script>
+</head>
+<body class="font-sans bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- ============================ CABEÇALHO ============================ -->
+    <header class="bg-brand-600 dark:bg-gray-900 border-b border-brand-700 dark:border-gray-700 flex flex-col shadow-sm dark:shadow-lg z-20 shrink-0 transition-colors duration-300">
+        <div class="flex items-center justify-between px-4 py-3 bg-brand-600 dark:bg-gray-900 transition-colors duration-300">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded bg-white dark:bg-gradient-to-br dark:from-accent-600 dark:to-accent-900 flex items-center justify-center text-brand-600 dark:text-white font-bold transition-colors duration-300">
+                    <i aria-hidden="true" class="fa-solid fa-star"></i>
+                </div>
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <h1 id="headerAppName" class="font-bold text-white leading-none whitespace-nowrap">TemplateZen</h1>
+                    <span class="text-xl text-white/30 dark:text-gray-700 font-light hidden">|</span>
+                    <span id="headerSigla" class="font-bold text-white/90 dark:text-accent-400 leading-none whitespace-nowrap hidden"></span>
+                    <!-- Nome definido pelo usuário na aba Configurações (| nome) -->
+                    <span id="headerUserNameSep" class="text-xl text-white/30 dark:text-gray-700 font-light hidden">|</span>
+                    <span id="headerUserName" class="font-bold text-white/90 dark:text-accent-400 leading-none whitespace-nowrap hidden"></span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <!-- Selo/logo secundário opcional (ex.: logo de uma organização parceira).
+                     Remova este bloco, ou troque a imagem, conforme necessário. -->
+                <div id="secondaryLogo" class="bg-white rounded px-2 py-1.5 items-center dark:hidden hidden">
+                    <img src="images/logo-secundaria.svg" alt="" class="h-5 w-auto" onerror="this.parentElement.style.display='none'">
+                </div>
+                <!-- Configurações: engrenagem na extrema direita (abre a aba de config). -->
+                <button type="button" id="headerConfigBtn" aria-controls="tab-config" title="Configurações" aria-label="Configurações" class="text-white/90 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded">
+                    <i aria-hidden="true" class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Abas de navegação: adicione/remova .tab-btn e o .tab-panel correspondente -->
+        <nav class="bg-white dark:bg-gray-800 border-t border-brand-700/20 dark:border-gray-700 px-2" role="tablist" aria-label="Seções">
+            <div class="max-w-5xl mx-auto flex gap-1 overflow-x-auto">
+                <button id="tab-inicio-btn" aria-controls="tab-inicio" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="true" data-tab="inicio">
+                    <i aria-hidden="true" class="fa-solid fa-house mr-1"></i> Início
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ============================ CONTEÚDO ============================ -->
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
+        <div id="tab-inicio" class="tab-panel" role="tabpanel" aria-labelledby="tab-inicio-btn" tabindex="0">
+            <div class="max-w-3xl mx-auto space-y-6">
+                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5">
+                    <p class="font-semibold text-brand-800 dark:text-accent-400 mb-1">
+                        <i aria-hidden="true" class="fa-solid fa-circle-info mr-1"></i> Este site é um modelo (template)
+                    </p>
+                    <p>
+                        O que você está vendo — cabeçalho, abas, rodapé com tema claro/escuro,
+                        alto contraste e ajuste de fonte — não é o produto final de um projeto:
+                        é o ponto de partida reutilizável (<strong>templateZen</strong>) para
+                        montar novas aplicações web com essa mesma base pronta. Substitua este
+                        texto e as abas ao lado pelo conteúdo real do seu projeto.
+                    </p>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Como usar este repositório como modelo no GitHub</h2>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>
+                            No repositório do GitHub, abra <strong>Settings</strong> e marque a
+                            opção <strong>Template repository</strong> (só precisa ser feito uma
+                            vez, pelo dono do repositório).
+                        </li>
+                        <li>
+                            Com isso ativado, o botão verde <strong>Use this template</strong>
+                            passa a aparecer no topo da página do repositório, ao lado de
+                            "Code".
+                        </li>
+                        <li>
+                            Clique em <strong>Use this template → Create a new repository</strong>,
+                            escolha o nome do novo projeto e crie-o — você recebe uma cópia
+                            limpa (sem o histórico de commits deste repositório).
+                        </li>
+                        <li>
+                            Clone o novo repositório e edite <code>src/js/config.js</code> com os
+                            dados do seu projeto (nome, autor, links, licença).
+                        </li>
+                        <li>
+                            Configure a publicação automática via SSH seguindo o
+                            <code>DEPLOY.md</code>, e ajuste <code>CLAUDE.md</code>,
+                            <code>CHANGELOG.md</code> e <code>VERSION</code> conforme o projeto
+                            evoluir.
+                        </li>
+                    </ol>
+                </div>
+
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Prefere não usar "Use this template"? Também funciona clonar o repositório
+                    normalmente ou baixar o ZIP — o <code>README.md</code> tem o passo a passo
+                    completo de customização.
+                </p>
+            </div>
+        </div>
+        <div id="tab-config" class="tab-panel" role="tabpanel" aria-labelledby="headerConfigBtn" tabindex="0" hidden>
+            <div class="max-w-md space-y-6">
+                <div>
+                    <label for="userNameInput" class="block text-sm font-medium mb-1">Nome:</label>
+                    <input id="userNameInput" type="text" placeholder="Digite um nome"
+                        class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Aparece no cabeçalho, ao lado do nome do aplicativo.
+                    </p>
+                </div>
+
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
+                        <i aria-hidden="true" class="fa-solid fa-palette text-brand-600 dark:text-accent-400"></i> Tema
+                    </h3>
+                    <div class="space-y-2">
+                        <label for="themeSelect" class="block text-sm">Escolha um tema</label>
+                        <select id="themeSelect"
+                            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <option value="catppuccin-latte" style="font-family:'Nunito',system-ui,sans-serif">Catppuccin Latte</option>
+                            <option value="catppuccin-mocha" style="font-family:'Nunito',system-ui,sans-serif">Catppuccin Mocha</option>
+                            <option value="dracula" style="font-family:'Fira Sans',system-ui,sans-serif">Drácula</option>
+                            <option value="github-light" style="font-family:system-ui,sans-serif">GitHub Light</option>
+                            <option value="github-dark" style="font-family:system-ui,sans-serif">GitHub Dark</option>
+                            <option value="govbr" style="font-family:'Rawline',system-ui,sans-serif">gov.br (padrão)</option>
+                            <option value="rose-pine-dawn" style="font-family:'Quicksand',system-ui,sans-serif">Rosé Pine Dawn</option>
+                            <option value="solarized-light" style="font-family:'Source Sans 3',system-ui,sans-serif">Solarized Light</option>
+                            <option value="solarized-dark" style="font-family:'Source Sans 3',system-ui,sans-serif">Solarized Dark</option>
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            O tema é aplicado a todo o site e fica salvo no seu navegador.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Área de notificações (toasts) -->
+    <div id="toasts" class="fixed bottom-16 right-4 z-50 flex flex-col gap-2" aria-live="polite"></div>
+
+    <!-- ============================ RODAPÉ ============================ -->
+    <!-- Rodapé injetado por js/chrome.js (fonte única, igual às páginas de apoio). -->
+    <div id="app-footer"></div>
+
+    <!-- ============================ SCRIPTS ============================ -->
+    <!-- version.js define window.__APP_VERSION (gerado do arquivo VERSION pelo
+         build) e precisa vir ANTES de config.js, que o consome. chrome.js
+         injeta o rodapé antes de layout.js preencher/ligar os controles. -->
+    <script src="js/version.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/chrome.js"></script>
+    <script src="js/layout.js"></script>
+</body>
+</html>

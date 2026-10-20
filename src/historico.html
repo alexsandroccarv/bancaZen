@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de versão — templateZen</title>
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        (function () {
+            const htmlEl = document.documentElement;
+            try {
+                if (localStorage.getItem('altoContraste') === '1') htmlEl.classList.add('high-contrast');
+                const fs = parseInt(localStorage.getItem('fontScale') || '100', 10);
+                if (fs && fs !== 100) htmlEl.style.fontSize = fs + '%';
+            } catch (e) { /* storage indisponível */ }
+        })();
+    </script>
+    <script src="js/cdn.js"></script>
+</head>
+<body data-page-title="Histórico de versão" class="font-sans bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+    <div id="app-header"></div>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
+        <div class="max-w-3xl mx-auto space-y-6">
+            <h1 class="text-xl font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-clock-rotate-left text-brand-600 dark:text-accent-400"></i> Histórico de versão</h1>
+            <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-2">
+                <p>Versão atual: <span class="font-mono font-semibold" id="currentVersion">—</span></p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Numeração <code class="font-mono">MAIOR.MENOR.PATCH</code>: o
+                    <strong>PATCH</strong> (3º número) é incrementado
+                    <strong>automaticamente</strong> a cada merge na <code>main</code>,
+                    documentando as issues fechadas; mudanças no
+                    <strong>MAIOR</strong> (1º) e no <strong>MENOR</strong> (2º) são
+                    <strong>solicitadas explicitamente</strong> (marcos do projeto).
+                    Também mantido em
+                    <a id="changelogLink" href="#" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">CHANGELOG.md</a>
+                    e nos
+                    <a id="releasesLink" href="#" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">Releases</a>.
+                </p>
+            </div>
+
+            <!-- ================================================================
+                 COMO DOCUMENTAR UMA NOVA VERSÃO
+                 Ao fechar issues e a numeração mudar, copie um bloco <section>
+                 abaixo (o mais recente no topo):
+                   - <span class="ver-pill"> = número da versão (ex.: v0.0.4)
+                   - <span> da direita = data (DD/MM/AAAA)
+                   - um <li> por mudança; para citar a issue fechada, use
+                     <a class="issue-link" data-issue="N">issue #N</a> — o href é
+                     montado a partir de APP_CONFIG.repo (portável entre projetos).
+                 As seções marcadas com data-marco="true" (mudança de MAIOR/MENOR)
+                 recebem destaque de "marco".
+                 ================================================================ -->
+            <!-- Entradas reais das versões (mais recente no topo). Os MODELOS
+                 para copiar (marco e patch) estão no comentário logo abaixo. -->
+            <div id="releaseList" class="space-y-4">
+                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                    <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
+                        <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.2</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">11/09/2026</span>
+                    </h2>
+                    <ul class="list-disc list-inside space-y-1 mt-3">
+                        <li>Seção de temas reorganizada para 9 paletas nomeadas (Catppuccin Latte/Mocha, Drácula, GitHub Light/Dark, gov.br como novo padrão, Rosé Pine Dawn, Solarized Light/Dark), removendo a lógica legada de tema claro/escuro que ficara órfã — <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="12" target="_blank" rel="noopener">issue #12</a>.</li>
+                    </ul>
+                </section>
+                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                    <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
+                        <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.1</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">—</span>
+                    </h2>
+                    <ul class="list-disc list-inside space-y-1 mt-3">
+                        <li>Base inicial do projeto a partir do modelo <strong>templateZen</strong>. As próximas versões serão documentadas aqui conforme as issues forem fechadas.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- ================================================================
+                 MODELOS PARA COPIAR (cole dentro de #releaseList, no topo)
+
+                 MARCO (mudança no 1º/2º numeral — MAIOR/MENOR — destaque maior):
+                 <section data-marco="true" class="rounded-xl border-2 border-brand-500 dark:border-accent-500 bg-brand-100/70 dark:bg-gray-800 p-6 shadow-md ring-1 ring-brand-500/20 dark:ring-accent-500/20">
+                     <p class="flex items-center gap-2 mb-3 text-sm font-bold uppercase tracking-wide text-brand-700 dark:text-accent-400">
+                         <i aria-hidden="true" class="fa-solid fa-flag"></i> Marco — nova versão (MAIOR/MENOR)
+                     </p>
+                     <h2 class="text-lg font-bold flex items-center gap-3 flex-wrap m-0">
+                         <span class="ver-pill font-mono text-sm font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-3 py-1">v0.1.0</span>
+                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">DD/MM/AAAA</span>
+                     </h2>
+                     <ul class="list-disc list-inside space-y-1 mt-3">
+                         <li>Descreva a mudança do marco — <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="N" target="_blank" rel="noopener">issue #N</a>.</li>
+                     </ul>
+                 </section>
+
+                 CORREÇÃO/PATCH (3º numeral — incremento automático a cada issue):
+                 <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
+                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.2</span>
+                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">DD/MM/AAAA</span>
+                     </h2>
+                     <ul class="list-disc list-inside space-y-1 mt-3">
+                         <li>Descreva a mudança — <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="N" target="_blank" rel="noopener">issue #N</a>.</li>
+                     </ul>
+                 </section>
+                 ================================================================ -->
+        </div>
+    </main>
+
+    <div id="toasts" class="fixed bottom-16 right-4 z-50 flex flex-col gap-2" aria-live="polite"></div>
+    <div id="app-footer"></div>
+
+    <script src="js/version.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/chrome.js"></script>
+    <script src="js/layout.js"></script>
+    <script>
+        // Versão atual (do arquivo VERSION via version.js) e links do repositório.
+        (function () {
+            var v = document.getElementById('currentVersion');
+            if (v) v.textContent = 'v' + (window.__APP_VERSION || '0.0.0');
+            var repo = (window.APP_CONFIG && window.APP_CONFIG.repo) || '';
+            var repoUrl = repo.replace(/\/$/, '');
+            var cl = document.getElementById('changelogLink');
+            var rl = document.getElementById('releasesLink');
+            if (repoUrl) {
+                if (cl) cl.href = repoUrl + '/blob/main/CHANGELOG.md';
+                if (rl) rl.href = repoUrl + '/releases';
+            }
+            // Links de issue portáveis: href montado a partir do repositório.
+            document.querySelectorAll('.issue-link[data-issue]').forEach(function (a) {
+                var n = a.getAttribute('data-issue');
+                if (repoUrl && n) a.href = repoUrl + '/issues/' + n;
+            });
+        })();
+    </script>
+</body>
+</html>
