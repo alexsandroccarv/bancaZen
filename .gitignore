@@ -1,2 +1,5 @@
 dist/
 node_modules/
+# Currículos Lattes e dados do backend: nunca versionar.
+lattes/
+buscabanca-dados/

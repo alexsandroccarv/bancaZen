@@ -122,6 +122,58 @@ servidor" mostra `Deploy (rsync) concluído.` e o site aparece no seu domínio.
 
 ---
 
+## Backend PHP e pasta de dados
+
+A busca e a área de administração (`admin.html`) usam o backend em PHP de
+`api/`. Requisitos no servidor: **PHP 8.0 ou superior** (Apache com
+`mod_php`/PHP-FPM ou Nginx com PHP-FPM). Não há dependências nem banco de
+dados.
+
+**1. Pasta de dados (uma vez).** Os currículos (XML), o índice e o hash da
+senha ficam numa pasta **fora** da pasta do site, para não serem servidos
+pela web nem apagados pelo deploy (`rsync --delete` espelha só
+`DEPLOY_PATH`). O padrão é a pasta irmã `buscabanca-dados`:
+
+```bash
+# site em /var/www/buscabanca  ->  dados em /var/www/buscabanca-dados
+sudo mkdir -p /var/www/buscabanca-dados
+sudo chown www-data:www-data /var/www/buscabanca-dados   # usuário do PHP
+sudo chmod 750 /var/www/buscabanca-dados
+```
+
+Para outro local, defina a variável `BUSCABANCA_DADOS` para o PHP (Apache:
+`SetEnv BUSCABANCA_DADOS /caminho`; Nginx/PHP-FPM:
+`fastcgi_param BUSCABANCA_DADOS /caminho;`).
+
+**2. Senha da administração (uma vez, e para trocar).** No servidor, na
+pasta do site, com o usuário do PHP:
+
+```bash
+cd /var/www/buscabanca
+sudo -u www-data php api/cli/definir-senha.php
+```
+
+Só o hash (`password_hash`) é gravado em `buscabanca-dados/admin.json`. Use
+HTTPS no site: a senha trafega no login.
+
+**3. Bloquear o acesso a `api/lib` e `api/cli`.** No Apache o
+`api/.htaccess` já faz isso. No Nginx, acrescente ao `server { }`:
+
+```nginx
+location ~ ^/api/(lib|cli)/ { deny all; return 404; }
+location ~ \.php$ { include snippets/fastcgi-php.conf; fastcgi_pass unix:/run/php/php-fpm.sock; }
+```
+
+**4. Limites de envio.** A administração envia os arquivos em lotes de até
+15 arquivos e 6 MB, compatíveis com a configuração padrão do PHP
+(`max_file_uploads = 20`, `post_max_size = 8M`). Um currículo isolado maior
+que `upload_max_filesize` (padrão 2 MB) precisa desse limite aumentado no
+`php.ini`.
+
+**Backup.** Copie a pasta `buscabanca-dados` (XML + `corpus.json`).
+
+---
+
 ## URL do site (SEO/social e sitemap)
 
 Para as metatags de compartilhamento (Open Graph/Twitter), o `canonical` e o

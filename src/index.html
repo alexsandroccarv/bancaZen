@@ -85,9 +85,6 @@
                 <button id="tab-banca-btn" aria-controls="tab-banca" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="true" data-tab="banca">
                     <i aria-hidden="true" class="fa-solid fa-user-check mr-1"></i> Indicar banca
                 </button>
-                <button id="tab-curriculos-btn" aria-controls="tab-curriculos" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="curriculos">
-                    <i aria-hidden="true" class="fa-solid fa-address-card mr-1"></i> Currículos
-                </button>
             </div>
         </nav>
     </header>
@@ -101,10 +98,11 @@
                     <h2 class="text-lg font-bold text-brand-800 dark:text-accent-400">Membro externo para a banca de defesa</h2>
                     <p>
                         Informe o título, o resumo e as palavras-chave do seu trabalho. A ferramenta compara esses
-                        dados com os currículos Lattes disponíveis e lista as 10 pessoas com maior proximidade
-                        temática, numa escala de 0 a 1, sem vínculo com você nem com a sua orientação.
+                        dados com os currículos Lattes cadastrados pela administração e mostra duas listas de 10
+                        pessoas com maior proximidade temática, numa escala de 0 a 1: uma do PROFIAP e outra de
+                        outros programas. Pessoas com vínculo com você ou com a sua orientação ficam de fora.
                     </p>
-                    <p id="corpusStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Carregando os currículos…</p>
+                    <p id="corpusStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Consultando a base de currículos…</p>
                 </div>
 
                 <form id="buscaForm" class="space-y-4" novalidate>
@@ -126,7 +124,8 @@
                         <p class="text-sm text-gray-600 dark:text-gray-400">
                             Informe o currículo Lattes da pessoa discente e da orientação. Pessoas com coautoria em
                             publicações ou relação de orientação com alguma delas são retiradas da lista e aparecem
-                            à parte, com o motivo.
+                            à parte, com o motivo. Os arquivos enviados aqui são usados só nesta consulta e não são
+                            guardados.
                         </p>
                         <div class="envolvido space-y-1" data-papel="discente">
                             <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-red-700 dark:text-red-400" aria-hidden="true">*</span></p>
@@ -198,17 +197,11 @@
 
                 <section id="resultado" class="space-y-3 hidden" aria-labelledby="resultadoTitulo" tabindex="-1">
                     <h2 id="resultadoTitulo" class="text-lg font-bold">Pessoas mais próximas do tema</h2>
-                    <p id="resultadoResumo" class="text-sm text-gray-600 dark:text-gray-400"></p>
-                    <ol id="resultadoLista" class="list-none p-0 space-y-3"></ol>
-                    <div id="retirados" class="hidden rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-gray-800 p-4 space-y-2">
-                        <h3 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Retiradas por vínculo (conformidade ética)</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Estas pessoas teriam proximidade suficiente para a lista, mas têm vínculo com a pessoa discente
-                            ou com a orientação. Vínculo "provável" foi identificado só pelo nome em citação e pode ser
-                            homônimo: confira no Lattes antes de descartar.
-                        </p>
-                        <ul id="retiradosLista" class="space-y-3"></ul>
-                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Duas listas, cada uma com até 10 pessoas sem vínculo identificado, da maior para a menor
+                        proximidade (0 a 1): currículos do PROFIAP e currículos de outros programas (segundo membro externo).
+                    </p>
+                    <div id="listas" class="space-y-8"></div>
                     <details class="text-sm text-gray-600 dark:text-gray-400">
                         <summary class="cursor-pointer font-medium">Como a proximidade é calculada</summary>
                         <div class="mt-2 space-y-2">
@@ -237,48 +230,6 @@
             </div>
         </div>
 
-        <!-- Currículos: o que foi carregado do servidor + XML/ZIP locais -->
-        <div id="tab-curriculos" class="tab-panel" role="tabpanel" aria-labelledby="tab-curriculos-btn" tabindex="0" hidden>
-            <div class="max-w-5xl mx-auto space-y-6">
-                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-3">
-                    <h2 class="text-lg font-bold text-brand-800 dark:text-accent-400">Currículos considerados</h2>
-                    <p>
-                        Os currículos publicados com o site vêm da pasta <code>lattes/</code> do repositório. Você também
-                        pode acrescentar arquivos XML (ou o ZIP exportado pela Plataforma Lattes) do seu computador: eles
-                        são lidos só no seu navegador e não são enviados a nenhum servidor.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
-                            <i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i> Adicionar arquivos
-                            <input id="arquivosInput" type="file" accept=".xml,.zip" multiple class="sr-only">
-                        </label>
-                        <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
-                            <i aria-hidden="true" class="fa-solid fa-folder-open"></i> Adicionar pasta
-                            <input id="pastaInput" type="file" webkitdirectory multiple class="sr-only">
-                        </label>
-                        <button type="button" id="limparLocaisBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium hidden">
-                            <i aria-hidden="true" class="fa-solid fa-trash-can"></i> Remover os adicionados
-                        </button>
-                    </div>
-                    <p id="cargaStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <caption class="sr-only">Currículos carregados</caption>
-                        <thead class="border-b border-gray-300 dark:border-gray-600">
-                            <tr>
-                                <th scope="col" class="py-2 pr-3">Nome</th>
-                                <th scope="col" class="py-2 pr-3">Titulação</th>
-                                <th scope="col" class="py-2 pr-3">Instituição</th>
-                                <th scope="col" class="py-2 pr-3">Atualização</th>
-                                <th scope="col" class="py-2">Origem</th>
-                            </tr>
-                        </thead>
-                        <tbody id="curriculosTabela"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
         <div id="tab-config" class="tab-panel" role="tabpanel" aria-labelledby="headerConfigBtn" tabindex="0" hidden>
             <div class="max-w-md space-y-6">
                 <div>
@@ -332,9 +283,6 @@
     <script src="js/config.js"></script>
     <script src="js/chrome.js"></script>
     <script src="js/layout.js"></script>
-    <script src="js/lattes-corpus.js"></script>
-    <script src="js/similaridade.js"></script>
-    <script src="js/vinculos.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

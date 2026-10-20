@@ -11,8 +11,7 @@
    ========================================================================== */
 import { cpSync, rmSync, mkdirSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, relative } from 'node:path';
-import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const src = join(root, 'src');
@@ -68,36 +67,9 @@ for (const name of ['images', 'favicon.ico']) {
     if (existsSync(p)) cpSync(p, join(dist, name), { recursive: true });
 }
 
-// 3.1) Currículos Lattes: cada .xml (ou .zip exportado pela Plataforma
-// Lattes) da pasta lattes/ é processado e o resultado vai para
-// dist/data/corpus.json, que a página carrega para indicar a banca. O
-// extrator é o mesmo usado no navegador (src/js/lattes-corpus.js).
-const lattesDir = join(root, 'lattes');
-const corpus = [];
-if (existsSync(lattesDir)) {
-    const LattesCorpus = createRequire(import.meta.url)('./src/js/lattes-corpus.js');
-    const arquivos = listFiles(lattesDir).filter((f) => /\.(xml|zip)$/i.test(f)).sort();
-    for (const f of arquivos) {
-        const nome = relative(lattesDir, f);
-        try {
-            corpus.push(...await LattesCorpus.lerArquivo(nome, readFileSync(f)));
-        } catch (e) {
-            console.warn(`AVISO: ${nome} ignorado (${e.message}).`);
-        }
-    }
-}
-// Mesmo currículo em dois arquivos: fica a versão atualizada mais recentemente.
-const porId = new Map();
-for (const p of corpus) {
-    const atual = porId.get(p.id);
-    if (!atual || (p.atualizacao || '') > (atual.atualizacao || '')) porId.set(p.id, p);
-}
-mkdirSync(join(dist, 'data'), { recursive: true });
-writeFileSync(join(dist, 'data', 'corpus.json'), JSON.stringify({
-    geradoEm: new Date().toISOString(),
-    curriculos: [...porId.values()],
-}));
-console.log(`Currículos Lattes processados: ${porId.size} (dist/data/corpus.json)`);
+// 3.1) Pasta de dados do backend PHP: NÃO faz parte do dist/. Os currículos
+// e o índice ficam fora da raiz pública (ver src/api/lib/base.php), para não
+// serem servidos nem apagados pelo deploy (rsync --delete).
 
 // 4) URL do site: substitui o placeholder %SITE_URL% (metatags Open Graph,
 // canonical, robots) pela URL real e gera o sitemap.xml. A URL vem da

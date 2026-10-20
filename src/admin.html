@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração — BuscaBanca</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        (function () {
+            const htmlEl = document.documentElement;
+            try {
+                if (localStorage.getItem('altoContraste') === '1') htmlEl.classList.add('high-contrast');
+                const fs = parseInt(localStorage.getItem('fontScale') || '100', 10);
+                if (fs && fs !== 100) htmlEl.style.fontSize = fs + '%';
+            } catch (e) { /* storage indisponível */ }
+        })();
+    </script>
+    <script src="js/cdn.js"></script>
+</head>
+<body data-page-title="Administração" class="font-sans bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+    <div id="app-header"></div>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
+        <div class="max-w-5xl mx-auto space-y-6">
+            <h1 class="text-xl font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-lock text-brand-600 dark:text-accent-400"></i> Administração</h1>
+
+            <!-- Entrada -->
+            <section id="entrada" class="hidden max-w-sm space-y-3" aria-labelledby="entradaTitulo">
+                <h2 id="entradaTitulo" class="text-lg font-bold">Entrar</h2>
+                <form id="entrarForm" class="space-y-3">
+                    <div>
+                        <label for="senhaInput" class="block text-sm font-medium mb-1">Senha</label>
+                        <input id="senhaInput" type="password" autocomplete="current-password" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    </div>
+                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50"><i aria-hidden="true" class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+                </form>
+                <p id="entradaMsg" class="text-sm text-red-700 dark:text-red-400" role="alert"></p>
+            </section>
+
+            <!-- Área logada -->
+            <div id="painel" class="hidden space-y-8">
+                <div class="flex justify-end">
+                    <button type="button" id="sairBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium"><i aria-hidden="true" class="fa-solid fa-right-from-bracket"></i> Sair</button>
+                </div>
+
+                <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="envioTitulo">
+                    <h2 id="envioTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Enviar currículos Lattes</h2>
+                    <p class="text-sm">
+                        Envie o XML exportado pela Plataforma Lattes ou o ZIP que a plataforma entrega. Os arquivos
+                        ficam guardados no servidor, fora da área pública do site. Se um currículo com o mesmo ID
+                        Lattes já existir, fica o de data de atualização mais recente.
+                    </p>
+                    <form id="envioForm" class="space-y-4">
+                        <fieldset class="space-y-2">
+                            <legend class="text-sm font-medium">Grupo</legend>
+                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupo" value="profiap" checked> PROFIAP (primeira lista)</label>
+                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupo" value="outro"> Outro programa (segunda lista: segundo membro externo)</label>
+                        </fieldset>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="ppgInput" class="block text-sm font-medium mb-1">PPG</label>
+                                <input id="ppgInput" type="text" list="ppgLista" required value="PROFIAP" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <datalist id="ppgLista"></datalist>
+                            </div>
+                            <div>
+                                <label for="instInput" class="block text-sm font-medium mb-1">Instituição</label>
+                                <input id="instInput" type="text" list="instLista" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <datalist id="instLista"></datalist>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">PPG e instituição valem para todos os arquivos deste envio e aparecem no resultado.</p>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                                <i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i> Escolher arquivos
+                                <input id="arquivosInput" type="file" accept=".xml,.zip" multiple class="sr-only">
+                            </label>
+                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                                <i aria-hidden="true" class="fa-solid fa-folder-open"></i> Escolher pasta
+                                <input id="pastaInput" type="file" webkitdirectory multiple class="sr-only">
+                            </label>
+                            <span id="selecionados" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Nenhum arquivo escolhido.</span>
+                        </div>
+                        <button type="submit" id="enviarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50" disabled><i aria-hidden="true" class="fa-solid fa-upload"></i> Enviar</button>
+                    </form>
+                    <div id="relatorio" class="text-sm space-y-1" aria-live="polite"></div>
+                </section>
+
+                <section class="space-y-3" aria-labelledby="baseTitulo">
+                    <h2 id="baseTitulo" class="text-lg font-bold">Currículos cadastrados <span id="totalBase" class="font-normal text-gray-600 dark:text-gray-400"></span></h2>
+                    <div>
+                        <label for="filtroInput" class="sr-only">Filtrar currículos</label>
+                        <input id="filtroInput" type="search" placeholder="Filtrar por nome, PPG ou instituição" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <caption class="sr-only">Currículos cadastrados</caption>
+                            <thead class="border-b border-gray-300 dark:border-gray-600">
+                                <tr>
+                                    <th scope="col" class="py-2 pr-3">Nome</th>
+                                    <th scope="col" class="py-2 pr-3">Grupo</th>
+                                    <th scope="col" class="py-2 pr-3">PPG / Instituição</th>
+                                    <th scope="col" class="py-2 pr-3">Atualização do Lattes</th>
+                                    <th scope="col" class="py-2">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="baseTabela"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div id="toasts" class="fixed bottom-16 right-4 z-50 flex flex-col gap-2" aria-live="polite"></div>
+    <div id="app-footer"></div>
+
+    <script src="js/version.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/chrome.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

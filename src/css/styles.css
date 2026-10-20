@@ -188,7 +188,7 @@ html.tz-theme .cafe-doc {
          padding: .1rem .45rem; border-radius: 9999px; font-weight: 600; white-space: nowrap; }
 
 /* ---- Barra da proximidade (0 a 1) nos resultados da banca ---- */
-#resultadoLista { list-style: none; padding: 0; }
+.lista-resultado { list-style: none; padding: 0; }
 .score-bar { height: .5rem; border-radius: 9999px; background: #e5e7eb; overflow: hidden; }
 .score-bar > span { display: block; height: 100%; background: #1d4ed8; border-radius: inherit; }
 html.tz-theme .score-bar { background: var(--tz-border); }

@@ -3,28 +3,34 @@
 Aplicação web que indica **membros externos para banca de defesa de
 mestrado** a partir de currículos Lattes.
 
-1. Os currículos (XML exportado pela Plataforma Lattes, ou o ZIP que a
-   contém) ficam na pasta [`lattes/`](lattes/README.md).
-2. O build (`node build.mjs`) processa a pasta e gera
-   `dist/data/corpus.json`.
-3. Na página, a pessoa informa **título**, **resumo** e **palavras-chave** do
-   trabalho e recebe as **10 pessoas** com maior proximidade temática, numa
-   escala de **0 a 1**, em ordem decrescente, com os termos em comum, a
-   titulação, a instituição e o número de bancas de mestrado registradas.
+1. A administração do programa envia os currículos (XML exportado pela
+   Plataforma Lattes, ou o ZIP que o contém) em **`admin.html`**, informando
+   o **grupo** (PROFIAP ou outro programa), o **PPG** e a **instituição**. Se
+   o mesmo ID Lattes já existir, fica o currículo com a data de atualização
+   mais recente.
+2. Na página inicial, a pessoa discente informa **título**, **resumo** e
+   **palavras-chave** do trabalho, o próprio currículo Lattes e o da
+   orientação, e recebe **duas listas de até 10 pessoas** com maior
+   proximidade temática, numa escala de **0 a 1**, em ordem decrescente:
+   - currículos do **PROFIAP**;
+   - currículos de **outros programas** (segundo membro externo).
+   Cada pessoa aparece com PPG e instituição, titulação, bancas de mestrado
+   registradas e os termos em comum.
 
-**Conformidade ética.** A pessoa discente informa o próprio currículo
-Lattes e o da orientação (orientador(a) obrigatório, coorientador(a)
-opcional), por arquivo XML/ZIP ou pelo link/ID de um currículo que já está
-na base. Quem tem coautoria em publicações (procurada nos currículos dos
-dois lados), relação de orientação com alguma dessas pessoas, ou é uma
-delas, sai da lista das 10 e aparece à parte, com o motivo. O vínculo é
-"confirmado" quando a pessoa é identificada pelo ID Lattes ou pelo nome
-completo, e "provável" quando só o sobrenome e as iniciais coincidem (pode
-ser homônimo). O período das coautorias é configurável (todo o período, 10
-ou 5 anos). Código: `src/js/vinculos.js`.
+**Proteção dos currículos.** Os XML e o índice processado ficam no servidor,
+numa pasta de dados fora da área pública do site (ver
+[DEPLOY.md](DEPLOY.md#backend-php-e-pasta-de-dados)). O navegador recebe só
+o resultado da busca. Os currículos da pessoa discente e da orientação
+enviados na busca são lidos em memória e não são gravados. Nenhum currículo
+é versionado no repositório.
 
-Também é possível acrescentar XML/ZIP do próprio computador na aba
-**Currículos**; esses arquivos são lidos só no navegador.
+**Conformidade ética.** Quem tem coautoria em publicações (procurada nos
+currículos dos dois lados), relação de orientação com a pessoa discente, o(a)
+orientador(a) ou o(a) coorientador(a), ou é uma dessas pessoas, sai da lista
+e aparece à parte, com o motivo. O vínculo é "confirmado" quando a pessoa é
+identificada pelo ID Lattes ou pelo nome completo, e "provável" quando só o
+sobrenome e as iniciais coincidem (pode ser homônimo). O período das
+coautorias é configurável (todo o período, 10 ou 5 anos).
 
 **Como a proximidade é calculada.** Cada currículo vira um vetor de termos
 (resumo, linhas de pesquisa, áreas do conhecimento, palavras-chave, títulos
@@ -34,10 +40,16 @@ vira outro vetor (palavras-chave e título pesam mais que o resumo). Os
 termos passam por remoção de acentos e de palavras vazias, radical leve e
 bigramas; a ponderação é TF-IDF e a proximidade é o cosseno entre os
 vetores (0 a 1). Filtros opcionais: desconsiderar a instituição do programa
-e manter só doutores. Código: `src/js/lattes-corpus.js` (extrator, schema
-`CurriculoLattes`, o mesmo do [lattesZen](https://github.com/alexsandroccarv/latteszen)),
-`src/js/similaridade.js`, `src/js/vinculos.js` e `src/js/app.js`. Teste:
-`node tools/testar-similaridade.mjs`.
+e manter só doutores.
+
+**Código.** Backend em PHP 8 sem dependências, em `src/api/`:
+`lib/lattes.php` (extrator, schema `CurriculoLattes`, o mesmo do
+[lattesZen](https://github.com/alexsandroccarv/latteszen)),
+`lib/similaridade.php`, `lib/vinculos.php`, `lib/base.php` (pasta de dados,
+sessão) e os endpoints `buscar.php`, `status.php` e `admin.php`. Interface:
+`src/js/app.js` e `src/js/admin.js`. Teste: `php tools/testar.php`.
+Ambiente local: `node build.mjs && php -S localhost:8000 -t dist` (dados em
+`buscabanca-dados/`, ignorada pelo Git).
 
 ---
 

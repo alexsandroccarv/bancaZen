@@ -27,6 +27,22 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   "confirmada" (ID Lattes ou nome completo) ou "provável" (sobrenome e
   iniciais); período de coautoria configurável. Novo `src/js/vinculos.js`.
   [issue #2](../../issues/2)
+- Área de administração (`admin.html`, com senha) para enviar currículos
+  Lattes (XML, ZIP ou pasta), listar, corrigir e remover; com o mesmo ID
+  Lattes, fica o currículo de data de atualização mais recente. Backend em
+  PHP (`src/api/`): extrator, proximidade e vínculos passam a rodar no
+  servidor, e os XML e o índice ficam numa pasta de dados fora da área
+  pública; o navegador recebe só o resultado. [issue #3](../../issues/3)
+- No envio, a administração informa grupo (PROFIAP ou outro programa), PPG e
+  instituição; o resultado mostra duas listas de até 10 pessoas (PROFIAP e
+  outros programas, para o segundo membro externo), com PPG e instituição.
+  [issue #4](../../issues/4)
+
+### Removido
+- Pasta `lattes/` no repositório, processamento dos currículos no build
+  (`dist/data/corpus.json`) e a aba pública **Currículos** com leitura de
+  arquivos no navegador: os currículos não ficam mais expostos.
+  [issue #3](../../issues/3)
 
 ### Alterado
 - Seção de temas reorganizada: de 16 paletas + "Padrão" para 9 temas
