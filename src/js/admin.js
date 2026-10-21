@@ -1,0 +1,238 @@
+/* ==========================================================================
+   bancaZen — área de administração (admin.html)
+   --------------------------------------------------------------------------
+   Entrada por senha, envio de currículos Lattes (XML/ZIP, arquivos ou pasta)
+   com grupo, PPG e instituição, lista da base, correção do programa e
+   remoção. Toda a regra (mesmo ID, guarda fora da área pública) fica no
+   servidor: api/admin.php.
+   ========================================================================== */
+(function () {
+    const $ = (s) => document.querySelector(s);
+    const API = 'api/admin.php?acao=';
+    // PHP aceita 20 arquivos por requisição (max_file_uploads) e 8 MB por
+    // POST (post_max_size) na configuração padrão: envia em lotes menores.
+    const LOTE_ARQUIVOS = 15;
+    const LOTE_BYTES = 6 * 1024 * 1024;
+    const GRUPOS = { profiap: 'PROFIAP', outro: 'Outro programa' };
+
+    let csrf = null;
+    let base = [];
+    let escolhidos = [];
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function dataBR(iso) {
+        return /^\d{4}-\d{2}-\d{2}/.test(iso || '') ? iso.slice(0, 10).split('-').reverse().join('/') : '';
+    }
+    function semAcento(s) {
+        return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    }
+
+    async function api(acao, corpo) {
+        const opts = corpo
+            ? { method: 'POST', body: corpo, headers: { 'X-CSRF': csrf || '' }, credentials: 'same-origin' }
+            : { credentials: 'same-origin', cache: 'no-store' };
+        const r = await fetch(API + acao, opts);
+        const dados = await r.json().catch(() => ({ erro: `Erro ${r.status} no servidor.` }));
+        if (r.status === 401 && acao !== 'entrar') { mostrarEntrada('Sessão expirada. Entre de novo.'); throw new Error('sessão'); }
+        if (!r.ok || dados.erro) throw new Error(dados.erro || `Erro ${r.status} no servidor.`);
+        return dados;
+    }
+    function form(obj) {
+        const fd = new FormData();
+        for (const [k, v] of Object.entries(obj)) fd.append(k, v);
+        return fd;
+    }
+
+    /* ------------------------------- sessão ------------------------------- */
+    function mostrarEntrada(msg) {
+        csrf = null;
+        $('#painel').classList.add('hidden');
+        $('#entrada').classList.remove('hidden');
+        $('#entradaMsg').textContent = msg || '';
+        $('#senhaInput').focus();
+    }
+    function mostrarPainel() {
+        $('#entrada').classList.add('hidden');
+        $('#painel').classList.remove('hidden');
+        listar();
+    }
+    async function iniciarSessao() {
+        try {
+            const s = await api('sessao');
+            if (!s.configurado) { mostrarEntrada('A senha da administração ainda não foi definida no servidor (php api/cli/definir-senha.php).'); return; }
+            if (s.logado) { csrf = s.csrf; mostrarPainel(); } else mostrarEntrada('');
+        } catch (e) {
+            if (e.message !== 'sessão') mostrarEntrada(`Não foi possível falar com o servidor: ${e.message}`);
+        }
+    }
+
+    /* ------------------------------- envio -------------------------------- */
+    function escolher(files) {
+        escolhidos = [...files].filter((f) => /\.(xml|zip)$/i.test(f.name));
+        $('#selecionados').textContent = escolhidos.length
+            ? `${escolhidos.length} arquivo(s) .xml/.zip escolhido(s).`
+            : 'Nenhum arquivo .xml ou .zip na seleção.';
+        $('#enviarBtn').disabled = !escolhidos.length;
+    }
+    function lotes(arquivos) {
+        const out = [];
+        let atual = [], bytes = 0;
+        for (const f of arquivos) {
+            if (atual.length && (atual.length >= LOTE_ARQUIVOS || bytes + f.size > LOTE_BYTES)) { out.push(atual); atual = []; bytes = 0; }
+            atual.push(f); bytes += f.size;
+        }
+        if (atual.length) out.push(atual);
+        return out;
+    }
+    const SITUACAO = {
+        novo: (r) => `incluído: ${r.nome}`,
+        substituido: (r) => `substituído pela versão mais recente: ${r.nome} (${dataBR(r.atualizacaoAnterior)} → ${dataBR(r.atualizacao)})`,
+        mantido: (r) => `mantido o currículo já cadastrado, que é mais recente: ${r.nome} (cadastrado ${dataBR(r.atualizacaoAnterior)}, enviado ${dataBR(r.atualizacao)})`,
+        erro: (r) => `ignorado: ${r.mensagem}`,
+    };
+    async function enviar(ev) {
+        ev.preventDefault();
+        const grupo = document.querySelector('input[name="grupo"]:checked').value;
+        const ppg = $('#ppgInput').value.trim();
+        const inst = $('#instInput').value.trim();
+        const rel = $('#relatorio');
+        if (!ppg || !inst) { rel.innerHTML = '<p class="text-red-700 dark:text-red-400">Informe o PPG e a instituição.</p>'; return; }
+        const btn = $('#enviarBtn');
+        btn.disabled = true;
+        const linhas = [];
+        const partes = lotes(escolhidos);
+        try {
+            for (let i = 0; i < partes.length; i++) {
+                rel.innerHTML = `<p>Enviando lote ${i + 1} de ${partes.length}…</p>`;
+                const fd = form({ grupo, ppg, instituicao: inst });
+                for (const f of partes[i]) fd.append('arquivos[]', f, f.webkitRelativePath || f.name);
+                const { relatorio } = await api('enviar', fd);
+                linhas.push(...relatorio);
+            }
+            const cont = (s) => linhas.filter((r) => r.situacao === s).length;
+            rel.innerHTML = `<p class="font-medium">Concluído: ${cont('novo')} incluído(s), ${cont('substituido')} substituído(s), ${cont('mantido')} mantido(s), ${cont('erro')} com erro.</p>
+                <ul class="list-disc list-inside">${linhas.map((r) => `<li>${esc(r.arquivo)}: ${esc(SITUACAO[r.situacao](r))}</li>`).join('')}</ul>`;
+            escolher([]);
+            listar();
+        } catch (e) {
+            rel.innerHTML += `<p class="text-red-700 dark:text-red-400">${esc(e.message)}</p>`;
+        } finally {
+            btn.disabled = !escolhidos.length;
+        }
+    }
+
+    /* ------------------------------- base --------------------------------- */
+    async function listar() {
+        try {
+            base = (await api('listar')).curriculos;
+        } catch (e) {
+            return;
+        }
+        $('#totalBase').textContent = `(${base.length})`;
+        // Sugestões de PPG e instituição a partir do que já foi cadastrado.
+        const unicos = (k) => [...new Set(base.map((p) => p[k]).filter(Boolean))].sort();
+        $('#ppgLista').innerHTML = unicos('ppg').map((v) => `<option value="${esc(v)}">`).join('');
+        $('#instLista').innerHTML = unicos('ppgInstituicao').map((v) => `<option value="${esc(v)}">`).join('');
+        renderTabela();
+    }
+
+    function renderTabela() {
+        const filtro = semAcento($('#filtroInput').value);
+        const lista = base.filter((p) => !filtro || semAcento(`${p.nome} ${p.ppg} ${p.ppgInstituicao}`).includes(filtro));
+        const tbody = $('#baseTabela');
+        if (!lista.length) {
+            tbody.innerHTML = `<tr><td colspan="5" class="py-3 text-gray-500 dark:text-gray-400">${base.length ? 'Nenhum currículo corresponde ao filtro.' : 'Nenhum currículo cadastrado.'}</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = lista.map((p) => `<tr class="border-b border-gray-200 dark:border-gray-700" data-id="${esc(p.id)}">
+            <td class="py-2 pr-3"><a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(p.nome)}</a></td>
+            <td class="py-2 pr-3">${esc(GRUPOS[p.grupo] || p.grupo)}</td>
+            <td class="py-2 pr-3">${esc([p.ppg, p.ppgInstituicao].filter(Boolean).join(' · '))}</td>
+            <td class="py-2 pr-3 whitespace-nowrap">${dataBR(p.atualizacao) || '—'}</td>
+            <td class="py-2 whitespace-nowrap">
+                <button type="button" class="editar text-brand-600 dark:text-accent-400 hover:underline mr-3" aria-label="Editar programa de ${esc(p.nome)}">Editar</button>
+                <button type="button" class="remover text-red-700 dark:text-red-400 hover:underline" aria-label="Remover ${esc(p.nome)}">Remover</button>
+            </td>
+        </tr>`).join('');
+    }
+
+    function editar(tr) {
+        const p = base.find((x) => x.id === tr.dataset.id);
+        const campo = 'px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm';
+        tr.innerHTML = `<td class="py-2 pr-3">${esc(p.nome)}</td>
+            <td class="py-2 pr-3"><label class="sr-only" for="eg-${p.id}">Grupo</label>
+                <select id="eg-${p.id}" class="${campo}">${Object.entries(GRUPOS).map(([v, r]) => `<option value="${v}"${v === p.grupo ? ' selected' : ''}>${r}</option>`).join('')}</select></td>
+            <td class="py-2 pr-3 space-y-1">
+                <label class="sr-only" for="ep-${p.id}">PPG</label><input id="ep-${p.id}" list="ppgLista" value="${esc(p.ppg)}" class="${campo} w-full">
+                <label class="sr-only" for="ei-${p.id}">Instituição</label><input id="ei-${p.id}" list="instLista" value="${esc(p.ppgInstituicao)}" class="${campo} w-full"></td>
+            <td class="py-2 pr-3">${dataBR(p.atualizacao) || '—'}</td>
+            <td class="py-2 whitespace-nowrap">
+                <button type="button" class="salvar text-brand-600 dark:text-accent-400 hover:underline mr-3">Salvar</button>
+                <button type="button" class="cancelar hover:underline">Cancelar</button></td>`;
+        tr.querySelector('select').focus();
+    }
+    async function salvar(tr) {
+        const id = tr.dataset.id;
+        try {
+            await api('programa', form({ id, grupo: $(`#eg-${id}`).value, ppg: $(`#ep-${id}`).value, instituicao: $(`#ei-${id}`).value }));
+            listar();
+        } catch (e) {
+            if (e.message !== 'sessão') alert(e.message);
+        }
+    }
+    async function remover(tr) {
+        const p = base.find((x) => x.id === tr.dataset.id);
+        if (!confirm(`Remover o currículo de ${p.nome}? O XML guardado também será apagado.`)) return;
+        try {
+            await api('remover', form({ id: p.id }));
+            listar();
+        } catch (e) {
+            if (e.message !== 'sessão') alert(e.message);
+        }
+    }
+
+    /* ------------------------------- início ------------------------------- */
+    function init() {
+        $('#entrarForm').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            $('#entradaMsg').textContent = '';
+            try {
+                const r = await api('entrar', form({ senha: $('#senhaInput').value }));
+                csrf = r.csrf;
+                $('#senhaInput').value = '';
+                mostrarPainel();
+            } catch (e) {
+                $('#entradaMsg').textContent = e.message;
+            }
+        });
+        $('#sairBtn').addEventListener('click', async () => {
+            try { await api('sair', form({})); } catch (_) { /* já saiu */ }
+            mostrarEntrada('');
+        });
+        for (const id of ['#arquivosInput', '#pastaInput']) {
+            $(id).addEventListener('change', (e) => { escolher(e.target.files); e.target.value = ''; });
+        }
+        // PROFIAP sugere o próprio nome do PPG; outro programa pede o nome.
+        document.querySelectorAll('input[name="grupo"]').forEach((r) => r.addEventListener('change', () => {
+            const ppg = $('#ppgInput');
+            if (r.value === 'outro' && ppg.value === 'PROFIAP') ppg.value = '';
+            if (r.value === 'profiap' && !ppg.value) ppg.value = 'PROFIAP';
+        }));
+        $('#envioForm').addEventListener('submit', enviar);
+        $('#filtroInput').addEventListener('input', renderTabela);
+        $('#baseTabela').addEventListener('click', (e) => {
+            const tr = e.target.closest('tr[data-id]');
+            if (!tr) return;
+            if (e.target.closest('.editar')) editar(tr);
+            else if (e.target.closest('.remover')) remover(tr);
+            else if (e.target.closest('.salvar')) salvar(tr);
+            else if (e.target.closest('.cancelar')) renderTabela();
+        });
+        iniciarSessao();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+})();

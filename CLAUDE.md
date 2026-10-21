@@ -1,9 +1,33 @@
-# Projeto: templateZen
+# Projeto: bancaZen (PROFIAP)
 
 ## Visão geral
-Template reutilizável de cabeçalho, rodapé, estrutura de arquivos e CI/CD
-(build + deploy via SSH) para começar novos projetos web a partir de uma
-base pronta.
+Aplicação web (site estático + backend PHP) que indica membros externos
+para banca de defesa de mestrado: a administração envia currículos Lattes
+(XML/ZIP) com grupo (PROFIAP ou outro programa), PPG e instituição; a partir
+do título, resumo e palavras-chave do trabalho, mostra duas listas de até 10
+pessoas (PROFIAP e outros programas) com maior proximidade temática (0 a 1,
+ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
+
+## Lattes e proximidade
+- **Currículos e índice nunca são públicos**: nada de XML no repositório
+  nem em `src/`/`dist/`; o navegador recebe só o resultado (`bb_publico`).
+  Ficam na pasta de dados fora da raiz do site (`BANCAZEN_DADOS`, padrão
+  `../bancazen-dados`), que o deploy (`rsync --delete`) não toca.
+- Backend PHP 8 sem dependências em `src/api/`: extrator
+  `lib/lattes.php` (tags do schema `CurriculoLattes`, o mesmo do lattesZen;
+  não extrair dados de contato), proximidade `lib/similaridade.php`
+  (TF-IDF + cosseno), vínculos `lib/vinculos.php`, base/sessão
+  `lib/base.php`; endpoints `buscar.php` (público), `status.php` (público,
+  só a contagem) e `admin.php` (sessão + token CSRF).
+- Mesmo ID Lattes no upload: fica o de `DATA-ATUALIZACAO` mais recente.
+- Conformidade ética: pessoa com vínculo (coautoria, orientação, mesma
+  pessoa) nunca entra nas listas; aparece à parte com o motivo.
+  "Confirmado" = ID Lattes ou nome completo; "provável" = sobrenome + ao
+  menos duas iniciais.
+- Ao mudar o backend, rodar `php tools/testar.php` (currículos fictícios em
+  `tools/fixtures/`; discente e orientadora em `tools/fixtures/envolvidos/`).
+  Currículos reais não entram em `tools/fixtures/`.
+- Senha da administração: `php api/cli/definir-senha.php` no servidor.
 
 ## Padrões de UI
 - Cabeçalho/rodapé (site estático HTML+JS): fonte única em `src/js/chrome.js`
@@ -52,16 +76,28 @@ base pronta.
   (v1.0.0)" (Actions) para materializar as tarefas (de `.github/go-live-issues.json`)
   como issues `go-live`.
 
-## Deploy
-- Automático via rsync/ssh quando há merge na `main` (ver `.github/workflows/deploy.yml`)
-- Segredos usados: `SSH_KEY`, `SSH_HOST`, `SSH_USER`, `SSH_PORT`, `DEPLOY_PATH`
-- Variável: `SITE_URL` (Actions → Variables) — usada pelo `build.mjs` para
-  URLs absolutas (Open Graph/canonical) e para gerar o `sitemap.xml`.
+## CI e deploy (detalhes em `DEPLOY.md`)
+- Validação em todo push/PR: `validar.yml` → `.github/scripts/validar.sh`
+  (rodar localmente antes do push).
+- Publicação: `deploy.yml` roda DEPOIS do `version-bump.yml` na `main`
+  (`workflow_run`), valida de novo e publica o `dist/` por rsync/SSH
+  (`.github/scripts/deploy.sh`), depois testa o site
+  (`.github/scripts/verificar-site.sh`). Manual: Actions → Publicar (só `main`).
+- Segredos (repositório ou ambiente `producao`): `SSH_KEY`, `SSH_HOST`,
+  `SSH_USER`, `DEPLOY_PATH`; opcionais `SSH_PORT`, `SSH_KNOWN_HOSTS`.
+- Variáveis: `SITE_URL` (metatags, `sitemap.xml`, verificação pós-deploy) e
+  `BANCAZEN_DADOS` (opcional; caminho da pasta de dados).
+- O `deploy.sh` nunca deve apagar a pasta de dados: recusa dados dentro do
+  `DEPLOY_PATH`, pasta alheia no primeiro deploy (marcador
+  `.bancazen-deploy`) e preserva `.well-known/` e `.user.ini`.
 
 ## Comandos úteis
 - `node build.mjs` — monta a pasta `dist/` a partir de `src/` (injeta
   versão/data, substitui `%SITE_URL%` e gera `sitemap.xml`).
+- `bash .github/scripts/validar.sh` — validação completa (a mesma da CI).
+- `php tools/testar.php` — testa extrator, proximidade, vínculos e a regra
+  do mesmo ID.
+- `php -S localhost:8000 -t dist` — servidor local (após o build).
 - `node scripts/setup.mjs` — setup do novo projeto (placeholders).
 - `node tools/contrast-check.mjs` — audita o contraste (WCAG) dos temas.
 - `node --check src/js/*.js` — valida a sintaxe dos módulos JS.
-- (sem suíte de testes de comportamento configurada ainda)

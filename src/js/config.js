@@ -3,7 +3,7 @@
    Edite este arquivo para adaptar o cabeçalho/rodapé ao seu projeto.
    ========================================================================== */
 window.APP_CONFIG = {
-    name: 'TemplateZen',
+    name: 'bancaZen',
     // Preenchido a partir do arquivo VERSION (via js/version.js). O 'v0.0.0'
     // é apenas o fallback usado em desenvolvimento local, quando o build
     // ainda não gerou a versão real. Não edite o número à mão — altere o
@@ -23,7 +23,7 @@ window.APP_CONFIG = {
         nome: 'Alexsandro Cardoso Carvalho',
         github: 'https://github.com/alexsandroccarv',
     },
-    repo: 'https://github.com/seu-usuario/seu-repo',
+    repo: 'https://github.com/alexsandroccarv/bancaZen',
     license: {
         nome: 'GPLv3',
         url: 'https://www.gnu.org/licenses/gpl-3.0.html',

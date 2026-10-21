@@ -1,0 +1,50 @@
+name: Validar
+
+# Valida o projeto (sintaxe JS/PHP, testes do backend, contraste, build) em:
+#  - todo push, em qualquer branch;
+#  - todo pull request;
+#  - chamada pelo workflow "Publicar" (workflow_call), que publica o dist/
+#    montado aqui (artefato "site").
+on:
+  push:
+  pull_request:
+  workflow_call:
+    inputs:
+      artefato:
+        description: Envia o dist/ como artefato "site" (usado pelo deploy).
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    name: Validar e montar o dist/
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      # A imagem ubuntu-latest já traz o PHP (CLI); o script confere a versão.
+      - name: Validar (JS, PHP, testes, contraste, build)
+        run: bash .github/scripts/validar.sh
+        env:
+          # Settings → Secrets and variables → Actions → Variables.
+          SITE_URL: ${{ vars.SITE_URL }}
+          BANCAZEN_DADOS: ${{ vars.BANCAZEN_DADOS }}
+
+      - name: Guardar o dist/ para a publicação
+        if: inputs.artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist/
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: error

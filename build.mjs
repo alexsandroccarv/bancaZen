@@ -17,6 +17,13 @@ const root = dirname(fileURLToPath(import.meta.url));
 const src = join(root, 'src');
 const dist = join(root, 'dist');
 
+function listFiles(dir) {
+    return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+        const p = join(dir, e.name);
+        return e.isDirectory() ? listFiles(p) : [p];
+    });
+}
+
 // 1) Recria dist/ do zero
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
@@ -60,6 +67,24 @@ for (const name of ['images', 'favicon.ico']) {
     if (existsSync(p)) cpSync(p, join(dist, name), { recursive: true });
 }
 
+// 3.1) Pasta de dados do backend PHP: NÃO faz parte do dist/. Os currículos
+// e o índice ficam fora da raiz pública (ver src/api/lib/base.php), para não
+// serem servidos nem apagados pelo deploy (rsync --delete). Se a variável
+// BANCAZEN_DADOS estiver definida (Actions → Variables), o caminho vai para
+// dist/api/lib/config-dados.php, dispensando configurar o servidor web.
+const dadosPath = (process.env.BANCAZEN_DADOS || '').trim();
+if (dadosPath) {
+    if (!dadosPath.startsWith('/')) {
+        console.error(`ERRO: BANCAZEN_DADOS deve ser um caminho absoluto (recebido: ${dadosPath}).`);
+        process.exit(1);
+    }
+    writeFileSync(
+        join(dist, 'api', 'lib', 'config-dados.php'),
+        `<?php\n// Gerado por build.mjs (variável BANCAZEN_DADOS): não editar.\nreturn ${JSON.stringify(dadosPath)};\n`
+    );
+    console.log(`Pasta de dados do backend: ${dadosPath}`);
+}
+
 // 4) URL do site: substitui o placeholder %SITE_URL% (metatags Open Graph,
 // canonical, robots) pela URL real e gera o sitemap.xml. A URL vem da
 // variável de ambiente SITE_URL (ex.: repo variable na CI); sem ela, usa um
@@ -71,12 +96,6 @@ if (!process.env.SITE_URL) {
 }
 
 // 4.1) Substitui %SITE_URL% em todos os .html e no robots.txt do dist/.
-function listFiles(dir) {
-    return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
-        const p = join(dir, e.name);
-        return e.isDirectory() ? listFiles(p) : [p];
-    });
-}
 for (const file of listFiles(dist)) {
     if (/\.(html|txt)$/.test(file)) {
         const content = readFileSync(file, 'utf8');
@@ -86,10 +105,11 @@ for (const file of listFiles(dist)) {
     }
 }
 
-// 4.2) Gera dist/sitemap.xml com as páginas públicas (exclui 404).
+// 4.2) Gera dist/sitemap.xml com as páginas públicas (exclui 404 e a
+// administração).
 const today = new Date().toISOString().slice(0, 10); // AAAA-MM-DD
 const pages = readdirSync(dist)
-    .filter((f) => f.endsWith('.html') && f !== '404.html')
+    .filter((f) => f.endsWith('.html') && f !== '404.html' && f !== 'admin.html')
     .sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b)));
 const urls = pages.map((f) => {
     const loc = f === 'index.html' ? SITE_URL + '/' : `${SITE_URL}/${f}`;

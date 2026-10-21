@@ -1,2 +1,6 @@
 dist/
 node_modules/
+# Currículos Lattes e dados do backend: nunca versionar.
+lattes/
+bancazen-dados/
+src/api/lib/config-dados.php

@@ -1,154 +1,225 @@
-# Publicação automática (CI/CD) via SSH
+# Integração contínua e publicação (rsync/SSH)
 
-Este template já vem com **integração contínua via GitHub Actions**: a cada
-`push` na branch principal, o robô monta a pasta `dist/` e a copia para o seu
-servidor Linux/VPS por **SSH (rsync)**. Você configura isto **uma vez** por
-projeto (que reutilize este template).
+O bancaZen é publicado por **GitHub Actions**: cada mudança é validada e,
+quando entra na `main`, o site (`dist/`) é copiado para o servidor por
+**rsync sobre SSH**. A configuração é feita **uma vez**.
 
-> Suas senhas/chaves ficam guardadas nos **Secrets** do GitHub. Elas não
-> entram no código e não são visíveis para ninguém depois de salvas.
+> Chaves e senhas ficam nos **Secrets** do GitHub: não entram no código e
+> não podem ser lidas depois de salvas.
 
 ---
 
-## Visão geral (o que vai acontecer)
+## Visão geral
 
 ```
-você faz "push" no GitHub
-        │
-        ▼
-GitHub Actions:  valida JS  ->  node build.mjs (monta dist/)  ->  rsync dist/ -> seu servidor
+push em qualquer branch / pull request
+    └─ "Validar": sintaxe JS e PHP, testes do backend, contraste, build, conferência do dist/
+
+push na main
+    └─ "Version bump (PATCH)": incrementa o VERSION e faz o commit
+         └─ "Publicar" (ao terminar o bump): valida de novo, monta o dist/ com a versão nova
+              ├─ verificações no servidor (PHP, pasta de dados, senha da administração)
+              ├─ rsync dist/ -> DEPLOY_PATH  (ou tar por SSH, se o servidor não tiver rsync)
+              └─ verificação do site publicado (SITE_URL)
 ```
 
-O deploy só acontece quando os 5 secrets abaixo estiverem configurados. Antes
-disso, o robô apenas valida e monta o site (fica "verde"), sem publicar.
+O deploy espera o incremento de versão para publicar a `main` já com o
+`VERSION` novo; assim o rodapé do site mostra a versão certa. Também dá para
+publicar à mão: **Actions → Publicar → Run workflow** (só na `main`).
+
+Enquanto os secrets não forem cadastrados, o "Publicar" valida, pula a cópia
+e fica verde.
 
 Arquivos envolvidos:
-- `.github/workflows/deploy.yml` — o workflow (quando/como roda).
-- `.github/scripts/deploy.sh` — o script que faz o rsync/SSH.
-- `build.mjs` — monta `dist/` a partir de `src/`.
 
----
+| Arquivo | Papel |
+|---|---|
+| `.github/workflows/validar.yml` | validação (push, pull request e antes do deploy) |
+| `.github/workflows/version-bump.yml` | incremento automático do PATCH na `main` |
+| `.github/workflows/deploy.yml` | publicação, depois do incremento |
+| `.github/scripts/validar.sh` | a validação em si (roda também na sua máquina) |
+| `.github/scripts/deploy.sh` | verificações no servidor e cópia por rsync/SSH |
+| `.github/scripts/verificar-site.sh` | testa o site publicado |
+| `build.mjs` | monta `dist/` a partir de `src/` |
 
-## Passo 1 — Ter um lugar no servidor para o site
-
-No seu servidor (via SSH), crie a pasta onde o site vai morar e dê permissão
-ao seu usuário. Exemplo (ajuste o caminho ao seu servidor web — Apache/Nginx):
-
-```bash
-sudo mkdir -p /var/www/meuapp
-sudo chown -R $USER:$USER /var/www/meuapp
-```
-
-⚠️ **Importante:** essa pasta será **espelhada** pelo deploy (o rsync usa
-`--delete`). Use uma pasta **dedicada só ao site** — tudo que estiver nela e
-não estiver no `dist/` será removido. Não aponte para a raiz do seu usuário
-nem para uma pasta com outros arquivos.
-
-Depois, configure o seu servidor web (Nginx/Apache) para servir essa pasta no
-domínio desejado (isso é a configuração normal do seu servidor, feita uma
-vez).
-
----
-
-## Passo 2 — Criar uma chave SSH dedicada ao deploy
-
-No **seu computador** (ou em qualquer terminal Linux/Mac; no Windows use o
-Git Bash), gere um par de chaves **só para o deploy** (não use sua chave
-pessoal). Troque `meuapp` pelo nome do seu projeto:
+Para validar localmente antes do push (Node.js 20+ e PHP 8.0+):
 
 ```bash
-ssh-keygen -t ed25519 -C "deploy-meuapp" -f ~/.ssh/meuapp_deploy -N ""
-```
-
-Isso cria dois arquivos:
-- `~/.ssh/meuapp_deploy`      → chave **PRIVADA** (vai para o GitHub, secret `SSH_KEY`)
-- `~/.ssh/meuapp_deploy.pub`  → chave **PÚBLICA** (vai para o servidor)
-
-Autorize a chave **pública** no servidor (troque `usuario` e `servidor`):
-
-```bash
-ssh-copy-id -i ~/.ssh/meuapp_deploy.pub usuario@servidor
-```
-
-> Sem `ssh-copy-id`? Copie manualmente o conteúdo de `meuapp_deploy.pub`
-> para o arquivo `~/.ssh/authorized_keys` do usuário no servidor.
-
-Teste que a chave funciona (deve entrar sem pedir senha):
-
-```bash
-ssh -i ~/.ssh/meuapp_deploy usuario@servidor
+bash .github/scripts/validar.sh
 ```
 
 ---
 
-## Passo 3 — Cadastrar os Secrets no GitHub
+## Passo 1: pastas no servidor
 
-No GitHub, abra o repositório e vá em:
-**Settings → Secrets and variables → Actions → New repository secret**
+O servidor precisa de **PHP 8.0 ou superior** (Apache com `mod_php`/PHP-FPM
+ou Nginx com PHP-FPM). Não há banco de dados nem dependências.
 
-Crie estes **5 secrets** (nome exatamente como abaixo):
+São duas pastas, **uma ao lado da outra**:
 
-| Nome          | Valor                                                                |
-|---------------|-----------------------------------------------------------------------|
-| `SSH_HOST`    | IP ou domínio do servidor (ex.: `200.100.50.10` ou `meuservidor.com`) |
-| `SSH_USER`    | usuário SSH (ex.: `deploy` ou o seu usuário)                          |
-| `SSH_PORT`    | porta SSH (geralmente `22`)                                           |
-| `DEPLOY_PATH` | pasta do site no servidor (ex.: `/var/www/meuapp`)                    |
-| `SSH_KEY`     | **conteúdo** do arquivo `~/.ssh/meuapp_deploy` (a chave PRIVADA)      |
-
-Para o `SSH_KEY`, cole o arquivo **inteiro**, incluindo as linhas
-`-----BEGIN OPENSSH PRIVATE KEY-----` e `-----END OPENSSH PRIVATE KEY-----`.
-No terminal, veja o conteúdo com:
+| Pasta | Conteúdo | Quem escreve |
+|---|---|---|
+| `/var/www/bancazen` (`DEPLOY_PATH`) | o site, espelhado a cada deploy | o usuário de deploy (SSH) |
+| `/var/www/bancazen-dados` | currículos (XML), índice, hash da senha | o PHP (ex.: `www-data`) |
 
 ```bash
-cat ~/.ssh/meuapp_deploy
+# usuário de deploy (sem senha; entra só com a chave do Passo 2)
+sudo adduser --disabled-password --gecos "" deploy
+
+# pasta do site: do usuário de deploy, legível pelo servidor web
+sudo mkdir -p /var/www/bancazen
+sudo chown deploy:deploy /var/www/bancazen
+
+# pasta de dados: do usuário do PHP, fora da pasta do site
+sudo mkdir -p /var/www/bancazen-dados
+sudo chown www-data:www-data /var/www/bancazen-dados
+sudo chmod 750 /var/www/bancazen-dados
+```
+
+Configure o servidor web para servir `/var/www/bancazen` no domínio (uma
+vez). Use **HTTPS**: a senha da administração trafega no login.
+
+**Por que a pasta de dados fica fora do site:** para não ser servida pela web
+e para não ser apagada pelo deploy (o rsync usa `--delete` e espelha só o
+`DEPLOY_PATH`). O deploy **se recusa** a publicar se a pasta de dados estiver
+dentro do `DEPLOY_PATH`.
+
+**Outro local para os dados:** defina a variável `BANCAZEN_DADOS` (Passo 3);
+o build grava o caminho em `api/lib/config-dados.php`, sem mexer no servidor
+web. Alternativa: `SetEnv BANCAZEN_DADOS /caminho` (Apache) ou
+`fastcgi_param BANCAZEN_DADOS /caminho;` (Nginx/PHP-FPM).
+
+**O que o deploy preserva no `DEPLOY_PATH`:** `.well-known/` (validação do
+certificado Let's Encrypt) e `.user.ini` (limites do PHP em hospedagem
+compartilhada). Todo o resto é espelhado do `dist/`.
+
+**Primeiro deploy:** a pasta do site precisa estar **vazia** (podendo ter só
+`.well-known/` e `.user.ini`). Se houver outro conteúdo, o deploy para sem
+apagar nada e mostra o que encontrou. Depois do primeiro deploy, o marcador
+`.bancazen-deploy` identifica a pasta.
+
+---
+
+## Passo 2: chave SSH dedicada ao deploy
+
+No **seu computador**, gere um par de chaves **só para o deploy**:
+
+```bash
+ssh-keygen -t ed25519 -C "deploy-bancazen" -f ~/.ssh/bancazen_deploy -N ""
+```
+
+- `~/.ssh/bancazen_deploy` → chave **PRIVADA** (secret `SSH_KEY`)
+- `~/.ssh/bancazen_deploy.pub` → chave **PÚBLICA** (vai para o servidor)
+
+Autorize a chave pública para o usuário de deploy e teste:
+
+```bash
+ssh-copy-id -i ~/.ssh/bancazen_deploy.pub deploy@servidor
+ssh -i ~/.ssh/bancazen_deploy deploy@servidor 'echo ok; php -v | head -1; which rsync'
+```
+
+Recomendado: guarde a chave **do servidor** para o GitHub conferir que está
+falando com a máquina certa (secret `SSH_KNOWN_HOSTS`):
+
+```bash
+ssh-keyscan -p 22 servidor     # confira a impressão digital com a da hospedagem
 ```
 
 ---
 
-## Passo 4 — Publicar
+## Passo 3: secrets e variáveis no GitHub
 
-Antes de tudo, confirme em `.github/workflows/deploy.yml` que o gatilho
-`branches: ['main']` bate com a branch principal do seu projeto (ajuste se
-usar outro nome, ex. `master` ou `producao`).
+**Secrets** (Settings → Secrets and variables → Actions → *Secrets*). Podem
+ficar no repositório ou no ambiente **`producao`** (Settings → Environments),
+que o deploy usa; no ambiente dá para exigir aprovação manual antes de
+publicar.
 
-Duas formas de disparar:
+| Nome | Obrigatório | Valor |
+|---|---|---|
+| `SSH_HOST` | sim | IP ou domínio do servidor |
+| `SSH_USER` | sim | usuário de deploy (ex.: `deploy`) |
+| `SSH_KEY` | sim | conteúdo **inteiro** de `~/.ssh/bancazen_deploy` (com as linhas `BEGIN`/`END`) |
+| `DEPLOY_PATH` | sim | pasta do site, caminho absoluto (ex.: `/var/www/bancazen`) |
+| `SSH_PORT` | não | porta SSH (padrão `22`) |
+| `SSH_KNOWN_HOSTS` | não (recomendado) | saída do `ssh-keyscan` do Passo 2. Sem ele, a chave do servidor é aceita no primeiro contato |
 
-1. **Automático:** faça qualquer `push` na branch principal — o deploy roda.
-2. **Manual:** no GitHub, aba **Actions → "Publicar" → Run workflow**.
+**Variáveis** (Settings → Secrets and variables → Actions → *Variables*):
 
-Acompanhe em **Actions**. Se tudo estiver certo, ao final o passo "Publicar no
-servidor" mostra `Deploy (rsync) concluído.` e o site aparece no seu domínio.
+| Nome | Obrigatório | Valor |
+|---|---|---|
+| `SITE_URL` | recomendado | endereço do site, sem barra final (ex.: `https://bancazen.exemplo.br`). Usado nas metatags, no `sitemap.xml` e na verificação depois do deploy |
+| `BANCAZEN_DADOS` | não | caminho absoluto da pasta de dados, se não for a irmã `bancazen-dados` |
 
 ---
 
-## URL do site (SEO/social e sitemap)
+## Passo 4: publicar
 
-Para as metatags de compartilhamento (Open Graph/Twitter), o `canonical` e o
-`sitemap.xml` ficarem com URLs **absolutas**, defina a variável `SITE_URL`
-com o domínio do site (sem barra final), em:
-**Settings → Secrets and variables → Actions → Variables → New variable**
+1. **Automático:** um push (ou merge) na `main` dispara o incremento de
+   versão e, em seguida, o "Publicar".
+2. **Manual:** **Actions → Publicar → Run workflow** (branch `main`).
 
-| Nome       | Valor (exemplo)              |
-|------------|------------------------------|
-| `SITE_URL` | `https://meuapp.com.br`      |
+No log do passo **Publicar (rsync/SSH)** aparecem, antes da cópia: a versão do
+PHP do servidor, a situação da pasta de dados, quantos currículos estão
+guardados e um aviso se a senha da administração ainda não foi definida.
 
-O `build.mjs` substitui o placeholder `%SITE_URL%` por esse valor e gera o
-`sitemap.xml`. Sem a variável, o build usa um placeholder e emite um aviso
-(o site publica normalmente, mas os links sociais ficam incorretos).
+Depois da cópia, o passo **Verificar o site publicado** (com `SITE_URL`)
+confere que:
 
-Localmente: `SITE_URL=https://meuapp.com.br node build.mjs`.
+- a página inicial e a `admin.html` respondem;
+- `api/status.php` devolve JSON, ou seja, o PHP está sendo executado;
+- `api/lib` e `api/cli` não expõem código-fonte.
+
+Se alguma verificação falhar, o workflow fica vermelho.
+
+---
+
+## Passo 5: senha da administração (uma vez, e para trocar)
+
+Depois do primeiro deploy, no servidor, com o usuário do PHP:
+
+```bash
+cd /var/www/bancazen
+sudo -u www-data php api/cli/definir-senha.php
+```
+
+Só o hash (`password_hash`) é gravado em `bancazen-dados/admin.json`.
+
+---
+
+## Backend: bloqueios e limites
+
+**Bloquear `api/lib` e `api/cli`.** No Apache o `api/.htaccess` já faz isso
+(requer `AllowOverride` habilitado). No Nginx, acrescente ao `server { }`:
+
+```nginx
+location ~ ^/api/(lib|cli)/ { deny all; return 404; }
+location ~ \.php$ { include snippets/fastcgi-php.conf; fastcgi_pass unix:/run/php/php-fpm.sock; }
+```
+
+**Limites de envio.** A administração envia os arquivos em lotes de até 15
+arquivos e 6 MB, compatíveis com o padrão do PHP (`max_file_uploads = 20`,
+`post_max_size = 8M`). Um currículo maior que `upload_max_filesize` (padrão
+2 MB) exige aumentar esse limite no `php.ini` ou no `.user.ini` da pasta do
+site (que o deploy preserva).
+
+**Backup.** Copie a pasta `bancazen-dados` (XML + `corpus.json` +
+`admin.json`).
 
 ---
 
 ## Resolução de problemas
 
-- **"Secrets do ambiente não configurados"** → falta cadastrar os 5 secrets
-  (Passo 3). O CI fica verde, mas não publica até você cadastrá-los.
-- **Permissão negada (publickey)** → a chave pública não está no
-  `authorized_keys` do servidor, ou o `SSH_USER`/`SSH_HOST`/`SSH_PORT` estão
-  errados. Refaça o teste do Passo 2.
-- **Conexão expira (timeout)** → o servidor bloqueia a porta SSH para a
-  internet ou o IP/porta estão errados. Confirme com sua hospedagem.
-- **O site publica, mas com arquivos a mais/velhos** → confirme que o
-  `DEPLOY_PATH` aponta **só** para a pasta do site (o `--delete` espelha).
+| Mensagem no log | Causa e solução |
+|---|---|
+| `Secrets de deploy não configurados` | Faltam os secrets obrigatórios (Passo 3). O workflow fica verde, mas não publica. |
+| `Permission denied (publickey)` | A chave pública não está no `authorized_keys` do usuário de deploy, ou `SSH_USER`/`SSH_HOST`/`SSH_PORT` estão errados. Refaça o teste do Passo 2. |
+| `Host key verification failed` | A chave do servidor mudou ou o `SSH_KNOWN_HOSTS` está errado. Confira com a hospedagem e refaça o `ssh-keyscan`. |
+| `Connection timed out` | O servidor bloqueia a porta SSH para a internet, ou o IP/porta estão errados. |
+| `DEPLOY_PATH raso demais` / `deve ser um caminho absoluto` | Use uma pasta dedicada com caminho completo, ex.: `/var/www/bancazen`. |
+| `A pasta de dados ... está dentro do DEPLOY_PATH` | Mova a pasta de dados para fora do site (ou ajuste `BANCAZEN_DADOS`). |
+| `não está vazia e não tem o marcador .bancazen-deploy` | Primeiro deploy numa pasta com outro conteúdo. Esvazie a pasta ou, se ela já é do bancaZen, crie o marcador com `touch`. |
+| `Pasta de dados criada ... Dê a posse ao usuário do PHP` | O deploy criou a pasta com o usuário de deploy; o PHP precisa escrever nela: `sudo chown -R www-data:www-data /var/www/bancazen-dados`. |
+| `Senha da administração não definida` | Faça o Passo 5. |
+| `api/status.php devolveu código PHP` | O servidor web não executa PHP nessa pasta. Instale/habilite o PHP (8.0+) no site. |
+| `api/lib/... expõe código-fonte` ou `respondeu com conteúdo` | Bloqueie `api/lib` e `api/cli` (seção "Backend"). No Apache, confira o `AllowOverride`. |
+| `rsync indisponível/falhou: usando o envio por tar` | O servidor não tem rsync; o deploy usou tar por SSH, com o mesmo resultado. Instalar o rsync deixa o envio incremental. |

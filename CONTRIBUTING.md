@@ -16,10 +16,12 @@ simples, orientado a issues.
    da issue (formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)).
 5. **Abra um Pull Request** com `Closes #<numero>` na descrição (o modelo de PR
    já traz o campo). A issue fecha automaticamente ao mergear.
-6. Ao mergear na `main`, a CI:
+6. Todo push e pull request passa pela validação (`validar.yml`); rode antes
+   na sua máquina: `bash .github/scripts/validar.sh`.
+7. Ao mergear na `main`, a CI:
    - incrementa o **PATCH** do arquivo `VERSION` (`version-bump.yml`);
-   - **publica** o site via SSH, se os segredos estiverem configurados
-     (`deploy.yml` — veja `DEPLOY.md`).
+   - em seguida **publica** o site via rsync/SSH, se os segredos estiverem
+     configurados (`deploy.yml`; veja `DEPLOY.md`).
 
 ## Versionamento (SemVer)
 

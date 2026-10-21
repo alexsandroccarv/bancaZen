@@ -1,11 +1,66 @@
-# templateZen
+# bancaZen
 
-Template de cabeçalho, rodapé e estrutura de arquivos para aplicações web
-estáticas (HTML + Tailwind via CDN + JS puro), extraído e generalizado a
-partir do [lattesZen](https://github.com/alexsandroccarv/latteszen).
+Aplicação web que indica **membros externos para banca de defesa de
+mestrado** a partir de currículos Lattes.
 
-Use este repositório como ponto de partida para novos projetos que
-precisem de um layout pronto, acessível e com tema claro/escuro.
+1. A administração do programa envia os currículos (XML exportado pela
+   Plataforma Lattes, ou o ZIP que o contém) em **`admin.html`**, informando
+   o **grupo** (PROFIAP ou outro programa), o **PPG** e a **instituição**. Se
+   o mesmo ID Lattes já existir, fica o currículo com a data de atualização
+   mais recente.
+2. Na página inicial, a pessoa discente informa **título**, **resumo** e
+   **palavras-chave** do trabalho, o próprio currículo Lattes e o da
+   orientação, e recebe **duas listas de até 10 pessoas** com maior
+   proximidade temática, numa escala de **0 a 1**, em ordem decrescente:
+   - currículos do **PROFIAP**;
+   - currículos de **outros programas** (segundo membro externo).
+   Cada pessoa aparece com PPG e instituição, titulação, bancas de mestrado
+   registradas e os termos em comum.
+
+**Proteção dos currículos.** Os XML e o índice processado ficam no servidor,
+numa pasta de dados fora da área pública do site (ver
+[DEPLOY.md](DEPLOY.md#passo-1-pastas-no-servidor)). O navegador recebe só
+o resultado da busca. Os currículos da pessoa discente e da orientação
+enviados na busca são lidos em memória e não são gravados. Nenhum currículo
+é versionado no repositório.
+
+**Conformidade ética.** Quem tem coautoria em publicações (procurada nos
+currículos dos dois lados), relação de orientação com a pessoa discente, o(a)
+orientador(a) ou o(a) coorientador(a), ou é uma dessas pessoas, sai da lista
+e aparece à parte, com o motivo. O vínculo é "confirmado" quando a pessoa é
+identificada pelo ID Lattes ou pelo nome completo, e "provável" quando só o
+sobrenome e as iniciais coincidem (pode ser homônimo). O período das
+coautorias é configurável (todo o período, 10 ou 5 anos).
+
+**Como a proximidade é calculada.** Cada currículo vira um vetor de termos
+(resumo, linhas de pesquisa, áreas do conhecimento, palavras-chave, títulos
+da formação, dos projetos, das produções e das orientações), com pesos por
+campo e peso menor para produções com mais de 10 anos. O trabalho informado
+vira outro vetor (palavras-chave e título pesam mais que o resumo). Os
+termos passam por remoção de acentos e de palavras vazias, radical leve e
+bigramas; a ponderação é TF-IDF e a proximidade é o cosseno entre os
+vetores (0 a 1). Filtros opcionais: desconsiderar a instituição do programa
+e manter só doutores.
+
+**Código.** Backend em PHP 8 sem dependências, em `src/api/`:
+`lib/lattes.php` (extrator, schema `CurriculoLattes`, o mesmo do
+[lattesZen](https://github.com/alexsandroccarv/latteszen)),
+`lib/similaridade.php`, `lib/vinculos.php`, `lib/base.php` (pasta de dados,
+sessão) e os endpoints `buscar.php`, `status.php` e `admin.php`. Interface:
+`src/js/app.js` e `src/js/admin.js`. Teste: `php tools/testar.php`.
+Ambiente local: `node build.mjs && php -S localhost:8000 -t dist` (dados em
+`bancazen-dados/`, ignorada pelo Git).
+
+**Integração contínua e publicação.** Todo push e pull request passa pela
+validação (`bash .github/scripts/validar.sh`: sintaxe JS e PHP, testes do
+backend, contraste, build). Na `main`, depois do incremento automático de
+versão, o site é publicado por rsync/SSH, com verificações no servidor antes
+da cópia e no site depois dela. Configuração em [DEPLOY.md](DEPLOY.md).
+
+---
+
+O restante deste documento descreve a base herdada do modelo **templateZen**
+(cabeçalho, rodapé, temas, CI/CD).
 
 ## O que vem pronto
 
@@ -32,8 +87,9 @@ precisem de um layout pronto, acessível e com tema claro/escuro.
 - **SEO/social**: `meta description`, Open Graph/Twitter e `canonical` com
   URLs absolutas (variável `SITE_URL`), `robots.txt` e `sitemap.xml`
   gerado no build.
-- **CI/CD via SSH** (GitHub Actions): valida, audita contraste, monta o
-  `dist/` e publica via `rsync` a cada `push` — veja [DEPLOY.md](DEPLOY.md).
+- **CI/CD via SSH** (GitHub Actions): valida em todo push e pull request e,
+  na `main`, publica via `rsync` depois do incremento de versão; veja
+  [DEPLOY.md](DEPLOY.md).
 - **Versionamento**: arquivo `VERSION` (SemVer) com `PATCH` automático a
   cada `push` em `main`, e `CHANGELOG.md` no formato
   [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
@@ -65,11 +121,14 @@ templatezen/
 │   └── contrast-check.mjs       # Auditoria de contraste (WCAG) dos temas
 ├── .github/
 │   ├── workflows/
-│   │   ├── deploy.yml           # CI: valida, audita contraste, builda e publica
+│   │   ├── validar.yml          # CI: valida em todo push/PR (e antes do deploy)
+│   │   ├── deploy.yml           # Publica após o version-bump (rsync/SSH)
 │   │   ├── version-bump.yml     # Incrementa o PATCH de VERSION automaticamente
 │   │   └── seed-go-live-issues.yml  # Cria as tarefas de Go-Live (v1.0.0) no repo
 │   ├── scripts/
-│   │   └── deploy.sh            # Script de deploy via rsync sobre SSH
+│   │   ├── validar.sh           # Validação (CI e local)
+│   │   ├── deploy.sh            # Verificações no servidor + rsync sobre SSH
+│   │   └── verificar-site.sh    # Teste do site publicado
 │   ├── go-live-issues.json      # Tarefas obrigatórias antes da v1.0.0 (manifesto)
 │   ├── pull_request_template.md
 │   └── ISSUE_TEMPLATE/
@@ -140,7 +199,7 @@ templatezen/
    itens do rodapé, ajuste `config.links` e o `footerHTML()` em
    `js/chrome.js`.
 6. Para publicar automaticamente via SSH a cada `push`, siga o passo a
-   passo em [DEPLOY.md](DEPLOY.md) (chave SSH dedicada + 5 secrets no
+   passo em [DEPLOY.md](DEPLOY.md) (chave SSH dedicada + secrets no
    GitHub). Antes dos secrets configurados, o workflow só valida e monta
    `dist/` — fica verde sem publicar. Defina também a variável `SITE_URL`
    (Actions → Variables) para as metatags sociais e o `sitemap.xml` saírem

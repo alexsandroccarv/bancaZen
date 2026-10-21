@@ -1,0 +1,11 @@
+# Apache: bibliotecas e scripts de linha de comando não são acessíveis pela web.
+# (Nginx: ver DEPLOY.md, seção "Backend PHP".)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(lib|cli)(/|$) - [F,L]
+</IfModule>
+<IfModule !mod_rewrite.c>
+    <FilesMatch "^(lattes|similaridade|vinculos|base|config-dados|definir-senha)\.php$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
