@@ -40,7 +40,7 @@ for p in termodeuso politicadeprivacidade ajuda sobre doeumcafe historico; do
 done
 # Currículos e dados do backend nunca vão para a pasta publicada.
 if find dist -iname '*.xml' ! -path dist/sitemap.xml | grep -q .; then erro "arquivo XML em dist/."; fi
-if find dist \( -name 'corpus.json' -o -name 'admin.json' -o -name '*.zip' \) | grep -q .; then erro "dados do backend em dist/."; fi
+if find dist \( -name 'corpus.json' -o -name 'admin.json' -o -name 'docentes.json' -o -name '*.zip' -o -iname '*.csv' \) | grep -q .; then erro "dados do backend em dist/."; fi
 
 echo
 echo "OK: validação concluída."

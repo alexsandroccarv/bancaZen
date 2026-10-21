@@ -1,9 +1,9 @@
 /* ==========================================================================
    bancaZen — área de administração (seção Administração do index.html)
    --------------------------------------------------------------------------
-   Entrada por senha, envio de currículos Lattes (XML/ZIP, arquivos ou pasta)
-   com grupo, PPG e instituição, lista da base, correção do programa e
-   remoção. Toda a regra (mesmo ID, guarda fora da área pública) fica no
+   Entrada por senha, importação da lista de docentes dos programas (CSV),
+   envio de currículos Lattes (XML/ZIP, arquivos ou pasta) com grupo, PPG,
+   instituição e situação, lista da base, correção do programa e remoção. Toda a regra (mesmo ID, guarda fora da área pública) fica no
    servidor: api/admin.php.
    ========================================================================== */
 (function () {
@@ -17,6 +17,7 @@
 
     let csrf = null;
     let base = [];
+    let docentes = [];
     let escolhidos = [];
 
     function esc(s) {
@@ -57,6 +58,7 @@
         $('#entrada').classList.add('hidden');
         $('#painel').classList.remove('hidden');
         listar();
+        listarDocentes();
     }
     async function iniciarSessao() {
         try {
@@ -106,7 +108,7 @@
         try {
             for (let i = 0; i < partes.length; i++) {
                 rel.innerHTML = `<p>Enviando lote ${i + 1} de ${partes.length}…</p>`;
-                const fd = form({ grupo, ppg, instituicao: inst });
+                const fd = form({ grupo, ppg, instituicao: inst, situacao: $('#situacaoInput').value });
                 for (const f of partes[i]) fd.append('arquivos[]', f, f.webkitRelativePath || f.name);
                 const { relatorio } = await api('enviar', fd);
                 linhas.push(...relatorio);
@@ -116,6 +118,7 @@
                 <ul class="list-disc list-inside">${linhas.map((r) => `<li>${esc(r.arquivo)}: ${esc(SITUACAO[r.situacao](r))}</li>`).join('')}</ul>`;
             escolher([]);
             listar();
+            listarDocentes();
         } catch (e) {
             rel.innerHTML += `<p class="text-red-700 dark:text-red-400">${esc(e.message)}</p>`;
         } finally {
@@ -134,22 +137,93 @@
         // Sugestões de PPG e instituição a partir do que já foi cadastrado.
         const unicos = (k) => [...new Set(base.map((p) => p[k]).filter(Boolean))].sort();
         $('#ppgLista').innerHTML = unicos('ppg').map((v) => `<option value="${esc(v)}">`).join('');
-        $('#instLista').innerHTML = unicos('ppgInstituicao').map((v) => `<option value="${esc(v)}">`).join('');
+        $('#instLista').innerHTML = unicos('universidade').map((v) => `<option value="${esc(v)}">`).join('');
         renderTabela();
+    }
+
+    /* ------------------------- lista de docentes -------------------------- */
+    async function listarDocentes() {
+        try {
+            docentes = (await api('docentes')).docentes;
+        } catch (e) {
+            return;
+        }
+        renderDocentes();
+    }
+
+    function renderDocentes() {
+        const com = docentes.filter((d) => d.temCurriculo).length;
+        $('#docTotais').textContent = docentes.length
+            ? `${docentes.length} docente(s) na lista: ${com} com currículo enviado, ${docentes.length - com} sem currículo.`
+            : 'Nenhuma lista de docentes importada.';
+        const filtro = semAcento($('#docFiltroInput').value);
+        const pendentes = $('#docPendentesInput').checked;
+        const lista = docentes.filter((d) => (!pendentes || !d.temCurriculo)
+            && (!filtro || semAcento(`${d.nome} ${d.universidade} ${d.ppg} ${d.situacao}`).includes(filtro)));
+        const tbody = $('#docTabela');
+        if (!lista.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-gray-500 dark:text-gray-400">${docentes.length ? 'Nenhum docente corresponde ao filtro.' : 'Importe uma lista para vê-la aqui.'}</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = lista.map((d) => `<tr class="border-b border-gray-200 dark:border-gray-700">
+            <td class="py-2 pr-3">${esc(d.nome)}</td>
+            <td class="py-2 pr-3">${esc(d.universidade) || '—'}</td>
+            <td class="py-2 pr-3">${esc(d.ppg)}</td>
+            <td class="py-2 pr-3">${esc(d.situacao) || '—'}</td>
+            <td class="py-2 pr-3"><a href="https://lattes.cnpq.br/${esc(d.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline font-mono">${esc(d.id)}</a></td>
+            <td class="py-2 whitespace-nowrap">${d.temCurriculo
+                ? '<i aria-hidden="true" class="fa-solid fa-circle-check text-green-700 dark:text-green-400"></i> enviado'
+                : '<i aria-hidden="true" class="fa-regular fa-clock text-gray-500"></i> pendente'}</td>
+        </tr>`).join('');
+    }
+
+    async function importarDocentes(ev) {
+        ev.preventDefault();
+        const rel = $('#docRelatorio');
+        const arq = $('#docArquivoInput').files[0];
+        if (!arq) { rel.innerHTML = '<p class="text-red-700 dark:text-red-400">Escolha o arquivo CSV.</p>'; return; }
+        const btn = $('#importarBtn');
+        btn.disabled = true;
+        rel.innerHTML = '<p>Importando…</p>';
+        try {
+            const fd = form({
+                grupo: document.querySelector('input[name="grupoDocentes"]:checked').value,
+                ppg: $('#docPpgInput').value.trim(),
+                substituir: $('#docSubstituirInput').checked ? '1' : '0',
+            });
+            fd.append('arquivo', arq);
+            const { relatorio: r } = await api('importar-docentes', fd);
+            rel.innerHTML = `<p class="font-medium">Lista importada: ${r.importados} docente(s) de ${r.linhas} linha(s)
+                (${r.novos} novo(s), ${r.atualizados} atualizado(s)${r.removidos ? `, ${r.removidos} retirado(s) da lista anterior` : ''}).</p>
+                <ul class="list-disc list-inside">
+                    ${r.duplicados ? `<li>${r.duplicados} pessoa(s) repetida(s) no arquivo foram unidas (prevalece a situação Permanente).</li>` : ''}
+                    ${r.semLattes.length ? `<li>Sem Lattes, não importado(s): ${esc(r.semLattes.join('; '))}.</li>` : ''}
+                    ${r.semSituacao ? `<li>${r.semSituacao} sem situação no programa reconhecida.</li>` : ''}
+                    ${r.colunasDescartadas.length ? `<li>Colunas não guardadas: ${esc(r.colunasDescartadas.join(', '))}.</li>` : ''}
+                </ul>`;
+            $('#docArquivoInput').value = '';
+            listarDocentes();
+            listar();
+        } catch (e) {
+            if (e.message !== 'sessão') rel.innerHTML = `<p class="text-red-700 dark:text-red-400">${esc(e.message)}</p>`;
+        } finally {
+            btn.disabled = false;
+        }
     }
 
     function renderTabela() {
         const filtro = semAcento($('#filtroInput').value);
-        const lista = base.filter((p) => !filtro || semAcento(`${p.nome} ${p.ppg} ${p.ppgInstituicao}`).includes(filtro));
+        const lista = base.filter((p) => !filtro || semAcento(`${p.nome} ${p.ppg} ${p.universidade} ${p.situacao}`).includes(filtro));
         const tbody = $('#baseTabela');
         if (!lista.length) {
-            tbody.innerHTML = `<tr><td colspan="5" class="py-3 text-gray-500 dark:text-gray-400">${base.length ? 'Nenhum currículo corresponde ao filtro.' : 'Nenhum currículo cadastrado.'}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-gray-500 dark:text-gray-400">${base.length ? 'Nenhum currículo corresponde ao filtro.' : 'Nenhum currículo cadastrado.'}</td></tr>`;
             return;
         }
         tbody.innerHTML = lista.map((p) => `<tr class="border-b border-gray-200 dark:border-gray-700" data-id="${esc(p.id)}">
             <td class="py-2 pr-3"><a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(p.nome)}</a></td>
             <td class="py-2 pr-3">${esc(GRUPOS[p.grupo] || p.grupo)}</td>
-            <td class="py-2 pr-3">${esc([p.ppg, p.ppgInstituicao].filter(Boolean).join(' · '))}</td>
+            <td class="py-2 pr-3">${esc([p.universidade, p.ppg].filter(Boolean).join(' · '))}${p.naLista ? ' <span class="badge border border-gray-300 dark:border-gray-600" title="Universidade, PPG e situação vêm da lista de docentes">lista</span>' : ''}</td>
+            <td class="py-2 pr-3">${esc(p.situacao) || '—'}</td>
             <td class="py-2 pr-3 whitespace-nowrap">${dataBR(p.atualizacao) || '—'}</td>
             <td class="py-2 whitespace-nowrap">
                 <button type="button" class="editar text-brand-600 dark:text-accent-400 hover:underline mr-3" aria-label="Editar programa de ${esc(p.nome)}">Editar</button>
@@ -166,7 +240,9 @@
                 <select id="eg-${p.id}" class="${campo}">${Object.entries(GRUPOS).map(([v, r]) => `<option value="${v}"${v === p.grupo ? ' selected' : ''}>${r}</option>`).join('')}</select></td>
             <td class="py-2 pr-3 space-y-1">
                 <label class="sr-only" for="ep-${p.id}">PPG</label><input id="ep-${p.id}" list="ppgLista" value="${esc(p.ppg)}" class="${campo} w-full">
-                <label class="sr-only" for="ei-${p.id}">Instituição</label><input id="ei-${p.id}" list="instLista" value="${esc(p.ppgInstituicao)}" class="${campo} w-full"></td>
+                <label class="sr-only" for="ei-${p.id}">Instituição</label><input id="ei-${p.id}" list="instLista" value="${esc(p.universidade)}" class="${campo} w-full"></td>
+            <td class="py-2 pr-3"><label class="sr-only" for="es-${p.id}">Situação</label>
+                <select id="es-${p.id}" class="${campo}">${['', 'Permanente', 'Colaborador', 'Visitante'].map((v) => `<option value="${v}"${v === p.situacao ? ' selected' : ''}>${v || 'Não informada'}</option>`).join('')}</select></td>
             <td class="py-2 pr-3">${dataBR(p.atualizacao) || '—'}</td>
             <td class="py-2 whitespace-nowrap">
                 <button type="button" class="salvar text-brand-600 dark:text-accent-400 hover:underline mr-3">Salvar</button>
@@ -176,7 +252,7 @@
     async function salvar(tr) {
         const id = tr.dataset.id;
         try {
-            await api('programa', form({ id, grupo: $(`#eg-${id}`).value, ppg: $(`#ep-${id}`).value, instituicao: $(`#ei-${id}`).value }));
+            await api('programa', form({ id, grupo: $(`#eg-${id}`).value, ppg: $(`#ep-${id}`).value, instituicao: $(`#ei-${id}`).value, situacao: $(`#es-${id}`).value }));
             listar();
         } catch (e) {
             if (e.message !== 'sessão') alert(e.message);
@@ -220,7 +296,15 @@
             if (r.value === 'outro' && ppg.value === 'PROFIAP') ppg.value = '';
             if (r.value === 'profiap' && !ppg.value) ppg.value = 'PROFIAP';
         }));
+        document.querySelectorAll('input[name="grupoDocentes"]').forEach((r) => r.addEventListener('change', () => {
+            const ppg = $('#docPpgInput');
+            if (r.value === 'outro' && ppg.value === 'PROFIAP') ppg.value = '';
+            if (r.value === 'profiap' && !ppg.value) ppg.value = 'PROFIAP';
+        }));
         $('#envioForm').addEventListener('submit', enviar);
+        $('#docentesForm').addEventListener('submit', importarDocentes);
+        $('#docFiltroInput').addEventListener('input', renderDocentes);
+        $('#docPendentesInput').addEventListener('change', renderDocentes);
         $('#filtroInput').addEventListener('input', renderTabela);
         $('#baseTabela').addEventListener('click', (e) => {
             const tr = e.target.closest('tr[data-id]');

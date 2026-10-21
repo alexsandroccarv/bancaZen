@@ -317,6 +317,62 @@
                     <button type="button" id="sairBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium"><i aria-hidden="true" class="fa-solid fa-right-from-bracket"></i> Sair</button>
                 </div>
 
+                <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="docentesTitulo">
+                    <h3 id="docentesTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Lista de docentes dos programas</h3>
+                    <p class="text-sm">
+                        Importe a lista de docentes de um programa (CSV com as colunas <code>nome</code>,
+                        <code>lattes_id</code> ou <code>lattes_url</code>, <code>universidade</code> e
+                        <code>categoria</code>), mesmo antes de enviar os XMLs. Para quem está na lista, valem a
+                        universidade, o PPG e a situação da lista. Outras colunas, como e-mail, são descartadas.
+                    </p>
+                    <form id="docentesForm" class="space-y-4">
+                        <fieldset class="space-y-2">
+                            <legend class="text-sm font-medium">Grupo</legend>
+                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupoDocentes" value="profiap" checked> PROFIAP</label>
+                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupoDocentes" value="outro"> Outro programa</label>
+                        </fieldset>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="docPpgInput" class="block text-sm font-medium mb-1">PPG (se o arquivo não tiver a coluna <code>ppg</code>)</label>
+                                <input id="docPpgInput" type="text" list="ppgLista" value="PROFIAP" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            </div>
+                            <div>
+                                <label for="docArquivoInput" class="block text-sm font-medium mb-1">Arquivo CSV</label>
+                                <input id="docArquivoInput" type="file" accept=".csv,text/csv" required class="block w-full text-sm">
+                            </div>
+                        </div>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input id="docSubstituirInput" type="checkbox" checked> Substituir a lista anterior deste PPG (quem não estiver no arquivo sai da lista)
+                        </label>
+                        <button type="submit" id="importarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50"><i aria-hidden="true" class="fa-solid fa-file-import"></i> Importar lista</button>
+                    </form>
+                    <div id="docRelatorio" class="text-sm space-y-1" aria-live="polite"></div>
+                    <div class="space-y-2">
+                        <p id="docTotais" class="text-sm font-medium"></p>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <label for="docFiltroInput" class="sr-only">Filtrar docentes</label>
+                            <input id="docFiltroInput" type="search" placeholder="Filtrar por nome, universidade, PPG ou situação" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 sm:flex-1">
+                            <label class="flex items-center gap-2 text-sm whitespace-nowrap"><input id="docPendentesInput" type="checkbox"> Só sem currículo</label>
+                        </div>
+                        <div class="overflow-x-auto max-h-[32rem] overflow-y-auto scroll-area">
+                            <table class="w-full text-sm text-left">
+                                <caption class="sr-only">Docentes dos programas</caption>
+                                <thead class="border-b border-gray-300 dark:border-gray-600">
+                                    <tr>
+                                        <th scope="col" class="py-2 pr-3">Nome</th>
+                                        <th scope="col" class="py-2 pr-3">Universidade</th>
+                                        <th scope="col" class="py-2 pr-3">PPG</th>
+                                        <th scope="col" class="py-2 pr-3">Situação</th>
+                                        <th scope="col" class="py-2 pr-3">Lattes</th>
+                                        <th scope="col" class="py-2">Currículo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="docTabela"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="envioTitulo">
                     <h3 id="envioTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Enviar currículos Lattes</h3>
                     <p class="text-sm">
@@ -342,7 +398,16 @@
                                 <datalist id="instLista"></datalist>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">PPG e instituição valem para todos os arquivos deste envio e aparecem no resultado.</p>
+                        <div class="sm:w-1/2">
+                            <label for="situacaoInput" class="block text-sm font-medium mb-1">Situação no programa</label>
+                            <select id="situacaoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <option value="">Não informada</option>
+                                <option>Permanente</option>
+                                <option>Colaborador</option>
+                                <option>Visitante</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">PPG, instituição e situação valem para todos os arquivos deste envio. Para quem está na lista de docentes, valem os dados da lista.</p>
                         <div class="flex flex-wrap gap-2 items-center">
                             <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
                                 <i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i> Escolher arquivos
@@ -372,7 +437,8 @@
                                 <tr>
                                     <th scope="col" class="py-2 pr-3">Nome</th>
                                     <th scope="col" class="py-2 pr-3">Grupo</th>
-                                    <th scope="col" class="py-2 pr-3">PPG / Instituição</th>
+                                    <th scope="col" class="py-2 pr-3">Universidade · PPG</th>
+                                    <th scope="col" class="py-2 pr-3">Situação</th>
                                     <th scope="col" class="py-2 pr-3">Atualização do Lattes</th>
                                     <th scope="col" class="py-2">Ações</th>
                                 </tr>

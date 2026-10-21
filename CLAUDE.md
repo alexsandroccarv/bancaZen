@@ -20,6 +20,15 @@ ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
   `lib/base.php`; endpoints `buscar.php` (público), `status.php` (público,
   só a contagem) e `admin.php` (sessão + token CSRF).
 - Mesmo ID Lattes no upload: fica o de `DATA-ATUALIZACAO` mais recente.
+- Lista de docentes dos programas (`lib/docentes.php`, `docentes.json` na
+  pasta de dados): importada de CSV pela Administração, **nunca versionada**
+  (a planilha do PROFIAP tem e-mails; `.gitignore` bloqueia `*.csv`). Guarda
+  só nome, universidade, PPG, grupo, situação (Permanente/Colaborador/
+  Visitante) e ID Lattes; e-mails e outras colunas são descartados. Mesma
+  regra para PROFIAP e outros programas: quem está na lista tem grupo,
+  universidade, PPG e situação da lista (`bb_programa_efetivo`); senão,
+  valem os dados do envio do XML. Exibição: Nome, Universidade, PPG,
+  Situação no programa e Link do Lattes.
 - Conformidade ética: pessoa com vínculo (coautoria, orientação, mesma
   pessoa) nunca entra nas listas; aparece à parte com o motivo.
   "Confirmado" = ID Lattes ou nome completo; "provável" = sobrenome + ao

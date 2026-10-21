@@ -35,8 +35,17 @@
         const url = urlLattes(p);
         return url ? `<a href="${url}" target="_blank" rel="noopener" class="hover:underline">${esc(p.nome)}</a>` : esc(p.nome);
     }
-    function programa(p) {
-        return [p.ppg, p.ppgInstituicao].filter(Boolean).join(' · ');
+    // Ficha da pessoa: Universidade, PPG, Situação no programa e Link do
+    // Lattes (o nome vem no título). Mesma ficha para PROFIAP e outros programas.
+    function ficha(p) {
+        const url = urlLattes(p);
+        const campo = (rotulo, valor) => `<div class="ficha-campo"><dt>${rotulo}</dt><dd>${valor}</dd></div>`;
+        return `<dl class="ficha text-sm">
+            ${campo('Universidade', esc(p.universidade) || '—')}
+            ${campo('PPG', esc(p.ppg) || '—')}
+            ${campo('Situação no programa', esc(p.situacao) || 'não informada')}
+            ${campo('Lattes', url ? `<a href="${url}" target="_blank" rel="noopener" title="${url}" class="text-brand-600 dark:text-accent-400 hover:underline whitespace-nowrap">Abrir currículo Lattes <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square text-xs"></i><span class="sr-only"> de ${esc(p.nome)} (abre em nova aba)</span></a>` : '—')}
+        </dl>`;
     }
 
     /* ------------------------------- status ------------------------------- */
@@ -161,7 +170,7 @@
         const pct = Math.round(r.score * 100);
         const detalhes = [
             p.titulacao,
-            p.instituicao && p.instituicao !== p.ppgInstituicao ? `Lattes: ${[p.instituicao, p.uf].filter(Boolean).join(' / ')}` : '',
+            p.instituicao && p.instituicao !== p.universidade ? `vínculo atual no Lattes: ${[p.instituicao, p.uf].filter(Boolean).join(' / ')}` : '',
             `${p.bancasMestrado} banca(s) de mestrado no Lattes`,
             p.atualizacao ? `currículo atualizado em ${dataBR(p.atualizacao)}` : '',
         ].filter(Boolean);
@@ -175,7 +184,7 @@
                         <span class="font-mono font-bold" aria-label="Proximidade ${fmt.format(r.score)} numa escala de 0 a 1">${fmt.format(r.score)}</span>
                     </div>
                     <div class="score-bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
-                    ${programa(p) ? `<p class="text-sm font-medium">${esc(programa(p))}</p>` : ''}
+                    ${ficha(p)}
                     <p class="text-sm text-gray-600 dark:text-gray-400">${esc(detalhes.join(' · '))}</p>
                     ${termos ? `<p class="text-sm flex flex-wrap items-center gap-1"><span class="text-gray-600 dark:text-gray-400">Termos em comum:</span> ${termos}</p>` : ''}
                 </div>
@@ -191,7 +200,7 @@
                 ${esc(descreverVinculo(v))}</li>`).join('');
             return `<li>
                 <p class="font-semibold">${nomeComLink(r.pessoa)} <span class="font-mono font-normal text-sm">(${fmt.format(r.score)})</span></p>
-                ${programa(r.pessoa) ? `<p class="text-sm">${esc(programa(r.pessoa))}</p>` : ''}
+                ${ficha(r.pessoa)}
                 <ul class="text-sm space-y-1 mt-1">${vs}</ul>
             </li>`;
         }).join('');

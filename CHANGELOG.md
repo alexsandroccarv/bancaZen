@@ -7,6 +7,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Lista de docentes dos programas: importação de CSV na Administração (ex.:
+  "docentes PROFIAP 2025", 611 linhas, 608 pessoas), antes mesmo dos XMLs,
+  com tabela que mostra quem já tem currículo enviado. Guarda só nome,
+  universidade, PPG, situação no programa e Lattes, na pasta de dados
+  privada; e-mails são descartados e a lista nunca é versionada. Mesma regra
+  para PROFIAP e outros programas. As sugestões passam a exibir Nome,
+  Universidade, PPG, Situação no programa e Link do Lattes; o envio de XML
+  ganha o campo "Situação no programa". [issue #15](../../issues/15)
+
+## [0.0.7] - 2026-10-21
+
 ### Alterado
 - A aplicação foi dividida em seções, cada uma com um ícone na barra
   superior: **Início** (apresentação e explicação do funcionamento), **Minha
