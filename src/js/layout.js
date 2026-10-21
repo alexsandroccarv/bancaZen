@@ -35,6 +35,12 @@
             if (active && focus) b.focus();
         });
         $$('.tab-panel').forEach(p => { p.hidden = (p.id !== 'tab-' + name); });
+        // Endereço da seção na URL (index.html#<nome>), para links diretos,
+        // sem criar uma entrada nova no histórico a cada troca.
+        if (opts && opts.url === false) { /* mantém a URL */ }
+        else if (window.history && history.replaceState && location.hash !== '#' + name) {
+            history.replaceState(null, '', '#' + name);
+        }
         document.dispatchEvent(new CustomEvent('tab:change', { detail: { tab: name } }));
     }
 
@@ -52,8 +58,11 @@
                 if (next >= 0) { e.preventDefault(); switchTab(btns[next].dataset.tab, { focus: true }); }
             });
         });
+        // Seção inicial: a do endereço (#nome), se existir; senão a marcada.
+        const doHash = location.hash.slice(1);
+        if (doHash && $('#tab-' + doHash)) { switchTab(doHash); return; }
         const initial = $('.tab-btn[aria-selected="true"]') || btns[0];
-        if (initial) switchTab(initial.dataset.tab);
+        if (initial) switchTab(initial.dataset.tab, { url: false });
     }
 
     /* =====================================================================
@@ -231,8 +240,14 @@
         // Engrenagem no cabeçalho abre o painel de Configurações.
         const cfgBtn = $('#headerConfigBtn');
         if (cfgBtn) cfgBtn.addEventListener('click', () => switchTab('config'));
-        // Vindo de outra página via engrenagem (index.html#config): abre a aba.
-        if (window.location.hash === '#config' && $('#tab-config')) switchTab('config');
+        // Botões "ir para" (data-ir="<seção>") em qualquer lugar da página.
+        document.addEventListener('click', (e) => {
+            const alvo = e.target.closest('[data-ir]');
+            if (alvo && $('#tab-' + alvo.dataset.ir)) {
+                switchTab(alvo.dataset.ir, { focus: true });
+                window.scrollTo(0, 0);
+            }
+        });
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

@@ -7,6 +7,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- A aplicação foi dividida em seções, cada uma com um ícone na barra
+  superior: **Início** (apresentação e explicação do funcionamento), **Minha
+  Dissertação**, **Minha orientação**, **Bancas sugeridas** (conferência do
+  que foi preenchido, critérios, busca e listas) e **Administração** (antes
+  em `admin.html`, que agora redireciona para a seção). Endereço de cada
+  seção na URL, botões "Próximo" entre as etapas e erros que levam à seção a
+  corrigir. [issue #13](../../issues/13)
+
 ### Corrigido
 - O deploy normaliza o `SSH_KEY` antes de usar (quebras de linha do Windows,
   espaços nas bordas, linhas em branco, chave colada numa linha só) e, se a

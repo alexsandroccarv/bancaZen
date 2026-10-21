@@ -4,13 +4,15 @@ Aplicação web que indica **membros externos para banca de defesa de
 mestrado** a partir de currículos Lattes.
 
 1. A administração do programa envia os currículos (XML exportado pela
-   Plataforma Lattes, ou o ZIP que o contém) em **`admin.html`**, informando
+   Plataforma Lattes, ou o ZIP que o contém) na seção **Administração**, informando
    o **grupo** (PROFIAP ou outro programa), o **PPG** e a **instituição**. Se
    o mesmo ID Lattes já existir, fica o currículo com a data de atualização
    mais recente.
-2. Na página inicial, a pessoa discente informa **título**, **resumo** e
-   **palavras-chave** do trabalho, o próprio currículo Lattes e o da
-   orientação, e recebe **duas listas de até 10 pessoas** com maior
+2. A página principal é dividida em seções, com ícones na barra superior:
+   **Início** (apresentação e funcionamento), **Minha Dissertação**, **Minha
+   orientação**, **Bancas sugeridas** e **Administração**. A pessoa discente
+   informa **título**, **resumo** e **palavras-chave** do trabalho, o próprio
+   currículo Lattes e o da orientação, e recebe **duas listas de até 10 pessoas** com maior
    proximidade temática, numa escala de **0 a 1**, em ordem decrescente:
    - currículos do **PROFIAP**;
    - currículos de **outros programas** (segundo membro externo).
