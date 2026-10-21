@@ -201,6 +201,13 @@ html.tz-theme .score-bar > span { background: var(--tz-accent); }
    branca sobre a barra de abas clara). */
 .tab-btn .tab-rotulo { color: inherit; }
 
+/* Ficha da pessoa nas listas de sugestões: rótulo e valor, em grade. */
+.ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .25rem 1rem; margin: 0; }
+.ficha-campo { min-width: 0; }
+.ficha dt { font-size: .75rem; color: #57606a; }
+.ficha dd { margin: 0; overflow-wrap: anywhere; }
+html.tz-theme .ficha dt { color: var(--tz-muted); }
+
 /* Ícone numerado dos passos do "Como funciona" (seção Início). */
 .passo { flex: none; width: 2.25rem; height: 2.25rem; border-radius: 9999px; display: inline-flex;
          align-items: center; justify-content: center; background: #1d4ed8; color: #ffffff; }

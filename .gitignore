@@ -4,3 +4,6 @@ node_modules/
 lattes/
 bancazen-dados/
 src/api/lib/config-dados.php
+# Listas de docentes (podem ter e-mails): importadas pela Administração, nunca versionadas.
+*.csv
+!tools/fixtures/docentes.csv

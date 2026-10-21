@@ -75,22 +75,23 @@ $busca = sim_buscar($indice, $consulta, [
 ]);
 // O filtro de instituição também vale para a instituição do programa.
 $excluir = trim(sim_sem_acento($texto('excluirInstituicao')));
+$docentes = bb_carregar_docentes();
 
 $periodo = (int) $texto('periodo');
 $desdeAno = in_array($periodo, [5, 10], true) ? (int) date('Y') - $periodo + 1 : 0;
 $listas = [];
 foreach (BB_GRUPOS as $grupo => $titulo) {
     $listas[$grupo] = ['grupo' => $grupo, 'titulo' => $titulo, 'resultados' => [], 'retirados' => [],
-        'total' => count(array_filter($corpus, fn($p) => bb_grupo($p) === $grupo))];
+        'total' => count(array_filter($corpus, fn($p) => bb_grupo($p, $docentes) === $grupo))];
 }
 // Percorre o ranking completo: quem tem vínculo sai da lista do seu grupo (e
 // é exibido à parte) até cada lista ter 10 pessoas sem vínculo.
 foreach ($busca['resultados'] as $r) {
     $p = $r['pessoa'];
-    if ($excluir !== '' && str_contains(sim_sem_acento($p['programa']['instituicao'] ?? ''), $excluir)) continue;
-    $l = &$listas[bb_grupo($p)];
+    if ($excluir !== '' && str_contains(sim_sem_acento(bb_programa_efetivo($p, $docentes)['instituicao']), $excluir)) continue;
+    $l = &$listas[bb_grupo($p, $docentes)];
     if (count($l['resultados']) < LIMITE) {
-        $item = ['pessoa' => bb_publico($p), 'score' => round($r['score'], 4), 'termos' => $r['termos']];
+        $item = ['pessoa' => bb_publico($p, $docentes), 'score' => round($r['score'], 4), 'termos' => $r['termos']];
         $vinculos = vinc_verificar($p, $envolvidos, $desdeAno);
         if ($vinculos) $l['retirados'][] = $item + ['vinculos' => $vinculos];
         else $l['resultados'][] = $item;

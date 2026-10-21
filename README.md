@@ -3,12 +3,16 @@
 Aplicação web que indica **membros externos para banca de defesa de
 mestrado** a partir de currículos Lattes.
 
-1. A administração do programa envia os currículos (XML exportado pela
+1. A administração importa a **lista de docentes** de cada programa (CSV com
+   nome, universidade, situação no programa e Lattes; e-mails são
+   descartados), mesmo antes dos XMLs, e acompanha quem ainda não tem
+   currículo enviado.
+2. A administração do programa envia os currículos (XML exportado pela
    Plataforma Lattes, ou o ZIP que o contém) na seção **Administração**, informando
    o **grupo** (PROFIAP ou outro programa), o **PPG** e a **instituição**. Se
    o mesmo ID Lattes já existir, fica o currículo com a data de atualização
    mais recente.
-2. A página principal é dividida em seções, com ícones na barra superior:
+3. A página principal é dividida em seções, com ícones na barra superior:
    **Início** (apresentação e funcionamento), **Minha Dissertação**, **Minha
    orientação**, **Bancas sugeridas** e **Administração**. A pessoa discente
    informa **título**, **resumo** e **palavras-chave** do trabalho, o próprio
@@ -16,8 +20,9 @@ mestrado** a partir de currículos Lattes.
    proximidade temática, numa escala de **0 a 1**, em ordem decrescente:
    - currículos do **PROFIAP**;
    - currículos de **outros programas** (segundo membro externo).
-   Cada pessoa aparece com PPG e instituição, titulação, bancas de mestrado
-   registradas e os termos em comum.
+   Cada pessoa aparece com **Nome, Universidade, PPG, Situação no programa e
+   Link do Lattes** (da lista de docentes, quando a pessoa está nela), além
+   de titulação, bancas de mestrado registradas e os termos em comum.
 
 **Proteção dos currículos.** Os XML e o índice processado ficam no servidor,
 numa pasta de dados fora da área pública do site (ver
