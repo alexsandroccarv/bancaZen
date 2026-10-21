@@ -8,6 +8,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Corrigido
+- O deploy confere que a pasta de dados que o PHP vai usar (gravada pelo
+  build) é a mesma que ele verificou; com `BANCAZEN_DADOS` criada só no
+  ambiente `producao`, o PHP cairia no padrão dentro do `public_html` sem
+  erro algum. [issue #10](../../issues/10)
+
+## [0.0.5] - 2026-10-21
+
+### Corrigido
 - Deploy em hospedagem compartilhada (cPanel): o `deploy.sh` recusa pasta de
   dados dentro de pasta pública da web (`public_html`, `htdocs`,
   `www/html`), onde os currículos poderiam ser baixados, e orienta a definir
