@@ -19,7 +19,7 @@ mestrado** a partir de currículos Lattes.
 
 **Proteção dos currículos.** Os XML e o índice processado ficam no servidor,
 numa pasta de dados fora da área pública do site (ver
-[DEPLOY.md](DEPLOY.md#backend-php-e-pasta-de-dados)). O navegador recebe só
+[DEPLOY.md](DEPLOY.md#passo-1-pastas-no-servidor)). O navegador recebe só
 o resultado da busca. Os currículos da pessoa discente e da orientação
 enviados na busca são lidos em memória e não são gravados. Nenhum currículo
 é versionado no repositório.
@@ -51,6 +51,12 @@ sessão) e os endpoints `buscar.php`, `status.php` e `admin.php`. Interface:
 Ambiente local: `node build.mjs && php -S localhost:8000 -t dist` (dados em
 `buscabanca-dados/`, ignorada pelo Git).
 
+**Integração contínua e publicação.** Todo push e pull request passa pela
+validação (`bash .github/scripts/validar.sh`: sintaxe JS e PHP, testes do
+backend, contraste, build). Na `main`, depois do incremento automático de
+versão, o site é publicado por rsync/SSH, com verificações no servidor antes
+da cópia e no site depois dela. Configuração em [DEPLOY.md](DEPLOY.md).
+
 ---
 
 O restante deste documento descreve a base herdada do modelo **templateZen**
@@ -81,8 +87,9 @@ O restante deste documento descreve a base herdada do modelo **templateZen**
 - **SEO/social**: `meta description`, Open Graph/Twitter e `canonical` com
   URLs absolutas (variável `SITE_URL`), `robots.txt` e `sitemap.xml`
   gerado no build.
-- **CI/CD via SSH** (GitHub Actions): valida, audita contraste, monta o
-  `dist/` e publica via `rsync` a cada `push` — veja [DEPLOY.md](DEPLOY.md).
+- **CI/CD via SSH** (GitHub Actions): valida em todo push e pull request e,
+  na `main`, publica via `rsync` depois do incremento de versão; veja
+  [DEPLOY.md](DEPLOY.md).
 - **Versionamento**: arquivo `VERSION` (SemVer) com `PATCH` automático a
   cada `push` em `main`, e `CHANGELOG.md` no formato
   [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
@@ -114,11 +121,14 @@ templatezen/
 │   └── contrast-check.mjs       # Auditoria de contraste (WCAG) dos temas
 ├── .github/
 │   ├── workflows/
-│   │   ├── deploy.yml           # CI: valida, audita contraste, builda e publica
+│   │   ├── validar.yml          # CI: valida em todo push/PR (e antes do deploy)
+│   │   ├── deploy.yml           # Publica após o version-bump (rsync/SSH)
 │   │   ├── version-bump.yml     # Incrementa o PATCH de VERSION automaticamente
 │   │   └── seed-go-live-issues.yml  # Cria as tarefas de Go-Live (v1.0.0) no repo
 │   ├── scripts/
-│   │   └── deploy.sh            # Script de deploy via rsync sobre SSH
+│   │   ├── validar.sh           # Validação (CI e local)
+│   │   ├── deploy.sh            # Verificações no servidor + rsync sobre SSH
+│   │   └── verificar-site.sh    # Teste do site publicado
 │   ├── go-live-issues.json      # Tarefas obrigatórias antes da v1.0.0 (manifesto)
 │   ├── pull_request_template.md
 │   └── ISSUE_TEMPLATE/
@@ -189,7 +199,7 @@ templatezen/
    itens do rodapé, ajuste `config.links` e o `footerHTML()` em
    `js/chrome.js`.
 6. Para publicar automaticamente via SSH a cada `push`, siga o passo a
-   passo em [DEPLOY.md](DEPLOY.md) (chave SSH dedicada + 5 secrets no
+   passo em [DEPLOY.md](DEPLOY.md) (chave SSH dedicada + secrets no
    GitHub). Antes dos secrets configurados, o workflow só valida e monta
    `dist/` — fica verde sem publicar. Defina também a variável `SITE_URL`
    (Actions → Variables) para as metatags sociais e o `sitemap.xml` saírem

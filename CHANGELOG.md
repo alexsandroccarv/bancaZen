@@ -38,6 +38,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   outros programas, para o segundo membro externo), com PPG e instituição.
   [issue #4](../../issues/4)
 
+- Integração contínua: validação (`validar.yml` e
+  `.github/scripts/validar.sh`, que também roda localmente) em todo push e
+  pull request; o deploy passa a rodar depois do incremento de versão, com
+  verificações no servidor (PHP, pasta de dados, senha), proteção da pasta
+  de dados, de `.well-known/` e de `.user.ini`, recusa de pasta alheia no
+  primeiro deploy, `SSH_KNOWN_HOSTS` opcional, ambiente `producao` e teste
+  do site publicado (`verificar-site.sh`). Variável opcional
+  `BUSCABANCA_DADOS`. `admin.html` fora do `sitemap.xml` e do `robots.txt`.
+  [issue #5](../../issues/5)
+
 ### Removido
 - Pasta `lattes/` no repositório, processamento dos currículos no build
   (`dist/data/corpus.json`) e a aba pública **Currículos** com leitura de

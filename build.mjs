@@ -69,7 +69,21 @@ for (const name of ['images', 'favicon.ico']) {
 
 // 3.1) Pasta de dados do backend PHP: NÃO faz parte do dist/. Os currículos
 // e o índice ficam fora da raiz pública (ver src/api/lib/base.php), para não
-// serem servidos nem apagados pelo deploy (rsync --delete).
+// serem servidos nem apagados pelo deploy (rsync --delete). Se a variável
+// BUSCABANCA_DADOS estiver definida (Actions → Variables), o caminho vai para
+// dist/api/lib/config-dados.php, dispensando configurar o servidor web.
+const dadosPath = (process.env.BUSCABANCA_DADOS || '').trim();
+if (dadosPath) {
+    if (!dadosPath.startsWith('/')) {
+        console.error(`ERRO: BUSCABANCA_DADOS deve ser um caminho absoluto (recebido: ${dadosPath}).`);
+        process.exit(1);
+    }
+    writeFileSync(
+        join(dist, 'api', 'lib', 'config-dados.php'),
+        `<?php\n// Gerado por build.mjs (variável BUSCABANCA_DADOS): não editar.\nreturn ${JSON.stringify(dadosPath)};\n`
+    );
+    console.log(`Pasta de dados do backend: ${dadosPath}`);
+}
 
 // 4) URL do site: substitui o placeholder %SITE_URL% (metatags Open Graph,
 // canonical, robots) pela URL real e gera o sitemap.xml. A URL vem da
@@ -91,10 +105,11 @@ for (const file of listFiles(dist)) {
     }
 }
 
-// 4.2) Gera dist/sitemap.xml com as páginas públicas (exclui 404).
+// 4.2) Gera dist/sitemap.xml com as páginas públicas (exclui 404 e a
+// administração).
 const today = new Date().toISOString().slice(0, 10); // AAAA-MM-DD
 const pages = readdirSync(dist)
-    .filter((f) => f.endsWith('.html') && f !== '404.html')
+    .filter((f) => f.endsWith('.html') && f !== '404.html' && f !== 'admin.html')
     .sort((a, b) => (a === 'index.html' ? -1 : b === 'index.html' ? 1 : a.localeCompare(b)));
 const urls = pages.map((f) => {
     const loc = f === 'index.html' ? SITE_URL + '/' : `${SITE_URL}/${f}`;

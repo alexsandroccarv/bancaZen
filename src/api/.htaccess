@@ -5,7 +5,7 @@
     RewriteRule ^(lib|cli)(/|$) - [F,L]
 </IfModule>
 <IfModule !mod_rewrite.c>
-    <FilesMatch "^(lattes|similaridade|vinculos|base|definir-senha)\.php$">
+    <FilesMatch "^(lattes|similaridade|vinculos|base|config-dados|definir-senha)\.php$">
         Require all denied
     </FilesMatch>
 </IfModule>

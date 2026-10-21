@@ -3,3 +3,4 @@ node_modules/
 # Currículos Lattes e dados do backend: nunca versionar.
 lattes/
 buscabanca-dados/
+src/api/lib/config-dados.php

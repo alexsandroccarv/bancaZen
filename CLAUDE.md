@@ -76,15 +76,25 @@ ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
   (v1.0.0)" (Actions) para materializar as tarefas (de `.github/go-live-issues.json`)
   como issues `go-live`.
 
-## Deploy
-- Automático via rsync/ssh quando há merge na `main` (ver `.github/workflows/deploy.yml`)
-- Segredos usados: `SSH_KEY`, `SSH_HOST`, `SSH_USER`, `SSH_PORT`, `DEPLOY_PATH`
-- Variável: `SITE_URL` (Actions → Variables) — usada pelo `build.mjs` para
-  URLs absolutas (Open Graph/canonical) e para gerar o `sitemap.xml`.
+## CI e deploy (detalhes em `DEPLOY.md`)
+- Validação em todo push/PR: `validar.yml` → `.github/scripts/validar.sh`
+  (rodar localmente antes do push).
+- Publicação: `deploy.yml` roda DEPOIS do `version-bump.yml` na `main`
+  (`workflow_run`), valida de novo e publica o `dist/` por rsync/SSH
+  (`.github/scripts/deploy.sh`), depois testa o site
+  (`.github/scripts/verificar-site.sh`). Manual: Actions → Publicar (só `main`).
+- Segredos (repositório ou ambiente `producao`): `SSH_KEY`, `SSH_HOST`,
+  `SSH_USER`, `DEPLOY_PATH`; opcionais `SSH_PORT`, `SSH_KNOWN_HOSTS`.
+- Variáveis: `SITE_URL` (metatags, `sitemap.xml`, verificação pós-deploy) e
+  `BUSCABANCA_DADOS` (opcional; caminho da pasta de dados).
+- O `deploy.sh` nunca deve apagar a pasta de dados: recusa dados dentro do
+  `DEPLOY_PATH`, pasta alheia no primeiro deploy (marcador
+  `.buscabanca-deploy`) e preserva `.well-known/` e `.user.ini`.
 
 ## Comandos úteis
 - `node build.mjs` — monta a pasta `dist/` a partir de `src/` (injeta
   versão/data, substitui `%SITE_URL%` e gera `sitemap.xml`).
+- `bash .github/scripts/validar.sh` — validação completa (a mesma da CI).
 - `php tools/testar.php` — testa extrator, proximidade, vínculos e a regra
   do mesmo ID.
 - `php -S localhost:8000 -t dist` — servidor local (após o build).

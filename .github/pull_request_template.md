@@ -17,7 +17,7 @@ Closes #
 
 ## Checklist
 - [ ] Segui o fluxo do `CONTRIBUTING.md` (Issue → branch → PR)
-- [ ] `node build.mjs` monta o `dist/` sem erros
-- [ ] `node --check` passa nos arquivos de `src/js/`
+- [ ] `bash .github/scripts/validar.sh` passa (sintaxe JS/PHP, `php tools/testar.php`, contraste, build)
+- [ ] Nenhum currículo Lattes real (XML/ZIP) no commit
 - [ ] Atualizei o `CHANGELOG.md` (com o número da issue), quando aplicável
 - [ ] Não alterei o arquivo `VERSION` manualmente (o PATCH é automático na CI)
