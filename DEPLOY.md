@@ -241,7 +241,8 @@ site (que o deploy preserva).
 | `Secrets de deploy não configurados` | Faltam os secrets obrigatórios (Passo 3). O workflow fica verde, mas não publica. |
 | `Permission denied (publickey)` / `Não foi possível entrar no servidor por SSH` | A chave pública não está autorizada para o `SSH_USER` (no cPanel: *Manage → Authorize*), o `SSH_USER` está errado, o SSH não está habilitado na conta, ou o `SSH_KEY` não é o par da chave autorizada (o log mostra a impressão digital da chave usada). Refaça o teste do Passo 2. |
 | `SSH_KEY está protegida por senha` | Gere uma chave sem senha (`-N ""`) ou remova a senha: `ssh-keygen -p -f ~/.ssh/bancazen_deploy -N ""`, e atualize o secret. |
-| `SSH_KEY não é uma chave privada válida` | Cole o arquivo da chave **privada** inteiro (com `BEGIN`/`END`), não o `.pub`. |
+| `SSH_KEY está no formato do PuTTY (.ppk)` | Converta para OpenSSH (`puttygen chave.ppk -O private-openssh -o chave`, ou PuTTYgen → *Conversions → Export OpenSSH key*) e cole o resultado. |
+| `SSH_KEY contém a chave PÚBLICA` / `não tem a linha BEGIN/END` / `não foi aceita pelo ssh-keygen` | Cole o arquivo da chave **privada** inteiro (`cat ~/.ssh/bancazen_deploy`), com as linhas `BEGIN` e `END`. Quebras de linha do Windows e espaços são corrigidos automaticamente. |
 | `A pasta de dados ... fica dentro de uma pasta pública da web` | Defina `BANCAZEN_DADOS` fora do `public_html`/`htdocs` (seção "Hospedagem compartilhada"). |
 | `A pasta de dados do PHP ... difere da verificada pelo deploy` | `BANCAZEN_DADOS` foi criada só no ambiente `producao`. Crie-a como variável **do repositório** (Passo 3). |
 | `Host key verification failed` | A chave do servidor mudou ou o `SSH_KNOWN_HOSTS` está errado. Confira com a hospedagem e refaça o `ssh-keyscan`. |

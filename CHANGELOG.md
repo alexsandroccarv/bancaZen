@@ -8,6 +8,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Corrigido
+- O deploy normaliza o `SSH_KEY` antes de usar (quebras de linha do Windows,
+  espaços nas bordas, linhas em branco, chave colada numa linha só) e, se a
+  chave continuar inválida, diz qual é o formato (PuTTY `.ppk`, chave
+  pública, SSH2, incompleta) sem mostrar o conteúdo. [issue #12](../../issues/12)
+
+## [0.0.6] - 2026-10-21
+
+### Corrigido
 - O deploy confere que a pasta de dados que o PHP vai usar (gravada pelo
   build) é a mesma que ele verificou; com `BANCAZEN_DADOS` criada só no
   ambiente `producao`, o PHP cairia no padrão dentro do `public_html` sem
