@@ -182,7 +182,7 @@ if [ ! -d "$DADOS" ]; then
 fi
 if [ -d "$DADOS" ]; then
   echo "Pasta de dados: $(ls -ld "$DADOS" | awk '{print $1, $3":"$4}')"
-  N=$(find "$DADOS/xml" -maxdepth 1 -name '*.xml' 2>/dev/null | wc -l || echo 0)
+  N=$( (find "$DADOS/xml" -maxdepth 1 -name '*.xml' 2>/dev/null || true) | wc -l)
   echo "Currículos guardados: $N"
   [ -f "$DADOS/admin.json" ] || aviso "Senha da administração não definida. No servidor: cd '$SITE' && php api/cli/definir-senha.php"
 fi
