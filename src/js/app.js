@@ -1,6 +1,10 @@
 /* ==========================================================================
-   bancaZen — aplicação (aba "Indicar banca")
+   bancaZen — aplicação (seções Minha Dissertação, Minha orientação e
+   Bancas sugeridas)
    --------------------------------------------------------------------------
+   Os campos ficam em seções diferentes (abas) e são lidos pelo id na hora
+   da busca, feita na seção Bancas sugeridas. Erros de preenchimento levam à
+   seção que falta (botões data-ir, tratados em layout.js).
    O navegador só envia o formulário: a comparação com os currículos e a
    verificação de vínculos rodam no servidor (api/buscar.php), que devolve
    duas listas (PROFIAP e outros programas) com até 10 pessoas sem vínculo
@@ -10,6 +14,11 @@
 (function () {
     const $ = (s) => document.querySelector(s);
     const ENVOLVIDOS = ['discente', 'orientador', 'coorientador'];
+    const PAPEIS = {
+        discente: { rotulo: 'Discente', obrigatorio: true },
+        orientador: { rotulo: 'Orientador(a)', obrigatorio: true },
+        coorientador: { rotulo: 'Coorientador(a)', obrigatorio: false },
+    };
 
     function esc(s) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -48,18 +57,52 @@
     }
 
     /* -------------------------------- busca ------------------------------- */
-    function mostrarErro(msg) {
+    // Erro na seção Bancas sugeridas, com botão para a seção a corrigir.
+    function mostrarErro(msg, secao, rotuloSecao) {
         const erro = $('#buscaErro');
-        erro.textContent = msg;
+        erro.innerHTML = msg ? esc(msg) + (secao
+            ? ` <button type="button" data-ir="${secao}" class="underline font-medium">Ir para ${esc(rotuloSecao)}</button>`
+            : '') : '';
         erro.classList.toggle('hidden', !msg);
+    }
+
+    /* --------------------------- conferência ------------------------------ */
+    // O que já foi informado nas seções 2 e 3, mostrado antes da busca.
+    function situacaoEnvolvido(k) {
+        const arq = $(`#${k}Arquivo`).files[0];
+        if (arq) return { ok: true, texto: `arquivo ${arq.name}` };
+        const id = ($(`#${k}Id`).value.match(/\d{16}/) || [])[0];
+        if (id) return { ok: true, texto: `Lattes ${id}` };
+        return { ok: false, texto: PAPEIS[k].obrigatorio ? 'falta informar' : 'não informado (opcional)' };
+    }
+    function dissertacaoPreenchida() {
+        return ['#tituloInput', '#resumoInput', '#palavrasInput'].filter((id) => $(id).value.trim()).length;
+    }
+    function renderConferencia() {
+        const n = dissertacaoPreenchida();
+        const item = (ok, opcional, rotulo, texto, secao) => `<li class="flex items-center gap-2">
+            <i aria-hidden="true" class="fa-solid ${ok ? 'fa-circle-check text-green-700 dark:text-green-400' : (opcional ? 'fa-circle-minus text-gray-500' : 'fa-circle-xmark text-red-700 dark:text-red-400')}"></i>
+            <span><span class="font-medium">${esc(rotulo)}:</span> ${esc(texto)}</span>
+            <button type="button" data-ir="${secao}" class="ml-auto text-brand-600 dark:text-accent-400 hover:underline">${ok ? 'editar' : 'preencher'}</button>
+        </li>`;
+        $('#conferencia').innerHTML =
+            item(n > 0, false, 'Minha Dissertação', n === 3 ? 'título, resumo e palavras-chave' : (n ? `${n} de 3 campos preenchidos` : 'falta preencher'), 'dissertacao') +
+            ENVOLVIDOS.map((k) => {
+                const s = situacaoEnvolvido(k);
+                return item(s.ok, !PAPEIS[k].obrigatorio, PAPEIS[k].rotulo, s.texto, 'orientacao');
+            }).join('');
     }
 
     async function buscar(ev) {
         ev.preventDefault();
         mostrarErro('');
-        if (!$('#tituloInput').value.trim() && !$('#resumoInput').value.trim() && !$('#palavrasInput').value.trim()) {
-            mostrarErro('Preencha ao menos o título, o resumo ou as palavras-chave.');
-            $('#tituloInput').focus();
+        if (!dissertacaoPreenchida()) {
+            mostrarErro('Preencha ao menos o título, o resumo ou as palavras-chave.', 'dissertacao', 'Minha Dissertação');
+            return;
+        }
+        const faltando = ENVOLVIDOS.filter((k) => PAPEIS[k].obrigatorio && !situacaoEnvolvido(k).ok);
+        if (faltando.length) {
+            mostrarErro(`Informe o currículo Lattes de: ${faltando.map((k) => PAPEIS[k].rotulo).join(', ')}.`, 'orientacao', 'Minha orientação');
             return;
         }
         const fd = new FormData();
@@ -81,7 +124,13 @@
         try {
             const r = await fetch('api/buscar.php', { method: 'POST', body: fd });
             const dados = await r.json().catch(() => ({ erro: `Erro ${r.status} no servidor.` }));
-            if (!r.ok || dados.erro) { mostrarErro(dados.erro || `Erro ${r.status} no servidor.`); return; }
+            if (!r.ok || dados.erro) {
+                const msg = dados.erro || `Erro ${r.status} no servidor.`;
+                // Erros sobre os currículos da orientação levam à seção 3.
+                const daOrientacao = /Discente|Orientador|Coorientador|currículo Lattes/.test(msg);
+                mostrarErro(msg, daOrientacao ? 'orientacao' : null, 'Minha orientação');
+                return;
+            }
             for (const k of ENVOLVIDOS) {
                 $(`#${k}Status`).textContent = dados.envolvidos && dados.envolvidos[k] ? `Currículo considerado: ${dados.envolvidos[k]}.` : '';
             }
@@ -185,6 +234,13 @@
                 $(`#${k}Status`).textContent = f ? `Arquivo selecionado: ${f.name}.` : '';
             });
         }
+        document.addEventListener('tab:change', (e) => {
+            const tab = e.detail && e.detail.tab;
+            if (tab === 'bancas') renderConferencia();
+            // A base pode ter mudado (ex.: envio pela Administração nesta página).
+            if (tab === 'bancas' || tab === 'inicio') carregarStatus();
+        });
+        renderConferencia();
         carregarStatus();
     }
 

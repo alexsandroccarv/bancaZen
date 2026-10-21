@@ -70,14 +70,39 @@ fi
 # ---- Chave e known_hosts ----
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
-printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+# Normaliza o que costuma estragar a chave ao copiar e colar: quebras de
+# linha do Windows (\r), espaços nas bordas das linhas e linhas em branco.
+printf '%s\n' "$SSH_KEY" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' > ~/.ssh/id_deploy
+# Chave colada numa linha só (quebras viraram espaços): remonta as linhas.
+if [ "$(wc -l < ~/.ssh/id_deploy)" -eq 1 ] && grep -q -- '-----BEGIN .*-----END ' ~/.ssh/id_deploy; then
+  sed -E 's/^(-----BEGIN [A-Z ]+-----) (.*) (-----END [A-Z ]+-----)$/\1\n\2\n\3/' ~/.ssh/id_deploy \
+    | sed -E '2s/ +/\n/g' > ~/.ssh/id_deploy.tmp && mv ~/.ssh/id_deploy.tmp ~/.ssh/id_deploy
+fi
 chmod 600 ~/.ssh/id_deploy
-# A chave precisa ser privada e SEM senha (o deploy não tem como digitá-la).
+
+# A chave precisa ser privada, no formato OpenSSH/PEM e SEM senha (o deploy
+# não tem como digitá-la). Em caso de erro, diz qual é o problema sem nunca
+# mostrar o conteúdo da chave.
 if ! CHAVE_MSG=$(ssh-keygen -y -P '' -f ~/.ssh/id_deploy 2>&1 >/dev/null); then
+  PRIMEIRA=$(head -1 ~/.ssh/id_deploy)
   if grep -q 'ENCRYPTED' ~/.ssh/id_deploy || echo "$CHAVE_MSG" | grep -qi 'passphrase'; then
     erro "SSH_KEY está protegida por senha (passphrase). Gere uma chave sem senha (ssh-keygen ... -N \"\") ou remova a senha: ssh-keygen -p -f <arquivo> -N \"\"."
   fi
-  erro "SSH_KEY não é uma chave privada válida. Cole o arquivo da chave PRIVADA inteiro, com as linhas BEGIN e END (não o .pub)."
+  case "$PRIMEIRA" in
+    PuTTY-User-Key-File-*)
+      erro "SSH_KEY está no formato do PuTTY (.ppk). Converta para OpenSSH: puttygen chave.ppk -O private-openssh -o chave (ou, no PuTTYgen, Conversions → Export OpenSSH key) e cole o resultado no secret." ;;
+    ssh-rsa\ *|ssh-ed25519\ *|ssh-dss\ *|ecdsa-sha2-*|sk-*)
+      erro "SSH_KEY contém a chave PÚBLICA (formato do .pub). O secret precisa da chave PRIVADA (o arquivo sem .pub)." ;;
+    ---\ BEGIN\ SSH2\ *)
+      erro "SSH_KEY está no formato SSH2/RFC4716. Converta para OpenSSH: ssh-keygen -i -f chave > chave_openssh (e cole o resultado)." ;;
+  esac
+  if ! grep -q -- '-----BEGIN .*PRIVATE KEY-----' ~/.ssh/id_deploy; then
+    erro "SSH_KEY não tem a linha -----BEGIN ... PRIVATE KEY-----: o conteúdo colado está incompleto ou não é uma chave privada."
+  fi
+  if ! grep -q -- '-----END .*PRIVATE KEY-----' ~/.ssh/id_deploy; then
+    erro "SSH_KEY não tem a linha -----END ... PRIVATE KEY-----: o conteúdo foi colado pela metade."
+  fi
+  erro "SSH_KEY não foi aceita pelo ssh-keygen ($(echo "$CHAVE_MSG" | sed 's|\"[^\"]*\"|<arquivo>|' | head -1); $(wc -l < ~/.ssh/id_deploy) linhas). Copie de novo o arquivo da chave PRIVADA inteiro (cat ~/.ssh/bancazen_deploy) e cole no secret sem alterar nada."
 fi
 if [ -n "${SSH_KNOWN_HOSTS:-}" ]; then
   printf '%s\n' "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
@@ -157,7 +182,7 @@ if [ ! -d "$DADOS" ]; then
 fi
 if [ -d "$DADOS" ]; then
   echo "Pasta de dados: $(ls -ld "$DADOS" | awk '{print $1, $3":"$4}')"
-  N=$(find "$DADOS/xml" -maxdepth 1 -name '*.xml' 2>/dev/null | wc -l || echo 0)
+  N=$( (find "$DADOS/xml" -maxdepth 1 -name '*.xml' 2>/dev/null || true) | wc -l)
   echo "Currículos guardados: $N"
   [ -f "$DADOS/admin.json" ] || aviso "Senha da administração não definida. No servidor: cd '$SITE' && php api/cli/definir-senha.php"
 fi

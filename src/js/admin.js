@@ -1,5 +1,5 @@
 /* ==========================================================================
-   bancaZen — área de administração (admin.html)
+   bancaZen — área de administração (seção Administração do index.html)
    --------------------------------------------------------------------------
    Entrada por senha, envio de currículos Lattes (XML/ZIP, arquivos ou pasta)
    com grupo, PPG e instituição, lista da base, correção do programa e
@@ -230,7 +230,11 @@
             else if (e.target.closest('.salvar')) salvar(tr);
             else if (e.target.closest('.cancelar')) renderTabela();
         });
-        iniciarSessao();
+        // Só consulta o servidor quando a seção é aberta (e uma vez só).
+        let iniciada = false;
+        const abrir = () => { if (!iniciada) { iniciada = true; iniciarSessao(); } };
+        document.addEventListener('tab:change', (e) => { if (e.detail && e.detail.tab === 'administracao') abrir(); });
+        if (!$('#tab-administracao').hidden) abrir(); // aberta direto por index.html#administracao
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

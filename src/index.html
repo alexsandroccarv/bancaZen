@@ -79,11 +79,24 @@
             </div>
         </div>
 
-        <!-- Abas de navegação: adicione/remova .tab-btn e o .tab-panel correspondente -->
+        <!-- Seções: cada .tab-btn abre o .tab-panel correspondente (#tab-<nome>);
+             o endereço da seção fica na URL (index.html#<nome>). -->
         <nav class="bg-white dark:bg-gray-800 border-t border-brand-700/20 dark:border-gray-700 px-2" role="tablist" aria-label="Seções">
             <div class="max-w-5xl mx-auto flex gap-1 overflow-x-auto">
-                <button id="tab-banca-btn" aria-controls="tab-banca" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="true" data-tab="banca">
-                    <i aria-hidden="true" class="fa-solid fa-user-check mr-1"></i> Indicar banca
+                <button id="tab-inicio-btn" aria-controls="tab-inicio" aria-label="Início" title="Início" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="true" data-tab="inicio">
+                    <i aria-hidden="true" class="fa-solid fa-house"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Início</span>
+                </button>
+                <button id="tab-dissertacao-btn" aria-controls="tab-dissertacao" aria-label="Minha Dissertação" title="Minha Dissertação" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="dissertacao">
+                    <i aria-hidden="true" class="fa-solid fa-book-open"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Minha Dissertação</span>
+                </button>
+                <button id="tab-orientacao-btn" aria-controls="tab-orientacao" aria-label="Minha orientação" title="Minha orientação" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="orientacao">
+                    <i aria-hidden="true" class="fa-solid fa-user-graduate"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Minha orientação</span>
+                </button>
+                <button id="tab-bancas-btn" aria-controls="tab-bancas" aria-label="Bancas sugeridas" title="Bancas sugeridas" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="bancas">
+                    <i aria-hidden="true" class="fa-solid fa-users-viewfinder"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Bancas sugeridas</span>
+                </button>
+                <button id="tab-administracao-btn" aria-controls="tab-administracao" aria-label="Administração" title="Administração" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="administracao">
+                    <i aria-hidden="true" class="fa-solid fa-user-shield"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Administração</span>
                 </button>
             </div>
         </nav>
@@ -91,21 +104,73 @@
 
     <!-- ============================ CONTEÚDO ============================ -->
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
-        <!-- Indicar banca: título, resumo e palavras-chave -> 10 pessoas mais próximas -->
-        <div id="tab-banca" class="tab-panel" role="tabpanel" aria-labelledby="tab-banca-btn" tabindex="0">
+        <!-- 1. Início: apresentação e funcionamento -->
+        <div id="tab-inicio" class="tab-panel" role="tabpanel" aria-labelledby="tab-inicio-btn" tabindex="0">
             <div class="max-w-3xl mx-auto space-y-6">
-                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-2">
-                    <h2 class="text-lg font-bold text-brand-800 dark:text-accent-400">Membro externo para a banca de defesa</h2>
+                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-3">
+                    <h2 class="text-xl font-bold text-brand-800 dark:text-accent-400">Encontre membros externos para a sua banca de defesa</h2>
                     <p>
-                        Informe o título, o resumo e as palavras-chave do seu trabalho. A ferramenta compara esses
-                        dados com os currículos Lattes cadastrados pela administração e mostra duas listas de 10
-                        pessoas com maior proximidade temática, numa escala de 0 a 1: uma do PROFIAP e outra de
-                        outros programas. Pessoas com vínculo com você ou com a sua orientação ficam de fora.
+                        O bancaZen ajuda discentes do PROFIAP a encontrar pessoas com proximidade temática com a
+                        dissertação para convidar como membros externos da banca de defesa. A comparação usa os
+                        currículos Lattes cadastrados pela administração do programa e respeita a conformidade
+                        ética: quem tem vínculo com você ou com a sua orientação não é indicado.
                     </p>
                     <p id="corpusStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Consultando a base de currículos…</p>
+                    <div><button type="button" data-ir="dissertacao" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Começar <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button></div>
                 </div>
 
-                <form id="buscaForm" class="space-y-4" novalidate>
+                <section class="space-y-3" aria-labelledby="comoTitulo">
+                    <h2 id="comoTitulo" class="text-lg font-bold">Como funciona</h2>
+                    <ol class="space-y-3 list-none p-0">
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Minha Dissertação</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe o título, o resumo e as palavras-chave do seu trabalho.</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></span><div><p class="font-semibold">Minha orientação</p><p class="text-sm text-gray-600 dark:text-gray-400">Envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base.</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Bancas sugeridas</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 pessoas, da maior para a menor proximidade: currículos do PROFIAP e currículos de outros programas (para o segundo membro externo).</p></div></li>
+                    </ol>
+                </section>
+
+                <section class="space-y-2" aria-labelledby="calculoTitulo">
+                    <h2 id="calculoTitulo" class="text-lg font-bold">Como a proximidade é calculada</h2>
+                    <p>
+                        Cada currículo é descrito pelos termos do resumo, das linhas de pesquisa, das áreas do
+                        conhecimento, das palavras-chave, dos títulos da formação, dos projetos, das produções e das
+                        orientações. O seu trabalho é descrito da mesma forma, com peso maior para as palavras-chave
+                        e o título.
+                    </p>
+                    <p>
+                        Termos raros entre os currículos valem mais do que termos comuns a todos (TF-IDF), e
+                        produções com mais de 10 anos pesam menos. A proximidade é o cosseno entre os dois perfis,
+                        numa escala de 0 a 1: 0 indica nenhum termo em comum e 1 indica o mesmo perfil de termos.
+                        A lista ajuda a encontrar nomes; a escolha da banca segue as regras do seu programa.
+                    </p>
+                </section>
+
+                <section class="space-y-2" aria-labelledby="eticaTitulo">
+                    <h2 id="eticaTitulo" class="text-lg font-bold">Conformidade ética</h2>
+                    <p>
+                        A pessoa é retirada das listas quando há coautoria em publicação (procurada nos currículos dos
+                        dois lados), relação de orientação com você, com o(a) orientador(a) ou com o(a)
+                        coorientador(a), ou quando é uma dessas pessoas. Ela aparece à parte, com o motivo. O vínculo é
+                        "confirmado" quando a pessoa é identificada pelo ID Lattes ou pelo nome completo, e "provável"
+                        quando só o sobrenome e as iniciais coincidem (pode ser homônimo).
+                    </p>
+                </section>
+
+                <section class="space-y-2" aria-labelledby="privacidadeTitulo">
+                    <h2 id="privacidadeTitulo" class="text-lg font-bold">Seus dados</h2>
+                    <p>
+                        Os currículos que você envia em "Minha orientação" são usados só na consulta e não são
+                        guardados. Os currículos da base ficam no servidor, fora da área pública do site: o navegador
+                        recebe apenas o resultado.
+                    </p>
+                </section>
+            </div>
+        </div>
+
+        <!-- 2. Minha Dissertação -->
+        <div id="tab-dissertacao" class="tab-panel" role="tabpanel" aria-labelledby="tab-dissertacao-btn" tabindex="0" hidden>
+            <div class="max-w-3xl mx-auto space-y-4">
+                <h2 class="text-lg font-bold">Minha Dissertação</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Quanto mais completos o resumo e as palavras-chave, melhor a comparação com os currículos.</p>
                     <div>
                         <label for="tituloInput" class="block text-sm font-medium mb-1">Título do trabalho</label>
                         <input id="tituloInput" type="text" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
@@ -119,14 +184,22 @@
                         <input id="palavrasInput" type="text" aria-describedby="palavrasAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <p id="palavrasAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separe por ponto e vírgula ou vírgula. Ex.: governança pública; transparência; controle social</p>
                     </div>
-                    <fieldset class="border border-gray-200 dark:border-gray-700 rounded p-4 space-y-4">
-                        <legend class="text-sm font-semibold px-1">Conformidade ética: vínculos</legend>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Informe o currículo Lattes da pessoa discente e da orientação. Pessoas com coautoria em
-                            publicações ou relação de orientação com alguma delas são retiradas da lista e aparecem
-                            à parte, com o motivo. Os arquivos enviados aqui são usados só nesta consulta e não são
-                            guardados.
-                        </p>
+                <div class="flex justify-end">
+                    <button type="button" data-ir="orientacao" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Próximo: Minha orientação <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Minha orientação -->
+        <div id="tab-orientacao" class="tab-panel" role="tabpanel" aria-labelledby="tab-orientacao-btn" tabindex="0" hidden>
+            <div class="max-w-3xl mx-auto space-y-4">
+                <h2 class="text-lg font-bold">Minha orientação</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Informe o currículo Lattes da pessoa discente e da orientação. Eles são usados para retirar das
+                    sugestões quem tem coautoria em publicações ou relação de orientação com alguma dessas pessoas.
+                    Os arquivos enviados aqui são usados só na consulta e não são guardados.
+                </p>
+                <div class="space-y-4">
                         <div class="envolvido space-y-1" data-papel="discente">
                             <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-red-700 dark:text-red-400" aria-hidden="true">*</span></p>
                             <div class="grid gap-2 sm:grid-cols-2">
@@ -178,7 +251,22 @@
                             </select>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Relações de orientação valem em qualquer período.</p>
                         </div>
-                    </fieldset>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" data-ir="bancas" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Próximo: Bancas sugeridas <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Bancas sugeridas -->
+        <div id="tab-bancas" class="tab-panel" role="tabpanel" aria-labelledby="tab-bancas-btn" tabindex="0" hidden>
+            <div class="max-w-3xl mx-auto space-y-6">
+                <h2 class="text-lg font-bold">Bancas sugeridas</h2>
+                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-2" aria-labelledby="conferenciaTitulo" role="group">
+                    <h3 id="conferenciaTitulo" class="font-semibold">Antes de buscar</h3>
+                    <ul id="conferencia" class="space-y-1 text-sm list-none p-0"></ul>
+                </div>
+                <form id="buscaForm" class="space-y-4" novalidate>
                     <fieldset class="border border-gray-200 dark:border-gray-700 rounded p-4 space-y-3">
                         <legend class="text-sm font-semibold px-1">Critérios para membro externo</legend>
                         <div>
@@ -196,40 +284,106 @@
                 </form>
 
                 <section id="resultado" class="space-y-3 hidden" aria-labelledby="resultadoTitulo" tabindex="-1">
-                    <h2 id="resultadoTitulo" class="text-lg font-bold">Pessoas mais próximas do tema</h2>
+                    <h3 id="resultadoTitulo" class="text-lg font-bold">Pessoas mais próximas do tema</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
                         Duas listas, cada uma com até 10 pessoas sem vínculo identificado, da maior para a menor
                         proximidade (0 a 1): currículos do PROFIAP e currículos de outros programas (segundo membro externo).
                     </p>
                     <div id="listas" class="space-y-8"></div>
-                    <details class="text-sm text-gray-600 dark:text-gray-400">
-                        <summary class="cursor-pointer font-medium">Como a proximidade é calculada</summary>
-                        <div class="mt-2 space-y-2">
-                            <p>
-                                Cada currículo é descrito pelos termos do resumo, das linhas de pesquisa, das áreas do
-                                conhecimento, das palavras-chave, dos títulos da formação, dos projetos, das produções e
-                                das orientações. O seu trabalho é descrito da mesma forma, com peso maior para as
-                                palavras-chave e o título.
-                            </p>
-                            <p>
-                                Termos raros entre os currículos valem mais do que termos comuns a todos (TF-IDF), e
-                                produções com mais de 10 anos pesam menos. A proximidade é o cosseno entre os dois
-                                perfis: 0 indica nenhum termo em comum e 1 indica o mesmo perfil de termos. A lista
-                                ajuda a encontrar nomes; a escolha da banca segue as regras do seu programa.
-                            </p>
-                            <p>
-                                Conformidade ética: a pessoa é retirada da lista quando há coautoria em publicação
-                                (procurada nos currículos dos dois lados) ou relação de orientação com a pessoa discente,
-                                o(a) orientador(a) ou o(a) coorientador(a). O vínculo é "confirmado" quando a pessoa é
-                                identificada pelo ID Lattes ou pelo nome completo, e "provável" quando só o sobrenome e
-                                as iniciais coincidem.
-                            </p>
-                        </div>
-                    </details>
                 </section>
             </div>
         </div>
 
+        <!-- 5. Administração (js/admin.js; só consulta o servidor quando a seção é aberta) -->
+        <div id="tab-administracao" class="tab-panel" role="tabpanel" aria-labelledby="tab-administracao-btn" tabindex="0" hidden>
+            <div class="max-w-5xl mx-auto space-y-6">
+                <h2 class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-user-shield text-brand-600 dark:text-accent-400"></i> Administração</h2>
+            <!-- Entrada -->
+            <section id="entrada" class="hidden max-w-sm space-y-3" aria-labelledby="entradaTitulo">
+                <h3 id="entradaTitulo" class="text-lg font-bold">Entrar</h3>
+                <form id="entrarForm" class="space-y-3">
+                    <div>
+                        <label for="senhaInput" class="block text-sm font-medium mb-1">Senha</label>
+                        <input id="senhaInput" type="password" autocomplete="current-password" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    </div>
+                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50"><i aria-hidden="true" class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+                </form>
+                <p id="entradaMsg" class="text-sm text-red-700 dark:text-red-400" role="alert"></p>
+            </section>
+
+            <!-- Área logada -->
+            <div id="painel" class="hidden space-y-8">
+                <div class="flex justify-end">
+                    <button type="button" id="sairBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium"><i aria-hidden="true" class="fa-solid fa-right-from-bracket"></i> Sair</button>
+                </div>
+
+                <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="envioTitulo">
+                    <h3 id="envioTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Enviar currículos Lattes</h3>
+                    <p class="text-sm">
+                        Envie o XML exportado pela Plataforma Lattes ou o ZIP que a plataforma entrega. Os arquivos
+                        ficam guardados no servidor, fora da área pública do site. Se um currículo com o mesmo ID
+                        Lattes já existir, fica o de data de atualização mais recente.
+                    </p>
+                    <form id="envioForm" class="space-y-4">
+                        <fieldset class="space-y-2">
+                            <legend class="text-sm font-medium">Grupo</legend>
+                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupo" value="profiap" checked> PROFIAP (primeira lista)</label>
+                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupo" value="outro"> Outro programa (segunda lista: segundo membro externo)</label>
+                        </fieldset>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="ppgInput" class="block text-sm font-medium mb-1">PPG</label>
+                                <input id="ppgInput" type="text" list="ppgLista" required value="PROFIAP" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <datalist id="ppgLista"></datalist>
+                            </div>
+                            <div>
+                                <label for="instInput" class="block text-sm font-medium mb-1">Instituição</label>
+                                <input id="instInput" type="text" list="instLista" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <datalist id="instLista"></datalist>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">PPG e instituição valem para todos os arquivos deste envio e aparecem no resultado.</p>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                                <i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i> Escolher arquivos
+                                <input id="arquivosInput" type="file" accept=".xml,.zip" multiple class="sr-only">
+                            </label>
+                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                                <i aria-hidden="true" class="fa-solid fa-folder-open"></i> Escolher pasta
+                                <input id="pastaInput" type="file" webkitdirectory multiple class="sr-only">
+                            </label>
+                            <span id="selecionados" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Nenhum arquivo escolhido.</span>
+                        </div>
+                        <button type="submit" id="enviarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50" disabled><i aria-hidden="true" class="fa-solid fa-upload"></i> Enviar</button>
+                    </form>
+                    <div id="relatorio" class="text-sm space-y-1" aria-live="polite"></div>
+                </section>
+
+                <section class="space-y-3" aria-labelledby="baseTitulo">
+                    <h3 id="baseTitulo" class="text-lg font-bold">Currículos cadastrados <span id="totalBase" class="font-normal text-gray-600 dark:text-gray-400"></span></h3>
+                    <div>
+                        <label for="filtroInput" class="sr-only">Filtrar currículos</label>
+                        <input id="filtroInput" type="search" placeholder="Filtrar por nome, PPG ou instituição" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <caption class="sr-only">Currículos cadastrados</caption>
+                            <thead class="border-b border-gray-300 dark:border-gray-600">
+                                <tr>
+                                    <th scope="col" class="py-2 pr-3">Nome</th>
+                                    <th scope="col" class="py-2 pr-3">Grupo</th>
+                                    <th scope="col" class="py-2 pr-3">PPG / Instituição</th>
+                                    <th scope="col" class="py-2 pr-3">Atualização do Lattes</th>
+                                    <th scope="col" class="py-2">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="baseTabela"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            </div>
+        </div>
         <div id="tab-config" class="tab-panel" role="tabpanel" aria-labelledby="headerConfigBtn" tabindex="0" hidden>
             <div class="max-w-md space-y-6">
                 <div>
@@ -284,5 +438,6 @@
     <script src="js/chrome.js"></script>
     <script src="js/layout.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 </html>

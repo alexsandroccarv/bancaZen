@@ -30,6 +30,12 @@ ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
 - Senha da administração: `php api/cli/definir-senha.php` no servidor.
 
 ## Padrões de UI
+- Página principal em seções (abas com ícone na barra superior, nome visível
+  a partir de 640px): `#inicio` (apresentação e funcionamento),
+  `#dissertacao`, `#orientacao`, `#bancas` (conferência, critérios, busca e
+  listas) e `#administracao` (`js/admin.js`, só consulta o servidor ao abrir).
+  O endereço da seção fica na URL; botões `data-ir="<seção>"` trocam de
+  seção (`layout.js`). `admin.html` só redireciona para `#administracao`.
 - Cabeçalho/rodapé (site estático HTML+JS): fonte única em `src/js/chrome.js`
   (injeta em `#app-header`/`#app-footer`). Não recriar por página. O `index.html`
   tem seu próprio cabeçalho (com abas); as páginas de apoio usam o `chrome.js`.
