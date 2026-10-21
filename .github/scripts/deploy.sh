@@ -14,7 +14,9 @@
 #
 # Proteções:
 #   - recusa DEPLOY_PATH raso (ex.: "/", "/var") e pasta de dados dentro do
-#     DEPLOY_PATH (o rsync --delete apagaria os currículos);
+#     DEPLOY_PATH (o rsync --delete apagaria os currículos) ou dentro de uma
+#     pasta servida pela web (public_html, htdocs, www/html), como acontece
+#     com o padrão em hospedagem compartilhada (cPanel);
 #   - no primeiro deploy, recusa uma pasta não vazia que não seja do site
 #     (marcador .bancazen-deploy), para não apagar outro conteúdo;
 #   - preserva .well-known/ (certificados Let's Encrypt) e .user.ini
@@ -45,12 +47,23 @@ NIVEIS=$(echo "$DEPLOY_PATH" | tr -cd '/' | wc -c)
 [ "$NIVEIS" -ge 2 ] || erro "DEPLOY_PATH raso demais ($DEPLOY_PATH): use uma pasta dedicada, ex.: /var/www/bancazen."
 case "$DADOS/" in "$DEPLOY_PATH"/*) erro "A pasta de dados ($DADOS) está dentro do DEPLOY_PATH: o deploy apagaria os currículos.";; esac
 case "$DEPLOY_PATH/" in "$DADOS"/*) erro "O DEPLOY_PATH está dentro da pasta de dados ($DADOS).";; esac
+# Os currículos não podem ficar numa pasta servida pela web.
+case "$DADOS/" in */public_html/*|*/htdocs/*|*/www/html/*)
+  erro "A pasta de dados ($DADOS) fica dentro de uma pasta pública da web: os currículos poderiam ser baixados. Defina a variável BANCAZEN_DADOS (Settings → Secrets and variables → Actions → Variables) com um caminho fora dela, ex.: /home/<usuário>/bancazen-dados (veja DEPLOY.md, hospedagem compartilhada).";;
+esac
 
 # ---- Chave e known_hosts ----
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
 printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
 chmod 600 ~/.ssh/id_deploy
+# A chave precisa ser privada e SEM senha (o deploy não tem como digitá-la).
+if ! CHAVE_MSG=$(ssh-keygen -y -P '' -f ~/.ssh/id_deploy 2>&1 >/dev/null); then
+  if grep -q 'ENCRYPTED' ~/.ssh/id_deploy || echo "$CHAVE_MSG" | grep -qi 'passphrase'; then
+    erro "SSH_KEY está protegida por senha (passphrase). Gere uma chave sem senha (ssh-keygen ... -N \"\") ou remova a senha: ssh-keygen -p -f <arquivo> -N \"\"."
+  fi
+  erro "SSH_KEY não é uma chave privada válida. Cole o arquivo da chave PRIVADA inteiro, com as linhas BEGIN e END (não o .pub)."
+fi
 if [ -n "${SSH_KNOWN_HOSTS:-}" ]; then
   printf '%s\n' "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
   CHECAGEM=yes
@@ -68,6 +81,19 @@ remoto() { ssh $SSH_OPTS "$REMOTE" "$@"; }
 echo "Servidor: ${REMOTE} (porta ${PORT})"
 echo "Site:     ${DEPLOY_PATH}"
 echo "Dados:    ${DADOS}"
+echo "Chave:    $(ssh-keygen -l -f ~/.ssh/id_deploy | awk '{print $1, $2, $NF}') (confira com a chave autorizada no servidor)"
+
+# ---- Conexão (antes de qualquer outra coisa, para um erro claro) ----
+if ! remoto true; then
+  echo "::error::Não foi possível entrar no servidor por SSH com a chave do SSH_KEY."
+  echo "Causas mais comuns:"
+  echo "  1. A chave PÚBLICA não está autorizada para o SSH_USER no servidor (~/.ssh/authorized_keys)."
+  echo "     No cPanel: SSH Access → Manage SSH Keys → na chave importada, Manage → Authorize."
+  echo "  2. SSH_USER errado (no cPanel, é o usuário da conta cPanel)."
+  echo "  3. O acesso SSH (shell) não está habilitado para a conta na hospedagem."
+  echo "  4. SSH_KEY e a chave pública autorizada não formam um par (compare a impressão digital acima com: ssh-keygen -l -f chave.pub)."
+  exit 1
+fi
 
 # ---- Verificações no servidor (antes de copiar qualquer coisa) ----
 # O script remoto recebe os caminhos como argumentos ($1 site, $2 dados).
@@ -83,6 +109,7 @@ SITE_REAL=$(cd "$SITE" && pwd -P)
 if [ -d "$DADOS" ]; then
   DADOS_REAL=$(cd "$DADOS" && pwd -P)
   case "$DADOS_REAL/" in "$SITE_REAL"/*) echo "::error::A pasta de dados ($DADOS_REAL) fica dentro do site ($SITE_REAL)."; exit 1;; esac
+  case "$DADOS_REAL/" in */public_html/*|*/htdocs/*|*/www/html/*) echo "::error::A pasta de dados ($DADOS_REAL) fica dentro de uma pasta pública da web."; exit 1;; esac
 fi
 
 # Primeiro deploy: só em pasta vazia (ou só com .well-known/.user.ini).

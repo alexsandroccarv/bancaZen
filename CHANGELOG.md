@@ -7,6 +7,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Corrigido
+- Deploy em hospedagem compartilhada (cPanel): o `deploy.sh` recusa pasta de
+  dados dentro de pasta pública da web (`public_html`, `htdocs`,
+  `www/html`), onde os currículos poderiam ser baixados, e orienta a definir
+  `BANCAZEN_DADOS`; confere antes da conexão se o `SSH_KEY` é chave privada
+  válida e sem senha, mostra a impressão digital da chave e explica as causas
+  comuns de `Permission denied`. `DEPLOY.md` ganhou a seção de hospedagem
+  compartilhada. [issue #8](../../issues/8)
+
+## [0.0.4] - 2026-10-21
+
 ### Adicionado
 - Indicação de membros externos para banca de defesa de mestrado a partir de
   currículos Lattes: os XML (ou ZIP exportados pela Plataforma Lattes) da
