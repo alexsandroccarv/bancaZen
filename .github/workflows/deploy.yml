@@ -62,7 +62,7 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          BUSCABANCA_DADOS: ${{ vars.BUSCABANCA_DADOS }}
+          BANCAZEN_DADOS: ${{ vars.BANCAZEN_DADOS }}
 
       - name: Verificar o site publicado
         if: steps.deploy.outputs.publicado == 'sim'

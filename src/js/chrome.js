@@ -25,7 +25,7 @@
                     <i aria-hidden="true" class="fa-solid fa-star"></i>
                 </div>
                 <div class="flex items-center gap-2 overflow-hidden">
-                    <span id="headerAppName" class="font-bold text-white leading-none whitespace-nowrap">BuscaBanca</span>
+                    <span id="headerAppName" class="font-bold text-white leading-none whitespace-nowrap">bancaZen</span>
                     <span class="text-xl text-white/30 dark:text-gray-700 font-light hidden">|</span>
                     <span id="headerSigla" class="font-bold text-white/90 dark:text-accent-400 leading-none whitespace-nowrap hidden"></span>
                     <span id="headerUserNameSep" class="text-xl text-white/30 dark:text-gray-700 font-light hidden">|</span>

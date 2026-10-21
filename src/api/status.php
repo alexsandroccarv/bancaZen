@@ -1,6 +1,6 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — GET api/status.php  (público)
+   bancaZen — GET api/status.php  (público)
    Só a quantidade de currículos na base; nenhum nome ou dado do índice.
    ========================================================================== */
 require_once __DIR__ . '/lib/base.php';

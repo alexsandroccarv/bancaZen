@@ -1,13 +1,13 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — base do backend: pasta de dados, índice, sessão e respostas
+   bancaZen — base do backend: pasta de dados, índice, sessão e respostas
    --------------------------------------------------------------------------
    Pasta de DADOS (privada, fora da raiz pública do site):
-     - variável de ambiente BUSCABANCA_DADOS, se definida no servidor web;
+     - variável de ambiente BANCAZEN_DADOS, se definida no servidor web;
      - senão, o caminho gravado pelo build em lib/config-dados.php (variável
-       BUSCABANCA_DADOS do GitHub Actions);
-     - senão, "buscabanca-dados" ao lado da pasta do site (ex.: site em
-       /var/www/buscabanca -> dados em /var/www/buscabanca-dados).
+       BANCAZEN_DADOS do GitHub Actions);
+     - senão, "bancazen-dados" ao lado da pasta do site (ex.: site em
+       /var/www/bancazen -> dados em /var/www/bancazen-dados).
    Fica fora da pasta publicada para (1) não ser servida pelo servidor web e
    (2) não ser apagada pelo deploy (rsync --delete espelha só a pasta do site).
 
@@ -24,11 +24,11 @@ require_once __DIR__ . '/vinculos.php';
 
 function bb_dir_dados(): string
 {
-    $env = getenv('BUSCABANCA_DADOS');
-    if ($env === false || $env === '') $env = $_SERVER['BUSCABANCA_DADOS'] ?? '';
+    $env = getenv('BANCAZEN_DADOS');
+    if ($env === false || $env === '') $env = $_SERVER['BANCAZEN_DADOS'] ?? '';
     if ($env === '' && is_file(__DIR__ . '/config-dados.php')) $env = (string) include __DIR__ . '/config-dados.php';
-    // __DIR__ = <site>/api/lib  ->  <site>/../buscabanca-dados
-    $dir = $env !== '' ? $env : dirname(__DIR__, 3) . '/buscabanca-dados';
+    // __DIR__ = <site>/api/lib  ->  <site>/../bancazen-dados
+    $dir = $env !== '' ? $env : dirname(__DIR__, 3) . '/bancazen-dados';
     return rtrim($dir, '/');
 }
 

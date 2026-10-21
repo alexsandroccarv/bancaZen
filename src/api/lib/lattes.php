@@ -1,6 +1,6 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — Extrator do XML do Currículo Lattes
+   bancaZen — Extrator do XML do Currículo Lattes
    --------------------------------------------------------------------------
    Lê o XML exportado pela Plataforma Lattes (CNPq) e extrai apenas o que
    interessa para medir a proximidade temática e verificar vínculos: resumo

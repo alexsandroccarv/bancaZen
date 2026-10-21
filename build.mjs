@@ -70,17 +70,17 @@ for (const name of ['images', 'favicon.ico']) {
 // 3.1) Pasta de dados do backend PHP: NÃO faz parte do dist/. Os currículos
 // e o índice ficam fora da raiz pública (ver src/api/lib/base.php), para não
 // serem servidos nem apagados pelo deploy (rsync --delete). Se a variável
-// BUSCABANCA_DADOS estiver definida (Actions → Variables), o caminho vai para
+// BANCAZEN_DADOS estiver definida (Actions → Variables), o caminho vai para
 // dist/api/lib/config-dados.php, dispensando configurar o servidor web.
-const dadosPath = (process.env.BUSCABANCA_DADOS || '').trim();
+const dadosPath = (process.env.BANCAZEN_DADOS || '').trim();
 if (dadosPath) {
     if (!dadosPath.startsWith('/')) {
-        console.error(`ERRO: BUSCABANCA_DADOS deve ser um caminho absoluto (recebido: ${dadosPath}).`);
+        console.error(`ERRO: BANCAZEN_DADOS deve ser um caminho absoluto (recebido: ${dadosPath}).`);
         process.exit(1);
     }
     writeFileSync(
         join(dist, 'api', 'lib', 'config-dados.php'),
-        `<?php\n// Gerado por build.mjs (variável BUSCABANCA_DADOS): não editar.\nreturn ${JSON.stringify(dadosPath)};\n`
+        `<?php\n// Gerado por build.mjs (variável BANCAZEN_DADOS): não editar.\nreturn ${JSON.stringify(dadosPath)};\n`
     );
     console.log(`Pasta de dados do backend: ${dadosPath}`);
 }

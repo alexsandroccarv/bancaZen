@@ -1,4 +1,4 @@
-# Projeto: BuscaBanca (PROFIAP)
+# Projeto: bancaZen (PROFIAP)
 
 ## Visão geral
 Aplicação web (site estático + backend PHP) que indica membros externos
@@ -11,8 +11,8 @@ ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
 ## Lattes e proximidade
 - **Currículos e índice nunca são públicos**: nada de XML no repositório
   nem em `src/`/`dist/`; o navegador recebe só o resultado (`bb_publico`).
-  Ficam na pasta de dados fora da raiz do site (`BUSCABANCA_DADOS`, padrão
-  `../buscabanca-dados`), que o deploy (`rsync --delete`) não toca.
+  Ficam na pasta de dados fora da raiz do site (`BANCAZEN_DADOS`, padrão
+  `../bancazen-dados`), que o deploy (`rsync --delete`) não toca.
 - Backend PHP 8 sem dependências em `src/api/`: extrator
   `lib/lattes.php` (tags do schema `CurriculoLattes`, o mesmo do lattesZen;
   não extrair dados de contato), proximidade `lib/similaridade.php`
@@ -86,10 +86,10 @@ ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
 - Segredos (repositório ou ambiente `producao`): `SSH_KEY`, `SSH_HOST`,
   `SSH_USER`, `DEPLOY_PATH`; opcionais `SSH_PORT`, `SSH_KNOWN_HOSTS`.
 - Variáveis: `SITE_URL` (metatags, `sitemap.xml`, verificação pós-deploy) e
-  `BUSCABANCA_DADOS` (opcional; caminho da pasta de dados).
+  `BANCAZEN_DADOS` (opcional; caminho da pasta de dados).
 - O `deploy.sh` nunca deve apagar a pasta de dados: recusa dados dentro do
   `DEPLOY_PATH`, pasta alheia no primeiro deploy (marcador
-  `.buscabanca-deploy`) e preserva `.well-known/` e `.user.ini`.
+  `.bancazen-deploy`) e preserva `.well-known/` e `.user.ini`.
 
 ## Comandos úteis
 - `node build.mjs` — monta a pasta `dist/` a partir de `src/` (injeta

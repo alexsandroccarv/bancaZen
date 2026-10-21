@@ -1,6 +1,6 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — Conformidade ética: vínculos com a discente e a orientação
+   bancaZen — Conformidade ética: vínculos com a discente e a orientação
    --------------------------------------------------------------------------
    Verifica se uma pessoa indicada para a banca tem vínculo com a pessoa
    discente, com o(a) orientador(a) ou com o(a) coorientador(a), a partir

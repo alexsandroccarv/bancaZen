@@ -1,10 +1,10 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — define a senha da área de administração (só linha de comando)
+   bancaZen — define a senha da área de administração (só linha de comando)
    --------------------------------------------------------------------------
    No servidor, na pasta do site:
        php api/cli/definir-senha.php
-   (Se a pasta de dados não for a padrão, defina BUSCABANCA_DADOS antes.)
+   (Se a pasta de dados não for a padrão, defina BANCAZEN_DADOS antes.)
    Grava apenas o hash (password_hash) em <dados>/admin.json.
    ========================================================================== */
 if (PHP_SAPI !== 'cli') {

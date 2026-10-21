@@ -37,7 +37,7 @@ jobs:
         env:
           # Settings → Secrets and variables → Actions → Variables.
           SITE_URL: ${{ vars.SITE_URL }}
-          BUSCABANCA_DADOS: ${{ vars.BUSCABANCA_DADOS }}
+          BANCAZEN_DADOS: ${{ vars.BANCAZEN_DADOS }}
 
       - name: Guardar o dist/ para a publicação
         if: inputs.artefato

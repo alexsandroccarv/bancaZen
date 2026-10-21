@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BuscaBanca — aplicação (aba "Indicar banca")
+   bancaZen — aplicação (aba "Indicar banca")
    --------------------------------------------------------------------------
    O navegador só envia o formulário: a comparação com os currículos e a
    verificação de vínculos rodam no servidor (api/buscar.php), que devolve

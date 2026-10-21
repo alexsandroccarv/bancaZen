@@ -1,6 +1,6 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — api/admin.php?acao=...  (área de administração)
+   bancaZen — api/admin.php?acao=...  (área de administração)
    --------------------------------------------------------------------------
      GET  sessao     -> { logado, configurado, csrf }
      POST entrar     senha

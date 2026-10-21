@@ -1,6 +1,6 @@
 # Integração contínua e publicação (rsync/SSH)
 
-O BuscaBanca é publicado por **GitHub Actions**: cada mudança é validada e,
+O bancaZen é publicado por **GitHub Actions**: cada mudança é validada e,
 quando entra na `main`, o site (`dist/`) é copiado para o servidor por
 **rsync sobre SSH**. A configuração é feita **uma vez**.
 
@@ -59,24 +59,24 @@ São duas pastas, **uma ao lado da outra**:
 
 | Pasta | Conteúdo | Quem escreve |
 |---|---|---|
-| `/var/www/buscabanca` (`DEPLOY_PATH`) | o site, espelhado a cada deploy | o usuário de deploy (SSH) |
-| `/var/www/buscabanca-dados` | currículos (XML), índice, hash da senha | o PHP (ex.: `www-data`) |
+| `/var/www/bancazen` (`DEPLOY_PATH`) | o site, espelhado a cada deploy | o usuário de deploy (SSH) |
+| `/var/www/bancazen-dados` | currículos (XML), índice, hash da senha | o PHP (ex.: `www-data`) |
 
 ```bash
 # usuário de deploy (sem senha; entra só com a chave do Passo 2)
 sudo adduser --disabled-password --gecos "" deploy
 
 # pasta do site: do usuário de deploy, legível pelo servidor web
-sudo mkdir -p /var/www/buscabanca
-sudo chown deploy:deploy /var/www/buscabanca
+sudo mkdir -p /var/www/bancazen
+sudo chown deploy:deploy /var/www/bancazen
 
 # pasta de dados: do usuário do PHP, fora da pasta do site
-sudo mkdir -p /var/www/buscabanca-dados
-sudo chown www-data:www-data /var/www/buscabanca-dados
-sudo chmod 750 /var/www/buscabanca-dados
+sudo mkdir -p /var/www/bancazen-dados
+sudo chown www-data:www-data /var/www/bancazen-dados
+sudo chmod 750 /var/www/bancazen-dados
 ```
 
-Configure o servidor web para servir `/var/www/buscabanca` no domínio (uma
+Configure o servidor web para servir `/var/www/bancazen` no domínio (uma
 vez). Use **HTTPS**: a senha da administração trafega no login.
 
 **Por que a pasta de dados fica fora do site:** para não ser servida pela web
@@ -84,10 +84,10 @@ e para não ser apagada pelo deploy (o rsync usa `--delete` e espelha só o
 `DEPLOY_PATH`). O deploy **se recusa** a publicar se a pasta de dados estiver
 dentro do `DEPLOY_PATH`.
 
-**Outro local para os dados:** defina a variável `BUSCABANCA_DADOS` (Passo 3);
+**Outro local para os dados:** defina a variável `BANCAZEN_DADOS` (Passo 3);
 o build grava o caminho em `api/lib/config-dados.php`, sem mexer no servidor
-web. Alternativa: `SetEnv BUSCABANCA_DADOS /caminho` (Apache) ou
-`fastcgi_param BUSCABANCA_DADOS /caminho;` (Nginx/PHP-FPM).
+web. Alternativa: `SetEnv BANCAZEN_DADOS /caminho` (Apache) ou
+`fastcgi_param BANCAZEN_DADOS /caminho;` (Nginx/PHP-FPM).
 
 **O que o deploy preserva no `DEPLOY_PATH`:** `.well-known/` (validação do
 certificado Let's Encrypt) e `.user.ini` (limites do PHP em hospedagem
@@ -96,7 +96,7 @@ compartilhada). Todo o resto é espelhado do `dist/`.
 **Primeiro deploy:** a pasta do site precisa estar **vazia** (podendo ter só
 `.well-known/` e `.user.ini`). Se houver outro conteúdo, o deploy para sem
 apagar nada e mostra o que encontrou. Depois do primeiro deploy, o marcador
-`.buscabanca-deploy` identifica a pasta.
+`.bancazen-deploy` identifica a pasta.
 
 ---
 
@@ -105,17 +105,17 @@ apagar nada e mostra o que encontrou. Depois do primeiro deploy, o marcador
 No **seu computador**, gere um par de chaves **só para o deploy**:
 
 ```bash
-ssh-keygen -t ed25519 -C "deploy-buscabanca" -f ~/.ssh/buscabanca_deploy -N ""
+ssh-keygen -t ed25519 -C "deploy-bancazen" -f ~/.ssh/bancazen_deploy -N ""
 ```
 
-- `~/.ssh/buscabanca_deploy` → chave **PRIVADA** (secret `SSH_KEY`)
-- `~/.ssh/buscabanca_deploy.pub` → chave **PÚBLICA** (vai para o servidor)
+- `~/.ssh/bancazen_deploy` → chave **PRIVADA** (secret `SSH_KEY`)
+- `~/.ssh/bancazen_deploy.pub` → chave **PÚBLICA** (vai para o servidor)
 
 Autorize a chave pública para o usuário de deploy e teste:
 
 ```bash
-ssh-copy-id -i ~/.ssh/buscabanca_deploy.pub deploy@servidor
-ssh -i ~/.ssh/buscabanca_deploy deploy@servidor 'echo ok; php -v | head -1; which rsync'
+ssh-copy-id -i ~/.ssh/bancazen_deploy.pub deploy@servidor
+ssh -i ~/.ssh/bancazen_deploy deploy@servidor 'echo ok; php -v | head -1; which rsync'
 ```
 
 Recomendado: guarde a chave **do servidor** para o GitHub conferir que está
@@ -138,8 +138,8 @@ publicar.
 |---|---|---|
 | `SSH_HOST` | sim | IP ou domínio do servidor |
 | `SSH_USER` | sim | usuário de deploy (ex.: `deploy`) |
-| `SSH_KEY` | sim | conteúdo **inteiro** de `~/.ssh/buscabanca_deploy` (com as linhas `BEGIN`/`END`) |
-| `DEPLOY_PATH` | sim | pasta do site, caminho absoluto (ex.: `/var/www/buscabanca`) |
+| `SSH_KEY` | sim | conteúdo **inteiro** de `~/.ssh/bancazen_deploy` (com as linhas `BEGIN`/`END`) |
+| `DEPLOY_PATH` | sim | pasta do site, caminho absoluto (ex.: `/var/www/bancazen`) |
 | `SSH_PORT` | não | porta SSH (padrão `22`) |
 | `SSH_KNOWN_HOSTS` | não (recomendado) | saída do `ssh-keyscan` do Passo 2. Sem ele, a chave do servidor é aceita no primeiro contato |
 
@@ -147,8 +147,8 @@ publicar.
 
 | Nome | Obrigatório | Valor |
 |---|---|---|
-| `SITE_URL` | recomendado | endereço do site, sem barra final (ex.: `https://buscabanca.exemplo.br`). Usado nas metatags, no `sitemap.xml` e na verificação depois do deploy |
-| `BUSCABANCA_DADOS` | não | caminho absoluto da pasta de dados, se não for a irmã `buscabanca-dados` |
+| `SITE_URL` | recomendado | endereço do site, sem barra final (ex.: `https://bancazen.exemplo.br`). Usado nas metatags, no `sitemap.xml` e na verificação depois do deploy |
+| `BANCAZEN_DADOS` | não | caminho absoluto da pasta de dados, se não for a irmã `bancazen-dados` |
 
 ---
 
@@ -178,11 +178,11 @@ Se alguma verificação falhar, o workflow fica vermelho.
 Depois do primeiro deploy, no servidor, com o usuário do PHP:
 
 ```bash
-cd /var/www/buscabanca
+cd /var/www/bancazen
 sudo -u www-data php api/cli/definir-senha.php
 ```
 
-Só o hash (`password_hash`) é gravado em `buscabanca-dados/admin.json`.
+Só o hash (`password_hash`) é gravado em `bancazen-dados/admin.json`.
 
 ---
 
@@ -202,7 +202,7 @@ arquivos e 6 MB, compatíveis com o padrão do PHP (`max_file_uploads = 20`,
 2 MB) exige aumentar esse limite no `php.ini` ou no `.user.ini` da pasta do
 site (que o deploy preserva).
 
-**Backup.** Copie a pasta `buscabanca-dados` (XML + `corpus.json` +
+**Backup.** Copie a pasta `bancazen-dados` (XML + `corpus.json` +
 `admin.json`).
 
 ---
@@ -215,10 +215,10 @@ site (que o deploy preserva).
 | `Permission denied (publickey)` | A chave pública não está no `authorized_keys` do usuário de deploy, ou `SSH_USER`/`SSH_HOST`/`SSH_PORT` estão errados. Refaça o teste do Passo 2. |
 | `Host key verification failed` | A chave do servidor mudou ou o `SSH_KNOWN_HOSTS` está errado. Confira com a hospedagem e refaça o `ssh-keyscan`. |
 | `Connection timed out` | O servidor bloqueia a porta SSH para a internet, ou o IP/porta estão errados. |
-| `DEPLOY_PATH raso demais` / `deve ser um caminho absoluto` | Use uma pasta dedicada com caminho completo, ex.: `/var/www/buscabanca`. |
-| `A pasta de dados ... está dentro do DEPLOY_PATH` | Mova a pasta de dados para fora do site (ou ajuste `BUSCABANCA_DADOS`). |
-| `não está vazia e não tem o marcador .buscabanca-deploy` | Primeiro deploy numa pasta com outro conteúdo. Esvazie a pasta ou, se ela já é do BuscaBanca, crie o marcador com `touch`. |
-| `Pasta de dados criada ... Dê a posse ao usuário do PHP` | O deploy criou a pasta com o usuário de deploy; o PHP precisa escrever nela: `sudo chown -R www-data:www-data /var/www/buscabanca-dados`. |
+| `DEPLOY_PATH raso demais` / `deve ser um caminho absoluto` | Use uma pasta dedicada com caminho completo, ex.: `/var/www/bancazen`. |
+| `A pasta de dados ... está dentro do DEPLOY_PATH` | Mova a pasta de dados para fora do site (ou ajuste `BANCAZEN_DADOS`). |
+| `não está vazia e não tem o marcador .bancazen-deploy` | Primeiro deploy numa pasta com outro conteúdo. Esvazie a pasta ou, se ela já é do bancaZen, crie o marcador com `touch`. |
+| `Pasta de dados criada ... Dê a posse ao usuário do PHP` | O deploy criou a pasta com o usuário de deploy; o PHP precisa escrever nela: `sudo chown -R www-data:www-data /var/www/bancazen-dados`. |
 | `Senha da administração não definida` | Faça o Passo 5. |
 | `api/status.php devolveu código PHP` | O servidor web não executa PHP nessa pasta. Instale/habilite o PHP (8.0+) no site. |
 | `api/lib/... expõe código-fonte` ou `respondeu com conteúdo` | Bloqueie `api/lib` e `api/cli` (seção "Backend"). No Apache, confira o `AllowOverride`. |

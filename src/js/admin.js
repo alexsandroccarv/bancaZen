@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BuscaBanca — área de administração (admin.html)
+   bancaZen — área de administração (admin.html)
    --------------------------------------------------------------------------
    Entrada por senha, envio de currículos Lattes (XML/ZIP, arquivos ou pasta)
    com grupo, PPG e instituição, lista da base, correção do programa e

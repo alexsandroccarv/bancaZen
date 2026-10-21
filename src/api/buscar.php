@@ -1,6 +1,6 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — POST api/buscar.php  (público)
+   bancaZen — POST api/buscar.php  (público)
    --------------------------------------------------------------------------
    Recebe (multipart/form-data):
      titulo, resumo, palavrasChave (texto separado por ; , ou quebra de linha)

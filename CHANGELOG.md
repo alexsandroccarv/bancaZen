@@ -17,7 +17,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   instituição do programa e manter só doutores. Aba **Currículos** para
   conferir os currículos e acrescentar XML/ZIP do computador (lidos só no
   navegador). Teste em `tools/testar-similaridade.mjs`, executado na CI.
-  Projeto renomeado para **BuscaBanca**. [issue #1](../../issues/1)
+  Projeto renomeado para **bancaZen**. [issue #1](../../issues/1)
 - Conformidade ética: a pessoa discente informa o próprio Lattes e o da
   orientação (orientador(a) obrigatório, coorientador(a) opcional), por
   arquivo XML/ZIP ou link/ID de currículo já na base. Pessoas com coautoria
@@ -45,8 +45,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   de dados, de `.well-known/` e de `.user.ini`, recusa de pasta alheia no
   primeiro deploy, `SSH_KNOWN_HOSTS` opcional, ambiente `producao` e teste
   do site publicado (`verificar-site.sh`). Variável opcional
-  `BUSCABANCA_DADOS`. `admin.html` fora do `sitemap.xml` e do `robots.txt`.
+  `BANCAZEN_DADOS`. `admin.html` fora do `sitemap.xml` e do `robots.txt`.
   [issue #5](../../issues/5)
+- Projeto renomeado de **BuscaBanca** para **bancaZen**, acompanhando o
+  repositório (`alexsandroccarv/bancaZen`, antes `profiap_buscabanca`):
+  nome da aplicação, endereço do repositório no rodapé e nos links das
+  issues, pasta de dados `bancazen-dados`, variável `BANCAZEN_DADOS` e
+  marcador `.bancazen-deploy`. [issue #6](../../issues/6)
 
 ### Removido
 - Pasta `lattes/` no repositório, processamento dos currículos no build

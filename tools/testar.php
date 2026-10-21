@@ -1,6 +1,6 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — testes do backend (extrator, proximidade, vínculos, base)
+   bancaZen — testes do backend (extrator, proximidade, vínculos, base)
    --------------------------------------------------------------------------
    Usa os currículos fictícios de tools/fixtures/ (XML e ZIP) e a discente e
    a orientadora de tools/fixtures/envolvidos/. A pasta de dados é criada em
@@ -8,7 +8,7 @@
    Uso: php tools/testar.php
    ========================================================================== */
 $tmp = sys_get_temp_dir() . '/bb-teste-' . bin2hex(random_bytes(4));
-putenv("BUSCABANCA_DADOS=$tmp");
+putenv("BANCAZEN_DADOS=$tmp");
 require __DIR__ . '/../src/api/lib/base.php';
 
 $falhas = 0;

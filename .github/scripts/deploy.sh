@@ -4,19 +4,19 @@
 #   SSH_HOST          (obrigatório)  ex.: servidor.exemplo.com
 #   SSH_USER          (obrigatório)  ex.: deploy
 #   SSH_KEY           (obrigatório)  chave PRIVADA SSH dedicada ao deploy
-#   DEPLOY_PATH       (obrigatório)  pasta do site, caminho absoluto, ex.: /var/www/buscabanca
+#   DEPLOY_PATH       (obrigatório)  pasta do site, caminho absoluto, ex.: /var/www/bancazen
 #   SSH_PORT          (opcional, padrão 22)
 #   SSH_KNOWN_HOSTS   (opcional) linha(s) do known_hosts do servidor; sem ela,
 #                     a chave do servidor é aceita no primeiro contato (ssh-keyscan)
 # E da variável (Actions → Variables):
-#   BUSCABANCA_DADOS  (opcional) pasta de dados do backend; padrão:
-#                     <pasta acima do DEPLOY_PATH>/buscabanca-dados
+#   BANCAZEN_DADOS  (opcional) pasta de dados do backend; padrão:
+#                     <pasta acima do DEPLOY_PATH>/bancazen-dados
 #
 # Proteções:
 #   - recusa DEPLOY_PATH raso (ex.: "/", "/var") e pasta de dados dentro do
 #     DEPLOY_PATH (o rsync --delete apagaria os currículos);
 #   - no primeiro deploy, recusa uma pasta não vazia que não seja do site
-#     (marcador .buscabanca-deploy), para não apagar outro conteúdo;
+#     (marcador .bancazen-deploy), para não apagar outro conteúdo;
 #   - preserva .well-known/ (certificados Let's Encrypt) e .user.ini
 #     (limites do PHP) do servidor, que não vêm no dist/.
 set -euo pipefail
@@ -35,14 +35,14 @@ test -f dist/index.html || erro "dist/ não encontrado (rode node build.mjs ante
 
 PORT="${SSH_PORT:-22}"
 DEPLOY_PATH="${DEPLOY_PATH%/}"
-DADOS="${BUSCABANCA_DADOS:-$(dirname "$DEPLOY_PATH")/buscabanca-dados}"
+DADOS="${BANCAZEN_DADOS:-$(dirname "$DEPLOY_PATH")/bancazen-dados}"
 DADOS="${DADOS%/}"
 
 # ---- Verificações locais dos caminhos ----
 case "$DEPLOY_PATH" in /*) ;; *) erro "DEPLOY_PATH deve ser um caminho absoluto (recebido: $DEPLOY_PATH).";; esac
-case "$DADOS" in /*) ;; *) erro "BUSCABANCA_DADOS deve ser um caminho absoluto (recebido: $DADOS).";; esac
+case "$DADOS" in /*) ;; *) erro "BANCAZEN_DADOS deve ser um caminho absoluto (recebido: $DADOS).";; esac
 NIVEIS=$(echo "$DEPLOY_PATH" | tr -cd '/' | wc -c)
-[ "$NIVEIS" -ge 2 ] || erro "DEPLOY_PATH raso demais ($DEPLOY_PATH): use uma pasta dedicada, ex.: /var/www/buscabanca."
+[ "$NIVEIS" -ge 2 ] || erro "DEPLOY_PATH raso demais ($DEPLOY_PATH): use uma pasta dedicada, ex.: /var/www/bancazen."
 case "$DADOS/" in "$DEPLOY_PATH"/*) erro "A pasta de dados ($DADOS) está dentro do DEPLOY_PATH: o deploy apagaria os currículos.";; esac
 case "$DEPLOY_PATH/" in "$DADOS"/*) erro "O DEPLOY_PATH está dentro da pasta de dados ($DADOS).";; esac
 
@@ -86,12 +86,12 @@ if [ -d "$DADOS" ]; then
 fi
 
 # Primeiro deploy: só em pasta vazia (ou só com .well-known/.user.ini).
-if [ ! -f "$SITE/.buscabanca-deploy" ]; then
+if [ ! -f "$SITE/.bancazen-deploy" ]; then
   OUTROS=$(find "$SITE" -mindepth 1 -maxdepth 1 ! -name .well-known ! -name .user.ini | head -5)
   if [ -n "$OUTROS" ]; then
-    echo "::error::$SITE não está vazia e não tem o marcador .buscabanca-deploy. Para não apagar outro conteúdo, o deploy parou."
+    echo "::error::$SITE não está vazia e não tem o marcador .bancazen-deploy. Para não apagar outro conteúdo, o deploy parou."
     echo "Conteúdo encontrado (até 5 itens):"; echo "$OUTROS"
-    echo "Se a pasta é mesmo do BuscaBanca, crie o marcador: touch '$SITE/.buscabanca-deploy'"
+    echo "Se a pasta é mesmo do bancaZen, crie o marcador: touch '$SITE/.bancazen-deploy'"
     exit 1
   fi
 fi
@@ -99,7 +99,7 @@ fi
 # PHP: a versão da linha de comando costuma ser a mesma do servidor web.
 if command -v php >/dev/null 2>&1; then
   echo "PHP no servidor: $(php -r 'echo PHP_VERSION;')"
-  php -r 'exit(PHP_VERSION_ID >= 80000 ? 0 : 1);' || aviso "O PHP de linha de comando é anterior ao 8.0; o BuscaBanca precisa de PHP 8.0+ no servidor web."
+  php -r 'exit(PHP_VERSION_ID >= 80000 ? 0 : 1);' || aviso "O PHP de linha de comando é anterior ao 8.0; o bancaZen precisa de PHP 8.0+ no servidor web."
 else
   aviso "php não encontrado na linha de comando do servidor: confira se o servidor web executa PHP 8.0+ e use o caminho completo do php para definir a senha."
 fi
@@ -122,8 +122,8 @@ fi
 REMOTO
 
 # ---- Cópia ----
-# Marcador: identifica a pasta como do BuscaBanca nos próximos deploys.
-echo "Publicado pelo deploy do BuscaBanca." > dist/.buscabanca-deploy
+# Marcador: identifica a pasta como do bancaZen nos próximos deploys.
+echo "Publicado pelo deploy do bancaZen." > dist/.bancazen-deploy
 
 # rsync: incremental, apaga o que saiu do dist/ (--delete), aplica tudo no
 # fim (--delay-updates) e não tenta copiar dono/grupo (-rlptz em vez de -a).

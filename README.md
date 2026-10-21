@@ -1,4 +1,4 @@
-# BuscaBanca
+# bancaZen
 
 Aplicação web que indica **membros externos para banca de defesa de
 mestrado** a partir de currículos Lattes.
@@ -49,7 +49,7 @@ e manter só doutores.
 sessão) e os endpoints `buscar.php`, `status.php` e `admin.php`. Interface:
 `src/js/app.js` e `src/js/admin.js`. Teste: `php tools/testar.php`.
 Ambiente local: `node build.mjs && php -S localhost:8000 -t dist` (dados em
-`buscabanca-dados/`, ignorada pelo Git).
+`bancazen-dados/`, ignorada pelo Git).
 
 **Integração contínua e publicação.** Todo push e pull request passa pela
 validação (`bash .github/scripts/validar.sh`: sintaxe JS e PHP, testes do

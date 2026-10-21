@@ -1,6 +1,6 @@
 <?php
 /* ==========================================================================
-   BuscaBanca — Proximidade temática (TF-IDF + cosseno)
+   bancaZen — Proximidade temática (TF-IDF + cosseno)
    --------------------------------------------------------------------------
    Cada currículo vira um vetor de termos ponderados; o trabalho informado
    (título, resumo, palavras-chave) vira outro. A proximidade é o cosseno
