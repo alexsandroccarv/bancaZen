@@ -100,6 +100,29 @@ apagar nada e mostra o que encontrou. Depois do primeiro deploy, o marcador
 
 ---
 
+### Hospedagem compartilhada (cPanel)
+
+Em hospedagem compartilhada não há `sudo` nem `/var/www`: o site fica dentro
+do `public_html` da conta (ex.: `/home1/<usuário>/public_html/labs/bancazen`)
+e tudo roda com o mesmo usuário (o da conta cPanel), que também é o do PHP.
+
+- **Pasta de dados fora do `public_html` (obrigatório).** O padrão "pasta ao
+  lado do site" cairia dentro do `public_html`, que é servido pela web; o
+  deploy **se recusa** a publicar assim. Defina a variável `BANCAZEN_DADOS`
+  (Passo 3) com um caminho na raiz da conta, ex.:
+  `/home1/<usuário>/bancazen-dados`. O deploy cria a pasta.
+- **Caminho real da conta:** veja em *cPanel → Informações gerais* (Home
+  Directory) ou, por SSH, com `echo $HOME`.
+- **Acesso SSH:** precisa estar habilitado para a conta (algumas hospedagens
+  pedem para ativar no suporte). A porta costuma ser diferente de 22 (ex.:
+  2222); informe-a em `SSH_PORT`.
+- **Chave SSH:** se importar a chave pública pelo cPanel (*SSH Access → Manage
+  SSH Keys → Import Key*), é preciso **autorizá-la** depois: na lista de
+  chaves públicas, *Manage → Authorize*. Sem isso, o deploy recebe
+  `Permission denied`. Não use chave gerada com senha (passphrase).
+- **PHP:** escolha PHP 8.0 ou superior em *cPanel → Select PHP Version* (ou
+  *MultiPHP Manager*) para o domínio.
+
 ## Passo 2: chave SSH dedicada ao deploy
 
 No **seu computador**, gere um par de chaves **só para o deploy**:
@@ -212,7 +235,10 @@ site (que o deploy preserva).
 | Mensagem no log | Causa e solução |
 |---|---|
 | `Secrets de deploy não configurados` | Faltam os secrets obrigatórios (Passo 3). O workflow fica verde, mas não publica. |
-| `Permission denied (publickey)` | A chave pública não está no `authorized_keys` do usuário de deploy, ou `SSH_USER`/`SSH_HOST`/`SSH_PORT` estão errados. Refaça o teste do Passo 2. |
+| `Permission denied (publickey)` / `Não foi possível entrar no servidor por SSH` | A chave pública não está autorizada para o `SSH_USER` (no cPanel: *Manage → Authorize*), o `SSH_USER` está errado, o SSH não está habilitado na conta, ou o `SSH_KEY` não é o par da chave autorizada (o log mostra a impressão digital da chave usada). Refaça o teste do Passo 2. |
+| `SSH_KEY está protegida por senha` | Gere uma chave sem senha (`-N ""`) ou remova a senha: `ssh-keygen -p -f ~/.ssh/bancazen_deploy -N ""`, e atualize o secret. |
+| `SSH_KEY não é uma chave privada válida` | Cole o arquivo da chave **privada** inteiro (com `BEGIN`/`END`), não o `.pub`. |
+| `A pasta de dados ... fica dentro de uma pasta pública da web` | Defina `BANCAZEN_DADOS` fora do `public_html`/`htdocs` (seção "Hospedagem compartilhada"). |
 | `Host key verification failed` | A chave do servidor mudou ou o `SSH_KNOWN_HOSTS` está errado. Confira com a hospedagem e refaça o `ssh-keyscan`. |
 | `Connection timed out` | O servidor bloqueia a porta SSH para a internet, ou o IP/porta estão errados. |
 | `DEPLOY_PATH raso demais` / `deve ser um caminho absoluto` | Use uma pasta dedicada com caminho completo, ex.: `/var/www/bancazen`. |
