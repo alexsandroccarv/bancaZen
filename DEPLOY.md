@@ -166,12 +166,16 @@ publicar.
 | `SSH_PORT` | não | porta SSH (padrão `22`) |
 | `SSH_KNOWN_HOSTS` | não (recomendado) | saída do `ssh-keyscan` do Passo 2. Sem ele, a chave do servidor é aceita no primeiro contato |
 
-**Variáveis** (Settings → Secrets and variables → Actions → *Variables*):
+**Variáveis** (Settings → Secrets and variables → Actions → *Variables* →
+**Repository variables**). Crie-as no **repositório**, não no ambiente: o
+site é montado numa etapa que não usa o ambiente `producao`, e o deploy para
+se o caminho dos dados que o PHP vai usar for diferente do que ele verificou.
+
 
 | Nome | Obrigatório | Valor |
 |---|---|---|
 | `SITE_URL` | recomendado | endereço do site, sem barra final (ex.: `https://bancazen.exemplo.br`). Usado nas metatags, no `sitemap.xml` e na verificação depois do deploy |
-| `BANCAZEN_DADOS` | não | caminho absoluto da pasta de dados, se não for a irmã `bancazen-dados` |
+| `BANCAZEN_DADOS` | em hospedagem compartilhada, sim | caminho absoluto da pasta de dados, se não for a irmã `bancazen-dados` (ex.: `/home1/<usuário>/bancazen-dados`) |
 
 ---
 
@@ -239,6 +243,7 @@ site (que o deploy preserva).
 | `SSH_KEY está protegida por senha` | Gere uma chave sem senha (`-N ""`) ou remova a senha: `ssh-keygen -p -f ~/.ssh/bancazen_deploy -N ""`, e atualize o secret. |
 | `SSH_KEY não é uma chave privada válida` | Cole o arquivo da chave **privada** inteiro (com `BEGIN`/`END`), não o `.pub`. |
 | `A pasta de dados ... fica dentro de uma pasta pública da web` | Defina `BANCAZEN_DADOS` fora do `public_html`/`htdocs` (seção "Hospedagem compartilhada"). |
+| `A pasta de dados do PHP ... difere da verificada pelo deploy` | `BANCAZEN_DADOS` foi criada só no ambiente `producao`. Crie-a como variável **do repositório** (Passo 3). |
 | `Host key verification failed` | A chave do servidor mudou ou o `SSH_KNOWN_HOSTS` está errado. Confira com a hospedagem e refaça o `ssh-keyscan`. |
 | `Connection timed out` | O servidor bloqueia a porta SSH para a internet, ou o IP/porta estão errados. |
 | `DEPLOY_PATH raso demais` / `deve ser um caminho absoluto` | Use uma pasta dedicada com caminho completo, ex.: `/var/www/bancazen`. |

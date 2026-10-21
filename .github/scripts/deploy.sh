@@ -52,6 +52,21 @@ case "$DADOS/" in */public_html/*|*/htdocs/*|*/www/html/*)
   erro "A pasta de dados ($DADOS) fica dentro de uma pasta pública da web: os currículos poderiam ser baixados. Defina a variável BANCAZEN_DADOS (Settings → Secrets and variables → Actions → Variables) com um caminho fora dela, ex.: /home/<usuário>/bancazen-dados (veja DEPLOY.md, hospedagem compartilhada).";;
 esac
 
+# O PHP usa o caminho gravado pelo build em api/lib/config-dados.php (ou o
+# padrão, sem o arquivo). Ele precisa ser o mesmo verificado aqui: se a
+# variável BANCAZEN_DADOS existir só no ambiente "producao", o build (que
+# não usa o ambiente) não a vê e o PHP cairia no padrão.
+CONFIG_DADOS=""
+if [ -f dist/api/lib/config-dados.php ]; then
+  CONFIG_DADOS=$(sed -n 's/^return "\(.*\)";$/\1/p' dist/api/lib/config-dados.php)
+  CONFIG_DADOS="${CONFIG_DADOS%/}"
+fi
+ESPERADO=""
+[ -n "${BANCAZEN_DADOS:-}" ] && ESPERADO="$DADOS"
+if [ "$CONFIG_DADOS" != "$ESPERADO" ]; then
+  erro "A pasta de dados do PHP (${CONFIG_DADOS:-padrão, ao lado do site}) difere da verificada pelo deploy ($DADOS). Crie BANCAZEN_DADOS como variável DO REPOSITÓRIO (Settings → Secrets and variables → Actions → Variables → Repository variables), não só no ambiente \"producao\"."
+fi
+
 # ---- Chave e known_hosts ----
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
