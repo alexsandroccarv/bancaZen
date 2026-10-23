@@ -17,6 +17,9 @@
      GET  modelo-docentes     -> modelo do CSV da lista de docentes (download;
                                  sem dados da base, não exige sessão)
      POST remover    id
+     POST limpar     curriculos (1/0), docentes (1/0), confirmacao = LIMPAR
+                     -> apaga índice e arquivos de <dados>/xml/ e/ou a lista
+                     de docentes (bb_limpar); a senha fica
      POST reindexar  ppg, instituicao, situacao, simular (1/0), organizar (1/0),
                      depois  -> um lote dos XML/ZIP de <dados>/xml/ (copiados
                      por rsync/FTP) no índice; repetir com depois = ultimo
@@ -155,6 +158,16 @@ try {
             $padrao = $post('ppg') !== '' ? bb_programa($post('ppg'), $post('instituicao'), $post('situacao')) : null;
             $simular = $post('simular') === '1';
             bb_json(['relatorio' => bb_reindexar($padrao, $simular, !$simular && $post('organizar') === '1', $post('depois'), BB_LOTE_REINDEXAR)]);
+
+        case 'limpar':
+            bb_exigir_metodo('POST');
+            bb_exigir_admin();
+            if ($post('confirmacao') !== 'LIMPAR') bb_erro('Digite LIMPAR para confirmar.');
+            $curriculos = $post('curriculos') === '1';
+            $docentes = $post('docentes') === '1';
+            if (!$curriculos && !$docentes) bb_erro('Escolha o que apagar.');
+            @set_time_limit(120);
+            bb_json(['relatorio' => bb_limpar($curriculos, $docentes)]);
 
         case 'remover':
             bb_exigir_metodo('POST');

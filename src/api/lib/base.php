@@ -231,6 +231,27 @@ function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = f
     return $rel;
 }
 
+// Zona de risco da Administração: apaga os currículos (índice e todos os
+// arquivos de <dados>/xml/) e/ou a lista de docentes, com as travas de
+// gravação. A senha (admin.json) fica. Devolve o que foi apagado.
+function bb_limpar(bool $curriculos, bool $docentes): array
+{
+    $dir = bb_preparar_dados();
+    $rel = ['curriculos' => 0, 'arquivos' => 0, 'docentes' => 0];
+    if ($curriculos) {
+        $rel['curriculos'] = bb_alterar_corpus(function (array $corpus) use ($dir, &$rel) {
+            foreach (glob("$dir/xml/*") ?: [] as $arq) {
+                if (is_file($arq) && @unlink($arq)) $rel['arquivos']++;
+            }
+            return [[], count($corpus)];
+        });
+    }
+    if ($docentes) {
+        $rel['docentes'] = bb_alterar_docentes(fn(array $d) => [[], count($d)]);
+    }
+    return $rel;
+}
+
 // Campos que podem sair do servidor (nada de produções, coautores ou XML).
 // Exibição: Nome, Universidade, PPG, Situação no programa e Link do Lattes.
 function bb_publico(array $p, array $docentes = []): array

@@ -51,6 +51,9 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   `tools/fixtures/`; discente e orientadora em `tools/fixtures/envolvidos/`).
   Currículos reais não entram em `tools/fixtures/`.
 - Senha da administração: `php api/cli/definir-senha.php` no servidor.
+- Zona de risco (Administração): ação `limpar` de `admin.php` (`bb_limpar`;
+  confirmação `LIMPAR` conferida no servidor) apaga currículos (índice e
+  `<dados>/xml/*`) e/ou a lista de docentes; nunca o `admin.json`.
 - XMLs copiados direto para `<dados>/xml/` (rsync/FTP) só entram na busca
   depois de incluídos: Administração, "Currículos guardados no servidor"
   (ação `reindexar` de `admin.php`, em lotes com cursor pelo nome do

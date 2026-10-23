@@ -225,6 +225,36 @@
             ${listaSemPpg(soma, 'ficaram')}${listaErros(soma)}`;
     }
 
+    /* ---------------------------- zona de risco ---------------------------- */
+    function atualizarLimpar() {
+        const algo = $('#limparCurriculosInput').checked || $('#limparDocentesInput').checked;
+        $('#limparBtn').disabled = !(algo && $('#limparConfirmaInput').value.trim() === 'LIMPAR');
+    }
+    async function limpar(ev) {
+        ev.preventDefault();
+        const curriculos = $('#limparCurriculosInput').checked;
+        const docs = $('#limparDocentesInput').checked;
+        const oQue = [curriculos && 'todos os currículos (índice e arquivos XML)', docs && 'a lista de docentes'].filter(Boolean).join(' e ');
+        if (!confirm(`Apagar ${oQue}? Esta ação não pode ser desfeita.`)) return;
+        const rel = $('#limparRelatorio');
+        $('#limparBtn').disabled = true;
+        rel.textContent = 'Apagando…';
+        try {
+            const r = (await api('limpar', form({ curriculos: curriculos ? '1' : '0', docentes: docs ? '1' : '0', confirmacao: $('#limparConfirmaInput').value.trim() }))).relatorio;
+            rel.textContent = [
+                curriculos && `${r.curriculos} currículo(s) e ${r.arquivos} arquivo(s) apagado(s).`,
+                docs && `${r.docentes} docente(s) retirado(s) da lista.`,
+            ].filter(Boolean).join(' ');
+            $('#limparForm').reset();
+            listar();
+            listarDocentes();
+        } catch (e) {
+            if (e.message !== 'sessão') rel.innerHTML = `<span class="text-red-700 dark:text-red-400">${esc(e.message)}</span>`;
+        } finally {
+            atualizarLimpar();
+        }
+    }
+
     /* ------------------------------- base --------------------------------- */
     async function listar() {
         try {
@@ -380,6 +410,8 @@
         $('#reSimularBtn').addEventListener('click', () => reindexar(true));
         $('#reIncluirBtn').addEventListener('click', () => reindexar(false));
         $('#reForm').addEventListener('submit', (ev) => ev.preventDefault());
+        for (const id of ['#limparCurriculosInput', '#limparDocentesInput', '#limparConfirmaInput']) $(id).addEventListener('input', atualizarLimpar);
+        $('#limparForm').addEventListener('submit', limpar);
         $('#docFiltroInput').addEventListener('input', renderDocentes);
         $('#docPendentesInput').addEventListener('change', renderDocentes);
         $('#filtroInput').addEventListener('input', renderTabela);
