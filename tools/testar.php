@@ -120,6 +120,16 @@ confere($docs['0000000000000099']['universidade'] === 'Universidade Federal da F
 confere($docs['0000000000000004']['situacao'] === 'Permanente', 'docentes: duplicidade fica com Permanente');
 confere($docs['0000000000000099']['situacao'] === 'Visitante', 'docentes: situação Visitante');
 
+// O modelo oferecido na Administração é lido pelo próprio importador; as
+// linhas de exemplo são ignoradas.
+$modelo = doc_modelo_csv();
+confere(str_starts_with($modelo, "\xEF\xBB\xBF") && str_contains($modelo, 'nome;lattes_id;universidade;categoria;ppg'), 'modelo: BOM e cabeçalho');
+[$doModelo, $relModelo] = doc_ler_csv($modelo, ['grupo' => 'profiap', 'ppg' => 'PROFIAP']);
+confere($doModelo === [] && $relModelo['exemplos'] === 2 && $relModelo['linhas'] === 2 && $relModelo['colunasDescartadas'] === [], 'modelo: colunas reconhecidas e exemplos ignorados');
+$preenchido = str_replace('Maria Exemplo da Silva;0000000000000000', 'Maria Exemplo da Silva;0000000000000077', $modelo);
+[$umDoModelo] = doc_ler_csv($preenchido, ['grupo' => 'profiap', 'ppg' => 'Outro']);
+confere(isset($umDoModelo['0000000000000077']) && $umDoModelo['0000000000000077']['ppg'] === 'PROFIAP' && $umDoModelo['0000000000000077']['situacao'] === 'Permanente', 'modelo preenchido: coluna ppg prevalece sobre o formulário');
+
 // Substituir a lista do mesmo PPG retira quem não está no arquivo novo; outro PPG fica.
 $antes = ['0000000000000050' => ['id' => '0000000000000050', 'ppg' => 'PROFIAP'], '0000000000000060' => ['id' => '0000000000000060', 'ppg' => 'PPG X']];
 [$juntos, $r] = doc_aplicar($antes, $docs, 'PROFIAP', true);
