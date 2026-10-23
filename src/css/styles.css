@@ -248,6 +248,35 @@ html.tz-theme .passo { background: var(--tz-accent); color: var(--tz-bg); }
                   border-radius: .375rem; background: transparent; border: 0; color: inherit; opacity: .6; cursor: pointer; }
 .botao-discreto:hover, .botao-discreto:focus-visible { opacity: 1; background: rgba(127, 127, 127, .12); }
 
+/* Relatório: documento para imprimir (página branca, fonte serifada). */
+.documento { background: #fff; color: #111; font-family: Georgia, "Times New Roman", serif; font-size: 11.5pt;
+             line-height: 1.5; padding: 2.5rem 2.75rem; border: 1px solid #d4d4d4; border-radius: .25rem; max-width: 21cm; }
+.documento p { margin: 0 0 .75rem; text-align: justify; }
+.doc-cabecalho { text-align: center; margin-bottom: 1.25rem; }
+.doc-cabecalho p { margin: 0; text-align: center; font-weight: 600; color: #111; }
+.doc-titulo { text-align: center; font-size: 13pt; font-weight: 700; margin: 0 0 1.25rem; }
+.doc-subtitulo { font-size: 12pt; font-weight: 700; margin: 1.25rem 0 .5rem; }
+.doc-nota { font-size: 10pt; color: #444; }
+.doc-tabela { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: .5rem 0 1rem; }
+.doc-tabela caption { text-align: left; font-weight: 700; padding: .25rem 0; }
+.doc-tabela th, .doc-tabela td { border: 1px solid #bbb; padding: .2rem .4rem; text-align: left; vertical-align: top; }
+.doc-tabela th { background: #f2f2f2; }
+.doc-tabela .doc-num { text-align: right; white-space: nowrap; }
+.doc-escolhida td { font-weight: 700; }
+.doc-escolhidas { margin: 0 0 1rem 1.25rem; padding: 0; }
+.doc-local { margin-top: 1.5rem !important; text-align: right !important; }
+.doc-assinaturas { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-around; margin: 2.5rem 0 1.5rem; text-align: center; }
+.doc-assinaturas > div { min-width: 14rem; }
+.doc-linha-assinatura { display: block; border-top: 1px solid #111; margin-bottom: .25rem; }
+.doc-rodape { border-top: 1px solid #bbb; padding-top: .5rem; font-size: 9pt; color: #333; }
+.doc-rodape p { text-align: left; margin: 0 0 .25rem; }
+@media print {
+  body * { visibility: hidden !important; }
+  #relDocumento, #relDocumento * { visibility: visible !important; }
+  #relDocumento { position: absolute; left: 0; top: 0; width: 100%; max-width: none; border: 0; padding: 0; }
+  @page { size: A4; margin: 2cm; }
+}
+
 /* Zona de risco da Administração: o alerta vale também sem o Tailwind. */
 .zona-risco { border: 2px solid #b91c1c; border-radius: .5rem; }
 .zona-risco h3 { color: #b91c1c; }

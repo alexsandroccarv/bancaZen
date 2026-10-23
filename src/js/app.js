@@ -180,6 +180,18 @@
             }
             renderListas(dados.listas || []);
             renderConformidade(dados.conformidade, dados.listas || []);
+            // Resultado para a seção Relatório (js/relatorio.js).
+            document.dispatchEvent(new CustomEvent('busca:resultado', { detail: {
+                listas: dados.listas || [],
+                conformidade: dados.conformidade || { verificada: false, considerados: [] },
+                criterios: {
+                    excluirInstituicao: $('#excluirInput').value.trim(),
+                    somenteDoutores: $('#doutoresInput').checked,
+                    periodo: Number($('#periodoInput').value) || 0,
+                },
+                dissertacao: dadosDissertacao(),
+                em: new Date(),
+            } }));
         } catch (_) {
             mostrarErro('Não foi possível falar com o servidor. Verifique a conexão e tente de novo.');
         } finally {
@@ -301,6 +313,18 @@
         }).join('');
         sec.focus();
     }
+
+    // Dados de Minha Dissertação usados no Relatório.
+    function dadosDissertacao() {
+        return {
+            nome: $('#nomeInput').value.trim(),
+            universidade: valorUniversidade(),
+            titulo: $('#tituloInput').value.trim(),
+            orientador: $('#orientadorNome').value.trim(),
+            coorientador: $('#coorientadorNome').value.trim(),
+        };
+    }
+    window.BancaZen = { dadosDissertacao };
 
     /* ------------------------- Minha universidade -------------------------- */
     // Caixa de seleção com as universidades da base (api/universidades.php) e

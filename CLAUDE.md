@@ -90,7 +90,10 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   nada disso é gravado no servidor; botões só com ícone exportam/importam
   esses dados num JSON local, `CAMPOS_JSON` em `app.js`, sem os arquivos
   XML/ZIP), `#bancas` (conferência, critérios, busca e
-  listas) e `#administracao` (`js/admin.js`, só consulta o servidor ao abrir).
+  listas), `#relatorio` (`js/relatorio.js`: declaração da indicação a partir
+  do evento `busca:resultado`; a declaração ética segue o que a busca
+  verificou: currículos, só nome ou nada; imprimir/PDF no navegador, nada
+  vai ao servidor) e `#administracao` (`js/admin.js`, só consulta o servidor ao abrir).
   O endereço da seção fica na URL; botões `data-ir="<seção ou trecho>"`
   trocam de seção (`irPara` em `layout.js`; um trecho abre a aba que o
   contém). `admin.html` só redireciona para `#administracao`.
