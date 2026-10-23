@@ -399,8 +399,9 @@
                     <h3 id="cfTitulo" class="text-lg font-bold">Conferência: currículos e planilha</h3>
                     <div class="grid gap-3 sm:grid-cols-2">
                         <div class="rounded-lg border border-gray-300 dark:border-gray-600 p-4 space-y-2">
-                            <p><span id="cfSemDadosN" class="text-3xl font-bold">–</span> <span class="font-medium">XML(s) sem dados na planilha</span></p>
-                            <p class="text-xs text-gray-600 dark:text-gray-400">Currículos guardados de pessoas que não estão na planilha de docentes: ficam fora da busca até a planilha trazê-las (pelo ID Lattes).</p>
+                            <p><span id="cfSemDadosN" class="text-3xl font-bold">–</span> <span class="font-medium">XML(s) não identificado(s) na planilha</span></p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">Currículos guardados cujo ID Lattes não está na planilha de docentes. Os que têm PPG informado no envio continuam na busca com esses dados; os sem PPG ficam fora dela até a planilha trazê-los.</p>
+                            <p id="cfForaBusca" class="text-sm"></p>
                             <details>
                                 <summary class="cursor-pointer text-sm font-semibold">Ver lista</summary>
                                 <ul id="cfSemDadosLista" class="text-sm list-disc list-inside mt-2 max-h-64 overflow-y-auto scroll-area"></ul>

@@ -7,6 +7,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Corrigido
+- Conferência: passa a contar todos os XMLs cujo ID Lattes não está na
+  planilha de docentes (antes, só os sem PPG), informando quantos deles estão
+  fora da busca por não terem PPG. [issue #37](../../issues/37)
+
+## [0.0.18] - 2026-10-23
+
 ### Adicionado
 - Planilha de docentes: coluna `email` opcional (também no modelo do CSV).
   O e-mail fica só na lista de docentes, na pasta de dados privada, e

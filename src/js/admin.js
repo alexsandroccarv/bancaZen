@@ -252,15 +252,19 @@
         renderConferencia();
     }
 
-    // Conferência XML x planilha: currículos sem dados (fora da busca) e
-    // docentes da planilha ainda sem currículo.
+    // Conferência XML x planilha: currículos cujo ID Lattes não está na
+    // planilha (destacando os sem PPG, fora da busca) e docentes da planilha
+    // ainda sem currículo.
     function renderConferencia() {
-        const item = (p) => `<li>${esc(p.nome)} <a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline font-mono text-xs">${esc(p.id)}</a></li>`;
+        const item = (p) => `<li>${esc(p.nome)} <a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline font-mono text-xs">${esc(p.id)}</a>${p.semDados ? ' <span class="text-xs text-gray-600 dark:text-gray-400">(sem PPG, fora da busca)</span>' : ''}</li>`;
         const preencher = (n, lista, itens, vazio) => {
             $(n).textContent = String(itens.length);
             $(lista).innerHTML = itens.length ? itens.map(item).join('') : `<li class="list-none text-gray-500 dark:text-gray-400">${vazio}</li>`;
         };
-        preencher('#cfSemDadosN', '#cfSemDadosLista', base.filter((p) => p.semDados), 'Nenhum: todos os currículos têm dados.');
+        const foraDaPlanilha = base.filter((p) => !p.naLista);
+        preencher('#cfSemDadosN', '#cfSemDadosLista', foraDaPlanilha, 'Nenhum: todos os currículos estão na planilha.');
+        const fora = foraDaPlanilha.filter((p) => p.semDados).length;
+        $('#cfForaBusca').textContent = fora ? `${fora} deles sem PPG, fora da busca.` : (foraDaPlanilha.length ? 'Todos com PPG, na busca.' : '');
         preencher('#cfSemXmlN', '#cfSemXmlLista', docentes.filter((d) => !d.temCurriculo), 'Nenhum: todos da planilha têm currículo.');
     }
 
