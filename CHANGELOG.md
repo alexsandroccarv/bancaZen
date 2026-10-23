@@ -8,6 +8,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Corrigido
+- Leitura dos XMLs: quando um arquivo não é currículo Lattes, a mensagem diz
+  o que ele contém (vazio, página HTML com título e texto, outro XML com o
+  elemento principal, ou o início do arquivo). Passam a ser aceitos
+  `CURRICULO-VITAE` com atributos de namespace (`xmlns:xsi`), conteúdo
+  compactado com gzip e ZIP em base64 com extensão `.xml`.
+  [issue #39](../../issues/39)
+
+## [0.0.19] - 2026-10-23
+
+### Corrigido
 - Conferência: passa a contar todos os XMLs cujo ID Lattes não está na
   planilha de docentes (antes, só os sem PPG), informando quantos deles estão
   fora da busca por não terem PPG. [issue #37](../../issues/37)

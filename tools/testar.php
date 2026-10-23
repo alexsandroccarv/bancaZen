@@ -211,6 +211,20 @@ $antesSub = ['A' => ['id' => 'A', 'ppg' => 'PROFIAP'], 'B' => ['id' => 'B', 'ppg
 confere(array_keys($depoisSub) === ['B', 'D'] && $rSub['removidos'] === 2, 'substituir troca só a lista dos PPGs presentes no arquivo');
 confere($rel['ppgPadrao'] > 0, 'linhas sem coluna ppg contadas (ficam com o PPG padrão)');
 
+// Arquivos que não são currículo: a mensagem diz o que contêm.
+$motivo = function (string $bytes) { try { lattes_ler_arquivo('x.xml', $bytes); return ''; } catch (RuntimeException $e) { return $e->getMessage(); } };
+confere(str_contains($motivo(''), 'está vazio'), 'arquivo vazio identificado');
+$html = $motivo('<!DOCTYPE html><html><head><title>Currículo não encontrado</title></head><body><p>Erro</p></body></html>');
+confere(str_contains($html, 'página HTML') && str_contains($html, 'título: "Currículo não encontrado"'), 'página HTML identificada, com o título');
+confere(str_contains($motivo('<?xml version="1.0"?><ERRO><MENSAGEM>Identificador inexistente</MENSAGEM></ERRO>'), 'elemento principal é <ERRO>') , 'outro XML identificado pelo elemento principal');
+confere(str_contains($motivo('<?xml version="1.0"?><ERRO><MENSAGEM>Identificador inexistente</MENSAGEM></ERRO>'), 'Identificador inexistente'), 'texto do outro XML na mensagem');
+// Variações do mesmo currículo aceitas: atributos xmlns, gzip e base64 (ZIP do serviço do CNPq).
+$cv1 = file_get_contents("$dir/curriculo-1.xml");
+$comNs = preg_replace('/<CURRICULO-VITAE /', '<CURRICULO-VITAE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="x.xsd" ', $cv1, 1);
+confere(lattes_ler_arquivo('a.xml', $comNs)[0]['pessoa']['id'] === '0000000000000001', 'CURRICULO-VITAE com xmlns:xsi');
+confere(lattes_ler_arquivo('a.xml', gzencode($cv1))[0]['pessoa']['id'] === '0000000000000001', 'XML compactado com gzip');
+confere(lattes_ler_arquivo('a.xml', chunk_split(base64_encode(file_get_contents("$dir/curriculo-5.zip")), 76))[0]['pessoa']['id'] === '0000000000000005', 'ZIP em base64 com extensão .xml');
+
 // limpeza
 array_map('unlink', glob("$tmp/xml/*"));
 rmdir("$tmp/xml");

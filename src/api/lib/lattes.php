@@ -87,16 +87,62 @@ function lattes_xmls_do_zip(string $b): array
     return $saida;
 }
 // Lê um arquivo (.xml ou .zip) e devolve [['xml' => bytes, 'pessoa' => registro], ...].
+// Aceita também o conteúdo compactado com gzip ou em base64 (como o serviço
+// de extração do CNPq entrega o ZIP), mesmo com a extensão .xml.
 function lattes_ler_arquivo(string $nome, string $bytes): array
 {
+    $bytes = lattes_desembrulhar($bytes);
     $itens = lattes_eh_zip($bytes) ? lattes_xmls_do_zip($bytes) : [['nome' => $nome, 'bytes' => $bytes]];
     if (!$itens) throw new RuntimeException('nenhum XML encontrado no ZIP');
     $out = [];
     foreach ($itens as $it) {
         $origem = count($itens) > 1 ? "$nome/{$it['nome']}" : $nome;
-        $out[] = ['xml' => $it['bytes'], 'pessoa' => lattes_parse(lattes_decodificar($it['bytes']), $origem)];
+        $xml = lattes_decodificar(lattes_desembrulhar($it['bytes']));
+        try {
+            $pessoa = lattes_parse($xml, $origem);
+        } catch (RuntimeException $e) {
+            throw new RuntimeException($e->getMessage() . '; ' . lattes_descrever($xml));
+        }
+        $out[] = ['xml' => $it['bytes'], 'pessoa' => $pessoa];
     }
     return $out;
+}
+function lattes_desembrulhar(string $b): string
+{
+    if (strncmp($b, "\x1f\x8b", 2) === 0 && function_exists('gzdecode')) {
+        $d = @gzdecode($b);
+        if (is_string($d)) return $d;
+    }
+    $t = trim(substr($b, 0, 64));
+    if ($t !== '' && preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $t) && preg_match('/^[A-Za-z0-9+\/=\s]+$/', $b)) {
+        $d = base64_decode(preg_replace('/\s+/', '', $b), true);
+        if (is_string($d) && (lattes_eh_zip($d) || strncmp($d, "\x1f\x8b", 2) === 0 || str_starts_with(ltrim($d), '<'))) return lattes_desembrulhar($d);
+    }
+    return $b;
+}
+// Diz, em poucas palavras, o que o arquivo contém quando não é um currículo:
+// vazio, página HTML (mensagem de erro de site), outro XML ou outro conteúdo.
+function lattes_descrever(string $s): string
+{
+    $s = preg_replace('/^\xEF\xBB\xBF/', '', $s);
+    if (trim($s) === '') return 'o arquivo está vazio';
+    $texto = function ($x) {
+        $t = trim((string) preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($x), ENT_QUOTES, 'UTF-8')));
+        return function_exists('mb_strimwidth') ? mb_strimwidth($t, 0, 160, '…', 'UTF-8') : substr($t, 0, 160);
+    };
+    $inicio = substr($s, 0, 4000);
+    if (preg_match('/<(!doctype\s+html|html[\s>])/i', $inicio)) {
+        $t = preg_match('/<title[^>]*>(.*?)<\/title>/is', $s, $m) ? $texto($m[1]) : '';
+        $corpo = preg_match('/<body[^>]*>(.*)/is', $s, $m) ? $texto(preg_replace('/<(script|style)\b.*?<\/\1>/is', '', $m[1])) : '';
+        return 'o arquivo é uma página HTML, provavelmente uma mensagem do site de onde foi baixado'
+            . ($t !== '' ? " (título: \"$t\")" : '') . ($corpo !== '' ? ": \"$corpo\"" : '');
+    }
+    $semCabecalho = preg_replace('/^\s*(<\?.*?\?>\s*|<!--.*?-->\s*)*/s', '', $inicio);
+    if (preg_match('/^<([A-Za-z_][\w:.-]*)/', $semCabecalho, $m)) {
+        $t = $texto($s);
+        return "o elemento principal é <{$m[1]}>, não <CURRICULO-VITAE>" . ($t !== '' ? ": \"$t\"" : '');
+    }
+    return 'o arquivo começa com "' . $texto(substr($s, 0, 200)) . '"';
 }
 
 /* -------------------------------- helpers -------------------------------- */
@@ -128,7 +174,7 @@ function lattes_atributos(string $src): array
 {
     $o = [];
     if ($src === '') return $o;
-    preg_match_all('/([A-Z0-9-]++)\s*+=\s*+(?:"([^"]*+)"|\'([^\']*+)\')/', $src, $mm, PREG_SET_ORDER);
+    preg_match_all('/([A-Za-z_:][A-Za-z0-9_:.-]*+)\s*+=\s*+(?:"([^"]*+)"|\'([^\']*+)\')/', $src, $mm, PREG_SET_ORDER);
     foreach ($mm as $m) $o[$m[1]] = lattes_unescape(isset($m[3]) && $m[3] !== '' ? $m[3] : $m[2]);
     return $o;
 }
@@ -192,7 +238,9 @@ function lattes_parse(string $xml, string $origem = ''): array
 
     // Quantificadores possessivos (*+): atributos longos (resumo) não estouram
     // o limite de retrocesso do PCRE.
-    $ok = preg_match_all('/<([A-Z][A-Z0-9-]*+)((?:\s++[A-Z0-9-]++\s*+=\s*+(?:"[^"]*+"|\'[^\']*+\'))*+)\s*+(\/?)>|<\/([A-Z][A-Z0-9-]*+)\s*+>/',
+    // Nomes de atributo também em minúsculas e com ":" (ex.: xmlns:xsi), que
+    // alguns XMLs trazem no CURRICULO-VITAE.
+    $ok = preg_match_all('/<([A-Z][A-Z0-9-]*+)((?:\s++[A-Za-z_:][A-Za-z0-9_:.-]*+\s*+=\s*+(?:"[^"]*+"|\'[^\']*+\'))*+)\s*+(\/?)>|<\/([A-Z][A-Z0-9-]*+)\s*+>/',
         $xml, $tags, PREG_SET_ORDER);
     if ($ok === false) throw new RuntimeException('XML não pôde ser lido');
     foreach ($tags as $m) {
