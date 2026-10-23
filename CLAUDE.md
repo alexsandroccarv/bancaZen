@@ -18,6 +18,15 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   nem em `src/`/`dist/`; o navegador recebe só o resultado (`bb_publico`).
   Ficam na pasta de dados fora da raiz do site (`BANCAZEN_DADOS`, padrão
   `../bancazen-dados`), que o deploy (`rsync --delete`) não toca.
+- **Memória (hospedagem com 128 MB):** `corpus.json` é leve (`bb_leve`:
+  exibição, filtro, programa); o registro completo fica em
+  `pessoas/<id>.json` (`bb_carregar_pessoa`, só para vínculos). A busca usa
+  o índice pré-calculado em `indice/` (256 partes por termo;
+  `bb_indice_garantir`/`bb_indice_leitor` + `sim_buscar_partes`, que dá o
+  mesmo resultado de `sim_buscar`). Nunca carregar todos os registros
+  completos de uma vez num endpoint. Base antiga é convertida em trechos
+  (`bb_migrar_corpus`). Erro fatal do PHP sai como JSON (tratador em
+  `base.php`).
 - Backend PHP 8 sem dependências em `src/api/`: extrator
   `lib/lattes.php` (tags do schema `CurriculoLattes`, o mesmo do lattesZen;
   não extrair dados de contato), proximidade `lib/similaridade.php`

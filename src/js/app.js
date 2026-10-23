@@ -121,6 +121,18 @@
             }).join('');
     }
 
+    // Resposta que não é JSON (ex.: página de erro da hospedagem): mostra o
+    // início do texto, em vez de só o código HTTP.
+    async function lerResposta(r) {
+        const texto = await r.text();
+        try {
+            return JSON.parse(texto);
+        } catch (_) {
+            const trecho = texto.replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
+            return { erro: `Resposta inesperada do servidor (HTTP ${r.status})${trecho ? `: ${trecho}` : '.'}` };
+        }
+    }
+
     async function buscar(ev) {
         ev.preventDefault();
         mostrarErro('');
@@ -146,7 +158,7 @@
         btn.setAttribute('aria-busy', 'true');
         try {
             const r = await fetch('api/buscar.php', { method: 'POST', body: fd });
-            const dados = await r.json().catch(() => ({ erro: `Erro ${r.status} no servidor.` }));
+            const dados = await lerResposta(r);
             if (!r.ok || dados.erro) {
                 const msg = dados.erro || `Erro ${r.status} no servidor.`;
                 // Erros sobre os currículos da orientação levam à seção 3.
