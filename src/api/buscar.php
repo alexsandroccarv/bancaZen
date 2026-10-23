@@ -25,6 +25,9 @@ const ENVOLVIDOS = [
 ];
 
 bb_exigir_metodo('POST');
+// Refazer o índice (primeira busca depois de uma carga) pode levar alguns
+// segundos; a busca em si lê só as partes do índice dos termos da consulta.
+@set_time_limit(600);
 $docentes = bb_carregar_docentes();
 // Currículo sem dados (fora da lista de docentes e sem PPG no envio) fica
 // fora da busca até a lista trazer a pessoa.
@@ -56,7 +59,7 @@ foreach (ENVOLVIDOS as $env) {
             bb_erro("{$env['papel']}: não foi possível ler {$arq['name']} ({$e->getMessage()}).");
         }
     } elseif (($id = vinc_id_lattes(preg_match('/\d{16}/', $texto($env['chave'] . 'Id'), $m) ? $m[0] : '')) !== '') {
-        $pessoa = $corpus[$id] ?? null;
+        $pessoa = isset($corpus[$id]) ? bb_carregar_pessoa($corpus[$id]) : null;
         if (!$pessoa) bb_erro("{$env['papel']}: currículo não encontrado na base. Envie o arquivo XML ou ZIP do Lattes.");
     } elseif ($texto($env['chave'] . 'Id') !== '') {
         bb_erro("{$env['papel']}: informe um link ou ID Lattes válido (16 dígitos).");
@@ -69,13 +72,17 @@ foreach (ENVOLVIDOS as $env) {
 }
 
 // Um só índice para toda a base (o IDF considera todos os currículos), e o
-// ranking é separado por grupo depois.
-$indice = sim_criar_indice(array_values($corpus));
-$busca = sim_buscar($indice, $consulta, [
+// ranking é separado por grupo depois. Quem está sem dados fica de fora aqui.
+$meta = bb_indice_garantir();
+$docs = [];
+foreach ($meta['ids'] as $k => $id) {
+    if (isset($corpus[$id])) $docs[$k] = ['pessoa' => $corpus[$id], 'norma' => $meta['normas'][$k] ?? 0];
+}
+$busca = sim_buscar_partes($consulta, [
     'limite' => INF,
     'excluirInstituicao' => $texto('excluirInstituicao'),
     'somenteDoutores' => $texto('somenteDoutores') === '1',
-]);
+], bb_indice_leitor(), $docs);
 // O filtro de instituição também vale para a instituição do programa.
 $excluir = trim(sim_sem_acento($texto('excluirInstituicao')));
 
@@ -94,7 +101,10 @@ foreach ($busca['resultados'] as $r) {
     $l = &$listas[bb_grupo($p, $docentes)];
     if (count($l['resultados']) < LIMITE) {
         $item = ['pessoa' => bb_publico($p, $docentes), 'score' => round($r['score'], 4), 'termos' => $r['termos']];
-        $vinculos = vinc_verificar($p, $envolvidos, $desdeAno);
+        // Vínculos pedem o registro completo (produções e coautores), lido só
+        // para quem chega à lista.
+        $completo = $envolvidos ? bb_carregar_pessoa($p) : null;
+        $vinculos = $completo ? vinc_verificar($completo, $envolvidos, $desdeAno) : [];
         if ($vinculos) $l['retirados'][] = $item + ['vinculos' => $vinculos];
         else $l['resultados'][] = $item;
     }

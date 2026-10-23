@@ -198,6 +198,23 @@ $l2 = bb_reindexar(null, true, false, $l1['ultimo'], 2);
 $l3 = bb_reindexar(null, true, false, $l2['ultimo'], 2);
 confere($l1['arquivos'] === 2 && $l1['restantes'] === 3 && $l2['arquivos'] === 2 && $l3['arquivos'] === 1 && $l3['restantes'] === 0 && $l1['totalArquivos'] === 5 && $l3['ultimo'] === 'quebrado.xml', 'reindexar em lotes percorre todos os arquivos');
 confere($l1['indiceAtual'] === 4 && count($l1['pessoas']) === 2 && $l1['pessoas'][0]['situacao'] === 'substituido', 'reindexar simulado em lotes informa índice atual e pessoas');
+// Registro leve no corpus.json e completo em pessoas/<id>.json.
+$leves = bb_carregar_corpus();
+confere(!isset(reset($leves)['producoes']) && is_file("$tmpR/pessoas/0000000000000001.json"), 'corpus.json leve; registro completo em pessoas/');
+$compl = bb_carregar_pessoa($leves['0000000000000001']);
+confere(!empty($compl['producoes']) && $compl['programa']['ppg'] === 'PROFIAP', 'registro completo com produções e o programa do corpus');
+// Índice em partes no disco: mesmo ranking da busca em memória.
+$meta = bb_indice_garantir();
+confere($meta['N'] === count($leves) && is_dir("$tmpR/indice/termos"), 'índice de busca gravado em partes');
+$consultaT = ['titulo' => 'Governança pública e transparência', 'resumo' => 'controle social nos municípios', 'palavrasChave' => ['accountability']];
+$docsT = [];
+foreach ($meta['ids'] as $k => $id) $docsT[$k] = ['pessoa' => $leves[$id], 'norma' => $meta['normas'][$k]];
+$disco = sim_buscar_partes($consultaT, ['limite' => INF], bb_indice_leitor(), $docsT);
+$memoria = sim_buscar(sim_criar_indice(array_map('bb_carregar_pessoa', array_values($leves))), $consultaT, ['limite' => INF]);
+$resumoR = fn($r) => array_map(fn($x) => $x['pessoa']['id'] . ':' . round($x['score'], 4) . ':' . implode(',', $x['termos']), $r['resultados']);
+confere($resumoR($disco) === $resumoR($memoria) && count($disco['resultados']) > 0, 'busca no índice em partes = busca em memória (ordem, proximidade e termos)');
+confere(bb_indice_garantir()['criadoEm'] === $meta['criadoEm'], 'índice não é refeito sem mudança no corpus');
+
 // Zona de risco: limpar a base (a senha fica).
 file_put_contents("$tmpR/admin.json", '{"hash":"x"}');
 $antesLimpar = count(bb_carregar_corpus());
@@ -206,10 +223,7 @@ confere($lim['docentes'] === 1 && !bb_carregar_docentes() && count(bb_carregar_c
 $lim = bb_limpar(true, false);
 confere($lim['curriculos'] === $antesLimpar && $lim['arquivos'] > 0 && !bb_carregar_corpus() && !glob("$tmpR/xml/*"), 'limpar currículos: índice e arquivos de xml/');
 confere(is_file("$tmpR/admin.json"), 'limpar não apaga a senha');
-array_map('unlink', glob("$tmpR/xml/*"));
-rmdir("$tmpR/xml");
-array_map('unlink', array_filter(glob("$tmpR/{,.}*", GLOB_BRACE) ?: [], 'is_file'));
-@rmdir($tmpR);
+bb_apagar_pasta($tmpR);
 putenv("BANCAZEN_DADOS=$tmp");
 
 // Cadastro só com arquivos: PPG opcional no envio; substituição pelos PPGs do arquivo.
@@ -253,11 +267,29 @@ $csvDuas = "nome\tlattes_id\tLink do Lattes\n"
 confere(array_map('strval', array_keys($dDuas)) === ['1533188485721174', '1533188485721179', '1533188485721171', '1533188485721172'], 'CSV com tabulação e duas colunas de Lattes: vale o link');
 confere(count($rDuas['idDivergente']) === 1 && str_contains($rDuas['idDivergente'][0], 'Arredondado') && !$rDuas['colunasDescartadas'], 'divergência entre número e link informada; colunas de Lattes não descartadas');
 
+// Base de versões anteriores (registros completos no corpus.json): convertida
+// na primeira leitura, em trechos, sem carregar o arquivo inteiro.
+$tmpM = sys_get_temp_dir() . '/bb-migra-' . bin2hex(random_bytes(4));
+mkdir($tmpM, 0750, true);
+putenv("BANCAZEN_DADOS=$tmpM");
+$antigo = [];
+foreach (['curriculo-1.xml', 'curriculo-2.xml'] as $f) {
+    $pp = lattes_ler_arquivo($f, file_get_contents("$dir/$f"))[0]['pessoa'];
+    $antigo[$pp['id']] = $pp + ['programa' => ['ppg' => 'PROFIAP', 'instituicao' => '', 'situacao' => '']];
+}
+// Registro maior que o trecho de leitura (1 MB), com chaves, colchetes e aspas em textos.
+$antigo['0000000000000002']['resumo'] = str_repeat('texto {com} [chaves] "aspas" \\ barra ', 40000);
+file_put_contents("$tmpM/corpus.json", json_encode($antigo, JSON_UNESCAPED_UNICODE));
+confere(bb_corpus_legado(), 'base antiga reconhecida');
+$conv = bb_carregar_corpus();
+confere(!bb_corpus_legado() && count($conv) === 2 && !isset($conv['0000000000000002']['resumo']), 'base antiga convertida em corpus.json leve');
+$p2 = bb_carregar_pessoa($conv['0000000000000002']);
+confere($p2['resumo'] === $antigo['0000000000000002']['resumo'] && $p2['producoes'] == $antigo['0000000000000002']['producoes'], 'registro completo preservado na conversão (texto de mais de 1 MB)');
+bb_apagar_pasta($tmpM);
+putenv("BANCAZEN_DADOS=$tmp");
+
 // limpeza
-array_map('unlink', glob("$tmp/xml/*"));
-rmdir("$tmp/xml");
-array_map('unlink', array_filter(glob("$tmp/{,.}*", GLOB_BRACE) ?: [], 'is_file'));
-@rmdir($tmp);
+bb_apagar_pasta($tmp);
 
 echo "Ranking da consulta de teste:\n";
 foreach ($res as $r) printf("  %.3f  %s  [%s]\n", $r['score'], $r['pessoa']['nome'], implode(', ', $r['termos']));

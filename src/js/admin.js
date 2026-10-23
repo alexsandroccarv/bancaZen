@@ -36,12 +36,23 @@
         return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
     }
 
+    // Resposta que não é JSON (ex.: página de erro da hospedagem): mostra o
+    // início do texto, em vez de só o código HTTP.
+    async function lerResposta(r) {
+        const texto = await r.text();
+        try {
+            return JSON.parse(texto);
+        } catch (_) {
+            const trecho = texto.replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
+            return { erro: `Resposta inesperada do servidor (HTTP ${r.status})${trecho ? `: ${trecho}` : '.'}` };
+        }
+    }
     async function api(acao, corpo) {
         const opts = corpo
             ? { method: 'POST', body: corpo, headers: { 'X-CSRF': csrf || '' }, credentials: 'same-origin' }
             : { credentials: 'same-origin', cache: 'no-store' };
         const r = await fetch(API + acao, opts);
-        const dados = await r.json().catch(() => ({ erro: `Erro ${r.status} no servidor.` }));
+        const dados = await lerResposta(r);
         if (r.status === 401 && acao !== 'entrar') { mostrarEntrada('Sessão expirada. Entre de novo.'); throw new Error('sessão'); }
         if (!r.ok || dados.erro) throw new Error(dados.erro || `Erro ${r.status} no servidor.`);
         return dados;
@@ -65,6 +76,8 @@
         $('#painel').classList.remove('hidden');
         listar();
         listarDocentes();
+        // Confere o índice de busca em segundo plano (só refaz se a base mudou).
+        atualizarIndice([]).catch(() => {});
     }
     async function iniciarSessao() {
         try {
@@ -156,6 +169,10 @@
                 partesHtml.push(`<p class="font-medium">Currículos: ${cont('novo')} incluído(s), ${cont('substituido')} substituído(s), ${cont('mantido')} mantido(s), ${cont('erro')} com erro.${semDados ? ` ${semDados} sem dados na planilha (fora da busca).` : ''}</p>
                     <ul class="list-disc list-inside">${linhas.map((r) => `<li>${esc(r.arquivo)}: ${esc(SITUACAO[r.situacao](r))}${r.semDados ? ' (sem dados na planilha)' : ''}</li>`).join('')}</ul>`);
             }
+            if (curriculos.length) {
+                mostrar('Atualizando o índice de busca…');
+                await atualizarIndice(partesHtml);
+            }
             mostrar('');
             escolher([]);
             listar();
@@ -195,8 +212,16 @@
                 if (indiceAtual === null && r.indiceAtual != null) indiceAtual = r.indiceAtual;
                 depois = r.ultimo;
             } while (r.restantes > 0 && r.arquivos > 0);
-            rel.innerHTML = simular ? relatorioSimulacao(soma, indiceAtual) : relatorioInclusao(soma, r.total);
-            if (!simular) { listar(); listarDocentes(); }
+            if (!simular) {
+                rel.innerHTML = '<p>Atualizando o índice de busca…</p>';
+                const avisos = [];
+                await atualizarIndice(avisos);
+                rel.innerHTML = relatorioInclusao(soma, r.total) + avisos.join('');
+                listar();
+                listarDocentes();
+            } else {
+                rel.innerHTML = relatorioSimulacao(soma, indiceAtual);
+            }
         } catch (e) {
             if (e.message !== 'sessão') rel.innerHTML = `<p class="text-red-700 dark:text-red-400">${esc(e.message)}${soma.lidos ? ` (depois de ${soma.lidos} arquivo(s) lido(s); pode repetir)` : ''}</p>`;
         } finally {
@@ -224,6 +249,18 @@
             Currículos guardados: ${total}.</p>
             ${soma.organizados ? `<p>${soma.organizados} cópia(s) com outro nome apagada(s).</p>` : soma.copias ? `<p>${soma.copias} arquivo(s) com outro nome continuam na pasta como cópia; para apagá-los, marque a opção acima e inclua de novo.</p>` : ''}
             ${listaSemPpg(soma, 'ficaram')}${listaErros(soma)}`;
+    }
+
+    // Índice de busca: montado logo depois das cargas, para a primeira busca
+    // das pessoas discentes não esperar por ele.
+    async function atualizarIndice(avisos) {
+        try {
+            const r = await api('indexar', form({}));
+            avisos.push(`<p>Índice de busca atualizado: ${r.curriculos} currículo(s).</p>`);
+        } catch (e) {
+            if (e.message === 'sessão') throw e;
+            avisos.push(`<p class="text-red-700 dark:text-red-400">Índice de busca: ${esc(e.message)} A primeira busca vai montá-lo.</p>`);
+        }
     }
 
     /* ---------------------------- zona de risco ---------------------------- */
@@ -403,6 +440,7 @@
         try {
             await api('remover', form({ id: p.id }));
             listar();
+            atualizarIndice([]);
         } catch (e) {
             if (e.message !== 'sessão') alert(e.message);
         }

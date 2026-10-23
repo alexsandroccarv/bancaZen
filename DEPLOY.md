@@ -278,8 +278,19 @@ arquivos e 6 MB, compatíveis com o padrão do PHP (`max_file_uploads = 20`,
 2 MB) exige aumentar esse limite no `php.ini` ou no `.user.ini` da pasta do
 site (que o deploy preserva).
 
-**Backup.** Copie a pasta `bancazen-dados` (XML + `corpus.json` +
-`admin.json`).
+**Backup.** Copie a pasta `bancazen-dados` (`xml/`, `corpus.json`,
+`pessoas/`, `docentes.json` e `admin.json`). A pasta `indice/` é refeita
+sozinha e não precisa de cópia.
+
+**Memória do PHP.** A busca lê só o índice leve (`corpus.json`), as partes
+do índice de busca (`indice/`) dos termos da consulta e o registro completo
+(`pessoas/<id>.json`) de quem passa pela verificação de vínculos; funciona
+com o `memory_limit` comum de hospedagem (128 MB). O índice de busca é
+montado pela Administração ao abrir e depois de cada carga (cerca de 10 a
+30 s para 600 currículos). Uma base gravada por versões anteriores
+(`corpus.json` com os registros completos) é convertida na primeira leitura.
+Se o PHP parar por falta de memória ou tempo, a resposta diz isso em vez de
+"Erro 200".
 
 ---
 

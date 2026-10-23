@@ -13,13 +13,37 @@
 
    Conteúdo:
      xml/<id>.xml   XML original de cada currículo (um por ID Lattes)
-     corpus.json    índice processado { id: registro }; cada registro leva
-                    'programa' => ['ppg', 'instituicao', 'situacao'] (o grupo da
-                    banca vem do PPG: bb_grupo_do_ppg)
+     corpus.json    índice leve { id: registro } só com os campos de exibição,
+                    filtro e 'programa' => ['ppg', 'instituicao', 'situacao']
+                    (o grupo da banca vem do PPG: bb_grupo_do_ppg)
+     pessoas/<id>.json  registro completo (produções, coautores, orientações),
+                    lido só quando preciso (vínculos e índice de busca)
+     indice/        índice de busca pré-calculado, em 256 partes por termo
+                    (bb_indice_construir); refeito quando o corpus.json muda
      docentes.json  lista de docentes dos programas { id Lattes: docente }
                     (lib/docentes.php), importada de CSV, sem e-mails
      admin.json     hash da senha da administração (php api/cli/definir-senha.php)
    ========================================================================== */
+
+// Erros do PHP (falta de memória, tempo esgotado) saem como JSON, não como
+// página HTML: o navegador mostra a mensagem em vez de "erro 200".
+ini_set('display_errors', '0');
+// Reserva liberada no erro fatal: sem memória, a mensagem ainda é escrita.
+$GLOBALS['bb_reserva'] = str_repeat(' ', 262144);
+register_shutdown_function(function () {
+    unset($GLOBALS['bb_reserva']);
+    $e = error_get_last();
+    if (!$e || !in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) return;
+    while (ob_get_level()) ob_end_clean();
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    $msg = preg_replace('/ in \/\S+ on line \d+$/', '', $e['message']);
+    if (str_contains($msg, 'Allowed memory size')) $msg = 'o servidor ficou sem memória para esta operação (memory_limit do PHP)';
+    elseif (str_contains($msg, 'Maximum execution time')) $msg = 'a operação passou do tempo limite do PHP (max_execution_time)';
+    echo json_encode(['erro' => "Erro no servidor: $msg."], JSON_UNESCAPED_UNICODE);
+});
 
 require_once __DIR__ . '/lattes.php';
 require_once __DIR__ . '/similaridade.php';
@@ -76,8 +100,282 @@ function bb_alterar_json(string $nome, callable $fn)
     }
 }
 
-function bb_carregar_corpus(): array { return bb_carregar_json('corpus.json'); }
-function bb_alterar_corpus(callable $fn) { return bb_alterar_json('corpus.json', $fn); }
+// O corpus.json é leve; uma base gravada por versões anteriores (registros
+// completos) é convertida na primeira leitura (bb_migrar_corpus).
+function bb_carregar_corpus(): array
+{
+    bb_migrar_corpus();
+    return bb_carregar_json('corpus.json');
+}
+function bb_alterar_corpus(callable $fn)
+{
+    bb_migrar_corpus();
+    return bb_alterar_json('corpus.json', $fn);
+}
+
+/* ------------------- registro leve e registro completo ------------------- */
+const BB_CAMPOS_LEVES = ['id', 'nome', 'citacoes', 'origem', 'atualizacao', 'instituicao', 'unidade', 'cidade', 'uf',
+    'titulacao', 'nivel', 'bancasMestrado', 'bancasDoutorado', 'programa', 'recebidoEm'];
+function bb_leve(array $p): array
+{
+    return array_intersect_key($p, array_flip(BB_CAMPOS_LEVES));
+}
+function bb_gravar_pessoa(array $p): void
+{
+    $dir = bb_dir_dados() . '/pessoas';
+    if (!is_dir($dir) && !@mkdir($dir, 0750, true)) throw new RuntimeException("não foi possível criar a pasta $dir");
+    $id = vinc_id_lattes($p['id']);
+    $tmp = "$dir/$id.json.tmp";
+    file_put_contents($tmp, json_encode($p, JSON_UNESCAPED_UNICODE));
+    rename($tmp, "$dir/$id.json");
+}
+// Registro completo de quem está no corpus ($leve). O programa vale o do
+// corpus (correções na administração alteram só o registro leve). Sem o
+// arquivo, relê o XML guardado.
+function bb_carregar_pessoa(array $leve): ?array
+{
+    $id = vinc_id_lattes((string) ($leve['id'] ?? ''));
+    if ($id === '') return null;
+    $dir = bb_dir_dados();
+    $p = is_file("$dir/pessoas/$id.json") ? json_decode((string) file_get_contents("$dir/pessoas/$id.json"), true) : null;
+    if (!is_array($p) && is_file("$dir/xml/$id.xml")) {
+        try { $p = lattes_ler_arquivo("$id.xml", (string) file_get_contents("$dir/xml/$id.xml"))[0]['pessoa']; } catch (Throwable $e) { $p = null; }
+    }
+    return is_array($p) ? array_merge($p, bb_leve($leve)) : null;
+}
+
+// Base de versões anteriores: corpus.json com os registros completos, que
+// pode passar do limite de memória do PHP. É lido em trechos, sem carregar o
+// arquivo inteiro, e dividido em corpus.json leve + pessoas/<id>.json.
+function bb_corpus_legado(): bool
+{
+    $arq = bb_dir_dados() . '/corpus.json';
+    if (!is_file($arq)) return false;
+    $h = fopen($arq, 'rb');
+    $inicio = (string) fread($h, 262144);
+    fclose($h);
+    return (bool) preg_match('/"(producoes|resumo|orientacoes)":/', $inicio);
+}
+function bb_migrar_corpus(): void
+{
+    if (!bb_corpus_legado()) return;
+    $dir = bb_preparar_dados();
+    $trava = fopen("$dir/corpus.json.lock", 'c');
+    flock($trava, LOCK_EX);
+    try {
+        if (!bb_corpus_legado()) return; // outro processo já converteu
+        @set_time_limit(600);
+        $leves = [];
+        bb_json_registros("$dir/corpus.json", function (string $id, array $p) use (&$leves) {
+            $p['id'] = vinc_id_lattes((string) ($p['id'] ?? $id)) ?: $id;
+            bb_gravar_pessoa($p);
+            $leves[$p['id']] = bb_leve($p);
+        });
+        file_put_contents("$dir/corpus.json.tmp", json_encode($leves, JSON_UNESCAPED_UNICODE));
+        rename("$dir/corpus.json.tmp", "$dir/corpus.json");
+    } finally {
+        flock($trava, LOCK_UN);
+        fclose($trava);
+    }
+}
+// Percorre um objeto JSON { chave: objeto, ... } gravado por json_encode,
+// lendo o arquivo em trechos de 1 MB: chama $fn(chave, valor) para cada par.
+function bb_json_registros(string $arq, callable $fn): int
+{
+    $h = fopen($arq, 'rb');
+    if (!$h) throw new RuntimeException('não foi possível ler ' . basename($arq));
+    $buf = '';
+    $mais = function () use ($h, &$buf): bool {
+        $c = fread($h, 1048576);
+        if ($c === false || $c === '') return false;
+        $buf .= $c;
+        return true;
+    };
+    $n = 0;
+    $i = 0;
+    while (($a = strpos($buf, '{', $i)) === false) { if (!$mais()) { fclose($h); return 0; } }
+    $i = $a + 1;
+    while (true) {
+        // Próxima chave ("...") ou fim do objeto (}).
+        while (($i += strcspn($buf, '"}', $i)) >= strlen($buf)) { if (!$mais()) break 2; }
+        if ($buf[$i] === '}') break;
+        while (($k = strpos($buf, '"', $i + 1)) === false) { if (!$mais()) break 2; }
+        $chave = substr($buf, $i + 1, $k - $i - 1);
+        while (($v = strpos($buf, '{', $k)) === false) { if (!$mais()) break 2; }
+        // Fim do valor: conta chaves e colchetes fora de textos.
+        $j = $v;
+        $nivel = 0;
+        $texto = false;
+        while (true) {
+            $len = strlen($buf);
+            while ($j < $len) {
+                if ($texto) {
+                    $j += strcspn($buf, '"\\', $j);
+                    if ($j >= $len) break;
+                    if ($buf[$j] === '\\') { $j += 2; continue; }
+                    $texto = false;
+                    $j++;
+                    continue;
+                }
+                $j += strcspn($buf, '"{}[]', $j);
+                if ($j >= $len) break;
+                $c = $buf[$j];
+                if ($c === '"') $texto = true;
+                elseif ($c === '{' || $c === '[') $nivel++;
+                elseif (--$nivel === 0) break 2;
+                $j++;
+            }
+            if (!$mais()) break 2;
+        }
+        $valor = json_decode(substr($buf, $v, $j - $v + 1), true);
+        if (is_array($valor)) { $fn($chave, $valor); $n++; }
+        $buf = substr($buf, $j + 1);
+        $i = 0;
+    }
+    fclose($h);
+    return $n;
+}
+
+/* --------------------------- índice de busca ----------------------------- */
+// Pré-calculado a partir dos registros completos (dois passes, um currículo
+// por vez) e gravado em indice/: meta.json (ids, normas, assinatura) e
+// termos/<2 hex>.json ({ termo: [idf, { doc: peso }] }). A busca lê só as
+// partes dos termos da consulta.
+function bb_indice_assinatura(): string
+{
+    $a = bb_dir_dados() . '/corpus.json';
+    return is_file($a) ? (string) md5_file($a) : '';
+}
+function bb_indice_meta(): ?array
+{
+    $m = bb_dir_dados() . '/indice/meta.json';
+    $d = is_file($m) ? json_decode((string) file_get_contents($m), true) : null;
+    return is_array($d) ? $d : null;
+}
+function bb_indice_parte(string $termo): string
+{
+    return substr(md5($termo), 0, 2);
+}
+// Devolve o meta do índice, refazendo-o se o corpus mudou.
+function bb_indice_garantir(): array
+{
+    bb_migrar_corpus();
+    $m = bb_indice_meta();
+    if ($m && ($m['assinatura'] ?? '') === bb_indice_assinatura() && ($m['ano'] ?? 0) === (int) date('Y')) return $m;
+    return bb_indice_construir();
+}
+function bb_indice_construir(): array
+{
+    $dir = bb_preparar_dados();
+    $trava = fopen("$dir/indice.lock", 'c');
+    flock($trava, LOCK_EX);
+    try {
+        $assinatura = bb_indice_assinatura();
+        $m = bb_indice_meta();
+        if ($m && ($m['assinatura'] ?? '') === $assinatura && ($m['ano'] ?? 0) === (int) date('Y')) return $m; // outro processo já fez
+        @set_time_limit(600);
+        $corpus = bb_carregar_json('corpus.json');
+        $ano = (int) date('Y');
+        $tfDe = function (array $leve) use ($ano): ?array {
+            $p = bb_carregar_pessoa($leve);
+            return $p ? sim_tf_curriculo($p, $ano) : null;
+        };
+        // 1º passe: em quantos currículos cada termo aparece. Os termos de
+        // cada currículo vão para um arquivo temporário (uma linha por
+        // currículo), lido no 2º passe sem recalcular.
+        $df = [];
+        $ids = [];
+        $tmpTf = "$dir/indice.tf-" . bin2hex(random_bytes(4));
+        $htf = fopen($tmpTf, 'wb');
+        foreach ($corpus as $id => $leve) {
+            $tf = $tfDe($leve);
+            if ($tf === null) continue;
+            $ids[] = (string) $id;
+            foreach ($tf as $t => $_) $df[$t] = ($df[$t] ?? 0) + 1;
+            fwrite($htf, json_encode($tf, JSON_UNESCAPED_UNICODE) . "\n");
+        }
+        fclose($htf);
+        $N = count($ids);
+        $idf = [];
+        foreach ($df as $t => $n) $idf[$t] = log(($N + 1) / ($n + 1)) + 1;
+        unset($df);
+        // 2º passe: pesos e normas; as postagens vão para arquivos por parte.
+        $novo = "$dir/indice.novo-" . bin2hex(random_bytes(4));
+        @mkdir("$novo/termos", 0750, true);
+        $buffers = [];
+        $normas = [];
+        $descarregar = function (string $parte) use (&$buffers, $novo) {
+            file_put_contents("$novo/termos/$parte.tsv", $buffers[$parte], FILE_APPEND);
+            $buffers[$parte] = '';
+        };
+        $htf = fopen($tmpTf, 'rb');
+        foreach ($ids as $k => $id) {
+            $tf = json_decode((string) fgets($htf), true) ?: [];
+            $norma = 0.0;
+            foreach ($tf as $t => $f) {
+                $peso = round((1 + log($f)) * ($idf[$t] ?? 0), 6);
+                if ($peso <= 0) continue;
+                $norma += $peso * $peso;
+                $parte = bb_indice_parte((string) $t);
+                $buffers[$parte] = ($buffers[$parte] ?? '') . "$t	$k	$peso
+";
+                if (strlen($buffers[$parte]) > 65536) $descarregar($parte);
+            }
+            $normas[$k] = sqrt($norma);
+        }
+        fclose($htf);
+        @unlink($tmpTf);
+        foreach (array_keys($buffers) as $parte) $descarregar($parte);
+        foreach (glob("$novo/termos/*.tsv") ?: [] as $tsv) {
+            $termos = [];
+            $h = fopen($tsv, 'rb');
+            while (($linha = fgets($h)) !== false) {
+                [$t, $k, $peso] = explode("	", rtrim($linha, "
+"));
+                $termos[$t] ??= [round($idf[$t], 6), []];
+                $termos[$t][1][(int) $k] = (float) $peso;
+            }
+            fclose($h);
+            file_put_contents(substr($tsv, 0, -4) . '.json', json_encode($termos, JSON_UNESCAPED_UNICODE));
+            unlink($tsv);
+        }
+        $meta = ['assinatura' => $assinatura, 'ano' => $ano, 'N' => $N, 'ids' => $ids, 'normas' => $normas, 'criadoEm' => date('c')];
+        file_put_contents("$novo/meta.json", json_encode($meta));
+        // Troca atômica da pasta do índice.
+        $velho = "$dir/indice.velho-" . bin2hex(random_bytes(4));
+        if (is_dir("$dir/indice")) rename("$dir/indice", $velho);
+        rename($novo, "$dir/indice");
+        if (is_dir($velho)) bb_apagar_pasta($velho);
+        return $meta;
+    } finally {
+        flock($trava, LOCK_UN);
+        fclose($trava);
+    }
+}
+// Leitor de termos para sim_buscar_partes: abre cada parte uma vez só.
+function bb_indice_leitor(): callable
+{
+    $partes = [];
+    $dir = bb_dir_dados() . '/indice/termos';
+    return function (string $termo) use (&$partes, $dir): ?array {
+        $parte = bb_indice_parte($termo);
+        if (!array_key_exists($parte, $partes)) {
+            $partes[$parte] = is_file("$dir/$parte.json") ? (json_decode((string) file_get_contents("$dir/$parte.json"), true) ?: []) : [];
+        }
+        return $partes[$parte][$termo] ?? null;
+    };
+}
+function bb_apagar_pasta(string $dir): int
+{
+    $n = 0;
+    foreach (glob("$dir/{,.}*", GLOB_BRACE) ?: [] as $a) {
+        if (in_array(basename($a), ['.', '..'], true)) continue;
+        if (is_dir($a)) $n += bb_apagar_pasta($a);
+        elseif (@unlink($a)) $n++;
+    }
+    @rmdir($dir);
+    return $n;
+}
 function bb_carregar_docentes(): array { return bb_carregar_json('docentes.json'); }
 function bb_alterar_docentes(callable $fn) { return bb_alterar_json('docentes.json', $fn); }
 
@@ -153,7 +451,8 @@ function bb_guardar_curriculo(array &$corpus, array $pessoa, string $xmlBytes, a
     $pessoa['id'] = $id;
     $pessoa['programa'] = $programa;
     $pessoa['recebidoEm'] = date('c');
-    $corpus[$id] = $pessoa;
+    bb_gravar_pessoa($pessoa);
+    $corpus[$id] = bb_leve($pessoa);
     return ['situacao' => $atual ? 'substituido' : 'novo', 'pessoa' => $pessoa, 'anterior' => $atual];
 }
 
@@ -201,7 +500,7 @@ function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = f
                     if ($simular) {
                         $atual = $corpus[$id] ?? null;
                         $sit = $atual && ($atual['atualizacao'] ?? '') > ($p['atualizacao'] ?? '') ? 'mantido' : ($atual ? 'substituido' : 'novo');
-                        if ($sit !== 'mantido') $corpus[$id] = ['id' => $id, 'programa' => $programa] + $p;
+                        if ($sit !== 'mantido') $corpus[$id] = bb_leve(['id' => $id, 'programa' => $programa] + $p);
                         $rel['pessoas'][] = ['id' => $id, 'situacao' => $sit];
                     } else {
                         $sit = bb_guardar_curriculo($corpus, $p, $it['xml'], $programa)['situacao'];
@@ -231,9 +530,10 @@ function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = f
     return $rel;
 }
 
-// Zona de risco da Administração: apaga os currículos (índice e todos os
-// arquivos de <dados>/xml/) e/ou a lista de docentes, com as travas de
-// gravação. A senha (admin.json) fica. Devolve o que foi apagado.
+// Zona de risco da Administração: apaga os currículos (corpus, registros
+// completos, índice de busca e todos os arquivos de <dados>/xml/) e/ou a
+// lista de docentes, com as travas de gravação. A senha (admin.json) fica.
+// Devolve o que foi apagado.
 function bb_limpar(bool $curriculos, bool $docentes): array
 {
     $dir = bb_preparar_dados();
@@ -243,6 +543,8 @@ function bb_limpar(bool $curriculos, bool $docentes): array
             foreach (glob("$dir/xml/*") ?: [] as $arq) {
                 if (is_file($arq) && @unlink($arq)) $rel['arquivos']++;
             }
+            bb_apagar_pasta("$dir/pessoas");
+            bb_apagar_pasta("$dir/indice");
             return [[], count($corpus)];
         });
     }

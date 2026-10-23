@@ -175,51 +175,101 @@ function sim_criar_indice(array $pessoas, ?int $anoAtual = null): array
 /* --------------------------------- busca --------------------------------- */
 // $consulta = ['titulo', 'resumo', 'palavrasChave' => string[]]
 // $opcoes   = ['limite', 'excluirInstituicao', 'somenteDoutores']
+// Busca no índice em memória (sim_criar_indice): usada nos testes e como
+// referência; o site usa sim_buscar_partes, com o mesmo cálculo.
 function sim_buscar(array $indice, array $consulta, array $opcoes = []): array
 {
-    $limite = $opcoes['limite'] ?? 10;
+    [$tf, $formas] = sim_consulta($consulta);
+    $termo = fn($t) => isset($indice['idf'][$t]) ? $indice['idf'][$t] : null;
+    $docs = [];
+    $postagens = [];
+    foreach ($indice['docs'] as $k => $d) {
+        $docs[$k] = ['pessoa' => $d['pessoa'], 'norma' => $d['norma']];
+        foreach ($tf as $t => $_) if (isset($d['v'][$t])) $postagens[$t][$k] = $d['v'][$t];
+    }
+    return sim_pontuar($tf, $formas, fn($t) => $termo($t) === null ? null : [$termo($t), $postagens[$t] ?? []], $docs, $opcoes);
+}
+
+// Busca no índice gravado em partes: $termo($t) devolve [idf, [doc => peso]]
+// (ou null, se o termo não aparece em nenhum currículo) e $docs[doc] =
+// ['pessoa' => registro (leve basta), 'norma' => norma do vetor].
+// Só os termos da consulta são lidos: a memória não cresce com a base.
+function sim_buscar_partes(array $consulta, array $opcoes, callable $termo, array $docs): array
+{
+    [$tf, $formas] = sim_consulta($consulta);
+    return sim_pontuar($tf, $formas, $termo, $docs, $opcoes);
+}
+
+// Termos da consulta (com pesos por campo) e a forma original de cada um.
+function sim_consulta(array $consulta): array
+{
     $tf = [];
     $formas = [];
     foreach ($consulta['palavrasChave'] ?? [] as $k) sim_acumular($tf, $k, SIM_PESOS_CONSULTA['palavrasChave'], $formas);
     sim_acumular($tf, $consulta['titulo'] ?? '', SIM_PESOS_CONSULTA['titulo'], $formas);
     sim_acumular($tf, $consulta['resumo'] ?? '', SIM_PESOS_CONSULTA['resumo'], $formas);
-    $q = sim_vetor($tf, $indice['idf']);
-    if (!$q['norma']) return ['resultados' => [], 'termosConsulta' => 0, 'avaliados' => 0];
+    return [$tf, $formas];
+}
+
+// Cosseno entre a consulta e cada currículo que tem algum termo em comum.
+function sim_pontuar(array $tf, array $formas, callable $termo, array $docs, array $opcoes): array
+{
+    $limite = $opcoes['limite'] ?? 10;
+    $q = [];
+    $qNorma = 0.0;
+    $postagens = [];
+    foreach ($tf as $t => $f) {
+        $info = $termo((string) $t);
+        if (!$info || $info[0] <= 0) continue;
+        $peso = (1 + log($f)) * $info[0];
+        if ($peso <= 0) continue;
+        $q[$t] = $peso;
+        $qNorma += $peso * $peso;
+        $postagens[$t] = $info[1];
+    }
+    $qNorma = sqrt($qNorma);
+    if (!$qNorma) return ['resultados' => [], 'termosConsulta' => 0, 'avaliados' => 0];
 
     $excluir = trim(sim_sem_acento($opcoes['excluirInstituicao'] ?? ''));
-    $candidatos = array_values(array_filter($indice['docs'], function ($d) use ($opcoes, $excluir) {
-        if (!empty($opcoes['somenteDoutores']) && ($d['pessoa']['nivel'] ?? 0) < 5) return false; // 5 = Doutorado
-        if ($excluir !== '' && str_contains(sim_sem_acento($d['pessoa']['instituicao'] ?? ''), $excluir)) return false;
-        return true;
-    }));
+    $produto = [];
+    $contrib = [];
+    foreach ($q as $t => $qw) {
+        foreach ($postagens[$t] as $k => $dw) {
+            $c = $qw * $dw;
+            $produto[$k] = ($produto[$k] ?? 0.0) + $c;
+            $contrib[$k][$t] = $c;
+        }
+    }
 
     $resultados = [];
-    foreach ($candidatos as $d) {
-        $prod = 0.0;
-        $contrib = [];
-        foreach ($q['v'] as $t => $qw) {
-            if (isset($d['v'][$t])) { $c = $qw * $d['v'][$t]; $prod += $c; $contrib[$t] = $c; }
-        }
+    $avaliados = 0;
+    foreach ($docs as $k => $d) {
+        $p = $d['pessoa'];
+        if (!empty($opcoes['somenteDoutores']) && ($p['nivel'] ?? 0) < 5) continue; // 5 = Doutorado
+        if ($excluir !== '' && str_contains(sim_sem_acento($p['instituicao'] ?? ''), $excluir)) continue;
+        $avaliados++;
+        $prod = $produto[$k] ?? 0.0;
         if ($prod <= 0) continue;
-        $score = $d['norma'] ? min(1.0, $prod / ($q['norma'] * $d['norma'])) : 0.0;
-        arsort($contrib);
+        $score = $d['norma'] ? min(1.0, $prod / ($qNorma * $d['norma'])) : 0.0;
+        $c = $contrib[$k];
+        arsort($c);
         // Termos em comum que mais pesaram (sem repetir a palavra de um bigrama já listado).
         $termos = [];
-        foreach (array_keys($contrib) as $t) {
+        foreach (array_keys($c) as $t) {
             $f = $formas[(string) $t] ?? '';
             if ($f === '') continue;
             foreach ($termos as $x) if (str_contains($x, $f) || str_contains($f, $x)) continue 2;
             $termos[] = $f;
             if (count($termos) >= 6) break;
         }
-        $resultados[] = ['pessoa' => $d['pessoa'], 'score' => $score, 'termos' => $termos];
+        $resultados[] = ['pessoa' => $p, 'score' => $score, 'termos' => $termos];
     }
 
     usort($resultados, fn($a, $b) => ($b['score'] <=> $a['score'])
         ?: strcmp(sim_sem_acento($a['pessoa']['nome']), sim_sem_acento($b['pessoa']['nome'])));
     return [
         'resultados' => $limite === INF ? $resultados : array_slice($resultados, 0, $limite),
-        'termosConsulta' => count($q['v']),
-        'avaliados' => count($candidatos),
+        'termosConsulta' => count($q),
+        'avaliados' => $avaliados,
     ];
 }

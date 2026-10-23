@@ -7,6 +7,20 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Corrigido
+- Busca com "Erro 200" na base real: o PHP ficava sem memória (pico de
+  790 MB com 620 currículos) e a hospedagem devolvia a página de erro. O
+  `corpus.json` passa a ser leve, com o registro completo de cada pessoa em
+  `pessoas/<id>.json`, e a busca usa um índice pré-calculado em partes
+  (`indice/`), lendo só as partes dos termos da consulta: o mesmo
+  resultado, com menos de 20 MB de memória e 0,1 s por busca. A base antiga
+  é convertida na primeira leitura, em trechos. A Administração monta o
+  índice ao abrir e depois de cada carga. Erros do servidor aparecem com a
+  mensagem (ex.: falta de memória), não mais como "Erro 200".
+  [issue #55](../../issues/55)
+
+## [0.0.27] - 2026-10-23
+
 ### Alterado
 - "Minha orientação" (conformidade ética) passa a ser opcional: discente e
   orientador(a) não são mais exigidos, no navegador nem em `buscar.php`. O
