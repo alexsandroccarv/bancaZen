@@ -7,6 +7,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Administração: seção **Zona de risco** para limpar a base de dados.
+  Escolha entre apagar os currículos (índice e todos os arquivos de `xml/`)
+  e/ou a lista de docentes; a senha fica. O botão só é habilitado depois de
+  digitar `LIMPAR` e pede confirmação; o servidor confere de novo (ação
+  `limpar`, sessão + CSRF). [issue #41](../../issues/41)
+
+## [0.0.20] - 2026-10-23
+
 ### Corrigido
 - Leitura dos XMLs: quando um arquivo não é currículo Lattes, a mensagem diz
   o que ele contém (vazio, página HTML com título e texto, outro XML com o

@@ -198,6 +198,14 @@ $l2 = bb_reindexar(null, true, false, $l1['ultimo'], 2);
 $l3 = bb_reindexar(null, true, false, $l2['ultimo'], 2);
 confere($l1['arquivos'] === 2 && $l1['restantes'] === 3 && $l2['arquivos'] === 2 && $l3['arquivos'] === 1 && $l3['restantes'] === 0 && $l1['totalArquivos'] === 5 && $l3['ultimo'] === 'quebrado.xml', 'reindexar em lotes percorre todos os arquivos');
 confere($l1['indiceAtual'] === 4 && count($l1['pessoas']) === 2 && $l1['pessoas'][0]['situacao'] === 'substituido', 'reindexar simulado em lotes informa índice atual e pessoas');
+// Zona de risco: limpar a base (a senha fica).
+file_put_contents("$tmpR/admin.json", '{"hash":"x"}');
+$antesLimpar = count(bb_carregar_corpus());
+$lim = bb_limpar(false, true);
+confere($lim['docentes'] === 1 && !bb_carregar_docentes() && count(bb_carregar_corpus()) === $antesLimpar, 'limpar só a lista de docentes');
+$lim = bb_limpar(true, false);
+confere($lim['curriculos'] === $antesLimpar && $lim['arquivos'] > 0 && !bb_carregar_corpus() && !glob("$tmpR/xml/*"), 'limpar currículos: índice e arquivos de xml/');
+confere(is_file("$tmpR/admin.json"), 'limpar não apaga a senha');
 array_map('unlink', glob("$tmpR/xml/*"));
 rmdir("$tmpR/xml");
 array_map('unlink', array_filter(glob("$tmpR/{,.}*", GLOB_BRACE) ?: [], 'is_file'));
