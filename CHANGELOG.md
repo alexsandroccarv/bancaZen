@@ -8,6 +8,21 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- "Minha orientação" passa a ser um trecho de "Minha Dissertação", e a aba
+  própria sai da barra superior; links antigos (`#orientacao`) e os botões
+  que levavam até ela abrem "Minha Dissertação" no trecho da orientação.
+  [issue #59](../../issues/59)
+
+### Adicionado
+- Minha Dissertação: botões discretos, só com ícone, para exportar e
+  importar os dados (nome, universidade, título, resumo, palavras-chave,
+  links do Lattes da orientação, período das coautorias e critérios da
+  busca) num arquivo JSON, sem passar pelo servidor. Os arquivos XML/ZIP não
+  entram no arquivo. [issue #59](../../issues/59)
+
+## [0.0.29] - 2026-10-23
+
+### Alterado
 - Busca com o modelo BM25 no lugar de TF-IDF e cosseno: saturação da
   frequência (repetir o termo rende cada vez menos) e ajuste ao tamanho do
   currículo (currículos extensos não levam vantagem só pelo volume). A

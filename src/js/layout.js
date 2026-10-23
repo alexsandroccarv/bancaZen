@@ -44,6 +44,19 @@
         document.dispatchEvent(new CustomEvent('tab:change', { detail: { tab: name } }));
     }
 
+    // Vai para uma seção (aba) ou para um trecho dentro de uma aba (ex.:
+    // #orientacao, dentro de Minha Dissertação). Devolve false se não existe.
+    function irPara(nome, opts) {
+        if ($('#tab-' + nome)) { switchTab(nome, opts); window.scrollTo(0, 0); return true; }
+        const trecho = nome && document.getElementById(nome);
+        const aba = trecho && trecho.closest('.tab-panel');
+        if (!aba) return false;
+        switchTab(aba.id.slice(4), Object.assign({}, opts, { url: false }));
+        if (window.history && history.replaceState) history.replaceState(null, '', '#' + nome);
+        trecho.scrollIntoView({ block: 'start' });
+        return true;
+    }
+
     function wireTabs() {
         const btns = $$('.tab-btn');
         btns.forEach((b, i) => {
@@ -60,7 +73,7 @@
         });
         // Seção inicial: a do endereço (#nome), se existir; senão a marcada.
         const doHash = location.hash.slice(1);
-        if (doHash && $('#tab-' + doHash)) { switchTab(doHash); return; }
+        if (doHash && irPara(doHash)) return;
         const initial = $('.tab-btn[aria-selected="true"]') || btns[0];
         if (initial) switchTab(initial.dataset.tab, { url: false });
     }
@@ -243,15 +256,12 @@
         // Botões "ir para" (data-ir="<seção>") em qualquer lugar da página.
         document.addEventListener('click', (e) => {
             const alvo = e.target.closest('[data-ir]');
-            if (alvo && $('#tab-' + alvo.dataset.ir)) {
-                switchTab(alvo.dataset.ir, { focus: true });
-                window.scrollTo(0, 0);
-            }
+            if (alvo) irPara(alvo.dataset.ir, { focus: true });
         });
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 
-    window.Layout = { switchTab };
+    window.Layout = { switchTab, irPara };
 })();
