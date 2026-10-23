@@ -2,8 +2,8 @@
    bancaZen — área de administração (seção Administração do index.html)
    --------------------------------------------------------------------------
    Entrada por senha; cadastro unificado de docentes e currículos (CSV da
-   lista de docentes e XML/ZIP do Lattes, arquivos ou pasta) com PPG,
-   instituição e situação; inclusão na busca dos XMLs copiados direto para
+   planilha de docentes e XML/ZIP do Lattes, arquivos ou pasta; os dados vêm
+   da planilha); conferência XML x planilha; inclusão na busca dos XMLs copiados direto para
    o servidor (rsync/FTP), em lotes; tabelas da lista e da base; correção
    e remoção.
    A lista da banca vem do PPG (PROFIAP -> Rede PROFIAP; outro -> Externa).
@@ -88,10 +88,6 @@
             : 'Nenhum arquivo .csv, .xml ou .zip na seleção.';
         $('#enviarBtn').disabled = !escolhidos.length;
     }
-    function mostrarBancaDoPpg() {
-        const ppg = $('#ppgInput').value.trim();
-        $('#ppgAjuda').textContent = ppg ? `Entra na lista da banca: ${BANCAS[bancaDoPpg(ppg)]}.` : 'Informe o PPG.';
-    }
     function lotes(arquivos) {
         const out = [];
         let atual = [], bytes = 0;
@@ -116,6 +112,7 @@
                 ${r.semLattes.length ? `<li>Sem Lattes, não importado(s): ${esc(r.semLattes.join('; '))}.</li>` : ''}
                 ${r.exemplos ? `<li>${r.exemplos} linha(s) de exemplo do modelo ignorada(s).</li>` : ''}
                 ${r.semSituacao ? `<li>${r.semSituacao} sem situação no programa reconhecida.</li>` : ''}
+                ${r.ppgPadrao ? `<li>${r.ppgPadrao} linha(s) sem PPG ficaram com PROFIAP.</li>` : ''}
                 ${r.colunasDescartadas.length ? `<li>Colunas não guardadas: ${esc(r.colunasDescartadas.join(', '))}.</li>` : ''}
             </ul>`;
     }
@@ -124,9 +121,7 @@
     // para os currículos), depois os XML/ZIP em lotes.
     async function enviar(ev) {
         ev.preventDefault();
-        const ppg = $('#ppgInput').value.trim();
         const rel = $('#relatorio');
-        if (!ppg) { rel.innerHTML = '<p class="text-red-700 dark:text-red-400">Informe o PPG.</p>'; $('#ppgInput').focus(); return; }
         const btn = $('#enviarBtn');
         btn.disabled = true;
         const partesHtml = [];
@@ -135,7 +130,7 @@
             for (const f of escolhidos.filter(ehCsv)) {
                 mostrar(`Importando a lista ${f.name}…`);
                 try {
-                    const fd = form({ ppg, substituir: $('#docSubstituirInput').checked ? '1' : '0' });
+                    const fd = form({});
                     fd.append('arquivo', f);
                     partesHtml.push(relatorioLista(f.name, (await api('importar-docentes', fd)).relatorio));
                 } catch (e) {
@@ -149,13 +144,14 @@
                 const partes = lotes(curriculos);
                 for (let i = 0; i < partes.length; i++) {
                     mostrar(`Enviando currículos: lote ${i + 1} de ${partes.length}…`);
-                    const fd = form({ ppg, instituicao: $('#instInput').value.trim(), situacao: $('#situacaoInput').value });
+                    const fd = form({});
                     for (const f of partes[i]) fd.append('arquivos[]', f, f.webkitRelativePath || f.name);
                     linhas.push(...(await api('enviar', fd)).relatorio);
                 }
                 const cont = (st) => linhas.filter((r) => r.situacao === st).length;
-                partesHtml.push(`<p class="font-medium">Currículos: ${cont('novo')} incluído(s), ${cont('substituido')} substituído(s), ${cont('mantido')} mantido(s), ${cont('erro')} com erro.</p>
-                    <ul class="list-disc list-inside">${linhas.map((r) => `<li>${esc(r.arquivo)}: ${esc(SITUACAO[r.situacao](r))}</li>`).join('')}</ul>`);
+                const semDados = linhas.filter((r) => r.semDados).length;
+                partesHtml.push(`<p class="font-medium">Currículos: ${cont('novo')} incluído(s), ${cont('substituido')} substituído(s), ${cont('mantido')} mantido(s), ${cont('erro')} com erro.${semDados ? ` ${semDados} sem dados na planilha (fora da busca).` : ''}</p>
+                    <ul class="list-disc list-inside">${linhas.map((r) => `<li>${esc(r.arquivo)}: ${esc(SITUACAO[r.situacao](r))}${r.semDados ? ' (sem dados na planilha)' : ''}</li>`).join('')}</ul>`);
             }
             mostrar('');
             escolher([]);
@@ -208,7 +204,7 @@
     function listaSemPpg(soma, verbo) {
         if (!soma.semPpg.size) return '';
         const nomes = [...soma.semPpg.values()].slice(0, 50).map((p) => `<li>${esc(p.nome || '(sem nome)')} <span class="font-mono text-xs">${esc(p.id)}</span> ${esc(p.arquivo)}</li>`).join('');
-        return `<p>${soma.semPpg.size} pessoa(s) sem PPG ${verbo} de fora (não estão cadastradas nem na lista de docentes). Para incluí-las, informe o PPG acima ou importe a lista de docentes do programa.</p>
+        return `<p>${soma.semPpg.size} pessoa(s) sem dados ${verbo} guardada(s) fora da busca (não estão na planilha de docentes nem cadastradas com PPG). Para incluí-las na busca, envie a planilha com elas ou informe o PPG acima.</p>
             <ul class="list-disc list-inside">${nomes}${soma.semPpg.size > 50 ? `<li>… e mais ${soma.semPpg.size - 50}</li>` : ''}</ul>`;
     }
     function listaErros(soma) {
@@ -216,14 +212,14 @@
     }
     function relatorioSimulacao(soma, indiceAtual) {
         const novos = [...soma.pessoas.values()].filter((s) => s === 'novo').length;
-        return `<p class="font-medium">Simulação (nada foi gravado): ${soma.lidos} arquivo(s) lido(s); ${soma.pessoas.size} pessoa(s) entrariam na busca
-            (${novos} nova(s), ${soma.pessoas.size - novos} já cadastrada(s)). Currículos na busca: ${indiceAtual ?? 0} → ${(indiceAtual ?? 0) + novos}.</p>
+        return `<p class="font-medium">Simulação (nada foi gravado): ${soma.lidos} arquivo(s) lido(s); ${soma.pessoas.size} pessoa(s) seriam guardadas
+            (${novos} nova(s), ${soma.pessoas.size - novos} já cadastrada(s)). Currículos guardados: ${indiceAtual ?? 0} → ${(indiceAtual ?? 0) + novos}.</p>
             ${soma.copias ? `<p>${soma.copias} arquivo(s) com outro nome seriam guardados como &lt;ID Lattes&gt;.xml.</p>` : ''}
             ${listaSemPpg(soma, 'ficariam')}${listaErros(soma)}`;
     }
     function relatorioInclusao(soma, total) {
         return `<p class="font-medium">${soma.lidos} arquivo(s) lido(s): ${soma.novo} incluído(s), ${soma.substituido} já cadastrado(s) ou repetido(s), ${soma.mantido} mantido(s) (havia versão mais recente).
-            Currículos na busca: ${total}.</p>
+            Currículos guardados: ${total}.</p>
             ${soma.organizados ? `<p>${soma.organizados} cópia(s) com outro nome apagada(s).</p>` : soma.copias ? `<p>${soma.copias} arquivo(s) com outro nome continuam na pasta como cópia; para apagá-los, marque a opção acima e inclua de novo.</p>` : ''}
             ${listaSemPpg(soma, 'ficaram')}${listaErros(soma)}`;
     }
@@ -241,6 +237,7 @@
         $('#ppgLista').innerHTML = unicos('ppg').map((v) => `<option value="${esc(v)}">`).join('');
         $('#instLista').innerHTML = unicos('universidade').map((v) => `<option value="${esc(v)}">`).join('');
         renderTabela();
+        renderConferencia();
     }
 
     /* ------------------------- lista de docentes -------------------------- */
@@ -251,6 +248,19 @@
             return;
         }
         renderDocentes();
+        renderConferencia();
+    }
+
+    // Conferência XML x planilha: currículos sem dados (fora da busca) e
+    // docentes da planilha ainda sem currículo.
+    function renderConferencia() {
+        const item = (p) => `<li>${esc(p.nome)} <a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline font-mono text-xs">${esc(p.id)}</a></li>`;
+        const preencher = (n, lista, itens, vazio) => {
+            $(n).textContent = String(itens.length);
+            $(lista).innerHTML = itens.length ? itens.map(item).join('') : `<li class="list-none text-gray-500 dark:text-gray-400">${vazio}</li>`;
+        };
+        preencher('#cfSemDadosN', '#cfSemDadosLista', base.filter((p) => p.semDados), 'Nenhum: todos os currículos têm dados.');
+        preencher('#cfSemXmlN', '#cfSemXmlLista', docentes.filter((d) => !d.temCurriculo), 'Nenhum: todos da planilha têm currículo.');
     }
 
     function renderDocentes() {
@@ -290,7 +300,7 @@
         }
         tbody.innerHTML = lista.map((p) => `<tr class="border-b border-gray-200 dark:border-gray-700" data-id="${esc(p.id)}">
             <td class="py-2 pr-3"><a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(p.nome)}</a></td>
-            <td class="py-2 pr-3">${esc(BANCAS[p.grupo] || '')}</td>
+            <td class="py-2 pr-3">${p.semDados ? '<span class="text-gray-600 dark:text-gray-400">sem dados (fora da busca)</span>' : esc(BANCAS[p.grupo] || '')}</td>
             <td class="py-2 pr-3">${esc([p.universidade, p.ppg].filter(Boolean).join(' · '))}${p.naLista ? ' <span class="badge border border-gray-300 dark:border-gray-600" title="Universidade, PPG e situação vêm da lista de docentes">lista</span>' : ''}</td>
             <td class="py-2 pr-3">${esc(p.situacao) || '—'}</td>
             <td class="py-2 pr-3 whitespace-nowrap">${dataBR(p.atualizacao) || '—'}</td>
@@ -360,8 +370,6 @@
         for (const id of ['#arquivosInput', '#pastaInput']) {
             $(id).addEventListener('change', (e) => { escolher(e.target.files); e.target.value = ''; });
         }
-        $('#ppgInput').addEventListener('input', mostrarBancaDoPpg);
-        mostrarBancaDoPpg();
         $('#envioForm').addEventListener('submit', enviar);
         $('#reSimularBtn').addEventListener('click', () => reindexar(true));
         $('#reIncluirBtn').addEventListener('click', () => reindexar(false));

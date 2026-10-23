@@ -14,7 +14,7 @@
      lattes_id ou lattes_url (ou lattes)     obrigatória (16 dígitos)
      universidade_normalizada ou universidade (ou instituicao)
      categoria_normalizada ou categoria (ou situacao)
-     ppg                                     opcional (senão, o PPG do envio)
+     ppg                                     opcional (senão, PROFIAP)
    Qualquer outra coluna, como e-mail, é DESCARTADA: a lista guarda só o que
    é exibido.
    ========================================================================== */
@@ -101,7 +101,7 @@ function doc_ler_csv(string $conteudo, array $padrao): array
     $descartadas = array_values(array_diff_key($colunas, array_flip($usadas)));
 
     $docentes = [];
-    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0, 'exemplos' => 0,
+    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0, 'exemplos' => 0, 'ppgPadrao' => 0,
             'colunasDescartadas' => $descartadas];
     foreach ($linhas as $linha) {
         if (trim($linha) === '') continue;
@@ -114,6 +114,7 @@ function doc_ler_csv(string $conteudo, array $padrao): array
         $situacao = $iSit !== null ? doc_situacao((string) ($c[$iSit] ?? '')) : '';
         if ($situacao === '') $rel['semSituacao']++;
         $ppg = $iPpg !== null ? trim((string) ($c[$iPpg] ?? '')) : '';
+        if ($ppg === '') $rel['ppgPadrao']++;
         $d = [
             'id' => $id, 'nome' => $nome,
             'universidade' => $iUniv !== null ? doc_capitalizar((string) ($c[$iUniv] ?? '')) : '',
@@ -126,15 +127,15 @@ function doc_ler_csv(string $conteudo, array $padrao): array
     return [$docentes, $rel];
 }
 
-// Junta a lista importada à atual. Com $substituir, quem era do mesmo PPG e
-// não está no arquivo novo sai da lista (atualização anual).
-function doc_aplicar(array $atuais, array $novos, string $ppg, bool $substituir): array
+// Junta a lista importada à atual. Com $substituir, quem era de um PPG
+// presente no arquivo e não está nele sai da lista (atualização anual).
+function doc_aplicar(array $atuais, array $novos, bool $substituir): array
 {
     $removidos = 0;
     if ($substituir) {
-        $alvo = sim_sem_acento($ppg);
+        $alvos = array_flip(array_map(fn($d) => sim_sem_acento(trim($d['ppg'])), $novos));
         foreach ($atuais as $id => $d) {
-            if (sim_sem_acento($d['ppg']) === $alvo && !isset($novos[$id])) { unset($atuais[$id]); $removidos++; }
+            if (isset($alvos[sim_sem_acento(trim($d['ppg']))]) && !isset($novos[$id])) { unset($atuais[$id]); $removidos++; }
         }
     }
     $atualizados = count(array_intersect_key($novos, $atuais));

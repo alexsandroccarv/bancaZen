@@ -95,10 +95,12 @@ const BB_SITUACOES = ['Permanente', 'Colaborador', 'Visitante'];
 
 // Programa informado na administração: PPG (obrigatório) e, opcionais,
 // instituição e situação no programa.
-function bb_programa(string $ppg, string $instituicao = '', string $situacao = ''): array
+// Sem PPG ($exigirPpg = false): currículo sem dados, fora da busca até a
+// lista de docentes trazer a pessoa (bb_tem_dados).
+function bb_programa(string $ppg, string $instituicao = '', string $situacao = '', bool $exigirPpg = true): array
 {
     $ppg = trim($ppg);
-    if ($ppg === '') throw new RuntimeException('informe o PPG');
+    if ($ppg === '' && $exigirPpg) throw new RuntimeException('informe o PPG');
     $situacao = trim($situacao);
     if ($situacao !== '' && !in_array($situacao, BB_SITUACOES, true)) throw new RuntimeException('situação inválida');
     return ['ppg' => bb_cortar($ppg, 200), 'instituicao' => bb_cortar(trim($instituicao), 200), 'situacao' => $situacao];
@@ -124,6 +126,12 @@ function bb_programa_efetivo(array $p, array $docentes = []): array
         ];
     $prog['grupo'] = bb_grupo_do_ppg($prog['ppg']);
     return $prog;
+}
+// Tem dados de programa (da lista de docentes ou do envio)? Sem eles, o
+// currículo fica guardado, mas fora da busca.
+function bb_tem_dados(array $p, array $docentes = []): bool
+{
+    return trim(bb_programa_efetivo($p, $docentes)['ppg']) !== '';
 }
 function bb_grupo(array $p, array $docentes = []): string
 {
@@ -152,8 +160,8 @@ function bb_guardar_curriculo(array &$corpus, array $pessoa, string $xmlBytes, a
 // Monta ou completa o índice a partir dos XML/ZIP já guardados em
 // <dados>/xml/ (por exemplo, copiados por rsync), com a regra do mesmo ID.
 // Programa de cada pessoa: o já gravado no índice; senão, o da lista de
-// docentes; senão, $padrao (bb_programa). Sem nenhum deles, a pessoa fica de
-// fora e vai para 'semPpg'. Com $simular, nada é gravado. 'comOutroNome'
+// docentes; senão, $padrao (bb_programa). Sem nenhum deles, o currículo é
+// guardado sem dados (fora da busca) e listado em 'semPpg'. Com $simular, nada é gravado. 'comOutroNome'
 // lista os arquivos já gravados como <ID>.xml com outro nome (cópias); com
 // $organizar, são apagados depois de o índice ser gravado.
 // Em lotes (Administração, limite de tempo do PHP): $limite arquivos por vez,
@@ -186,11 +194,10 @@ function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = f
                     $programa = ($corpus[$id]['programa']['ppg'] ?? '') !== '' ? $corpus[$id]['programa']
                         : (($d['ppg'] ?? '') !== '' ? bb_programa($d['ppg'], $d['universidade'] ?? '', $d['situacao'] ?? '') : $padrao);
                     if (!$programa) {
+                        $programa = bb_programa('', '', '', false);
                         $rel['semPpg'][] = ['arquivo' => $p['origem'], 'nome' => $p['nome'], 'id' => $id];
-                        $ids = null;
-                        continue;
                     }
-                    if ($ids !== null) $ids[] = $id;
+                    $ids[] = $id;
                     if ($simular) {
                         $atual = $corpus[$id] ?? null;
                         $sit = $atual && ($atual['atualizacao'] ?? '') > ($p['atualizacao'] ?? '') ? 'mantido' : ($atual ? 'substituido' : 'novo');

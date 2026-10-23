@@ -7,6 +7,22 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- "Cadastrar docentes e currículos" só com **Escolher arquivos** e
+  **Escolher pasta**: saem os campos PPG, instituição, situação e a opção de
+  substituir. Os dados vêm da planilha (linha sem PPG fica com PROFIAP), que
+  substitui a lista de cada PPG que traz. Currículo de quem não está na
+  planilha é guardado sem dados e fica fora da busca (e da contagem pública)
+  até a planilha trazer a pessoa; a inclusão dos XMLs do servidor segue a
+  mesma regra, sem descartar ninguém. [issue #33](../../issues/33)
+
+### Adicionado
+- Administração: área "Conferência: currículos e planilha", com quantos XMLs
+  estão sem dados na planilha e quantos docentes da planilha ainda não têm
+  XML, com as listas. [issue #33](../../issues/33)
+
+## [0.0.16] - 2026-10-23
+
 ### Adicionado
 - Administração: seção "Currículos guardados no servidor", com os botões
   **Simular** e **Incluir na busca** para os XML/ZIP copiados direto para a

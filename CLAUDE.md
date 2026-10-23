@@ -3,8 +3,8 @@
 ## Visão geral
 Aplicação web (site estático + backend PHP) que indica membros externos
 para banca de defesa de mestrado: a administração cadastra, num formulário
-único, a lista de docentes (CSV) e os currículos Lattes (XML/ZIP) com PPG,
-instituição e situação; a partir do título, resumo e palavras-chave do
+único só de arquivos, a planilha de docentes (CSV, com universidade, PPG e
+situação; linha sem PPG = PROFIAP) e os currículos Lattes (XML/ZIP); a partir do título, resumo e palavras-chave do
 trabalho, mostra duas listas de até 10 pessoas com maior proximidade temática
 (0 a 1, ordem decrescente), sem vínculo com discente/orientação: **Rede
 PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
@@ -31,8 +31,13 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   só nome, universidade, PPG, situação (Permanente/Colaborador/
   Visitante) e ID Lattes; e-mails e outras colunas são descartados. Quem
   está na lista tem universidade, PPG e situação da lista
-  (`bb_programa_efetivo`); senão, valem os dados do envio do XML (sem
-  instituição informada, a do Lattes). Exibição: Nome, Universidade, PPG,
+  (`bb_programa_efetivo`); senão, valem os dados gravados com o XML (PPG
+  da inclusão pelo servidor ou da correção na tabela; sem instituição, a do
+  Lattes). Sem PPG nenhum, o currículo fica guardado **sem dados e fora da
+  busca** (`bb_tem_dados`; `buscar.php` e `status.php` filtram). A
+  Administração mostra a conferência XML x planilha (sem dados; planilha
+  sem XML). A planilha substitui a lista de cada PPG que traz
+  (`doc_aplicar`). Exibição: Nome, Universidade, PPG,
   Situação no programa e Link do Lattes. Modelo do CSV: `doc_modelo_csv()`
   (download em `api/admin.php?acao=modelo-docentes`; gerado, não é arquivo,
   porque `*.csv` é bloqueado); linhas com ID `0000000000000000` são exemplos

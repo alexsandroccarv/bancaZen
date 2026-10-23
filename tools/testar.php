@@ -132,9 +132,9 @@ confere(isset($umDoModelo['0000000000000077']) && $umDoModelo['0000000000000077'
 
 // Substituir a lista do mesmo PPG retira quem não está no arquivo novo; outro PPG fica.
 $antes = ['0000000000000050' => ['id' => '0000000000000050', 'ppg' => 'PROFIAP'], '0000000000000060' => ['id' => '0000000000000060', 'ppg' => 'PPG X']];
-[$juntos, $r] = doc_aplicar($antes, $docs, 'PROFIAP', true);
+[$juntos, $r] = doc_aplicar($antes, $docs, true);
 confere(!isset($juntos['0000000000000050']) && isset($juntos['0000000000000060']) && $r['removidos'] === 1 && $r['novos'] === 3, 'docentes: substituir só o mesmo PPG');
-[$juntos] = doc_aplicar($antes, $docs, 'PROFIAP', false);
+[$juntos] = doc_aplicar($antes, $docs, false);
 confere(isset($juntos['0000000000000050']), 'docentes: sem substituir, mantém os anteriores');
 
 // Mesma regra para os dois grupos: a lista prevalece sobre o informado no envio.
@@ -168,13 +168,15 @@ file_put_contents("$tmpR/xml/leia-me.txt", 'ignorado');
 file_put_contents("$tmpR/xml/quebrado.xml", '<nada/>');
 bb_alterar_docentes(fn($d) => [['0000000000000001' => ['id' => '0000000000000001', 'nome' => 'Ana', 'universidade' => 'Univ. da Lista', 'ppg' => 'PROFIAP', 'situacao' => 'Permanente']], null]);
 $sim = bb_reindexar(null, true);
-confere($sim['arquivos'] === 5 && $sim['novo'] === 1 && count($sim['semPpg']) === 3, 'reindexar simulado: só quem está na lista entra sem --ppg');
+confere($sim['arquivos'] === 5 && $sim['novo'] === 4 && count($sim['semPpg']) === 3, 'reindexar simulado: quem não está na lista é guardado sem dados e listado');
 confere(count($sim['erros']) === 1 && !is_file("$tmpR/corpus.json"), 'reindexar simulado: erro do arquivo inválido e nada gravado');
 $r = bb_reindexar(null);
-confere($r['novo'] === 1 && $r['total'] === 1, 'reindexar sem --ppg grava só quem está na lista');
+$c = bb_carregar_corpus();
+confere($r['novo'] === 4 && $r['total'] === 4 && count($r['semPpg']) === 3, 'reindexar sem --ppg guarda todos');
+confere(bb_tem_dados($c['0000000000000001'], bb_carregar_docentes()) && !bb_tem_dados($c['0000000000000002'], bb_carregar_docentes()), 'sem dados na lista nem --ppg: currículo fora da busca');
 $r = bb_reindexar(bb_programa('PPG em Teste', 'Univ. Padrão'));
 $c = bb_carregar_corpus();
-confere($r['novo'] === 3 && $r['total'] === 4 && !$r['semPpg'], 'reindexar com --ppg inclui os demais');
+confere($r['substituido'] === 8 && $r['novo'] === 0 && $r['total'] === 4 && !$r['semPpg'], 'reindexar com --ppg completa quem estava sem dados');
 confere($c['0000000000000001']['programa']['ppg'] === 'PROFIAP' && $c['0000000000000002']['programa']['ppg'] === 'PPG em Teste', 'reindexar: programa da lista ou do índice prevalece sobre o --ppg');
 confere(is_file("$tmpR/xml/0000000000000005.xml"), 'reindexar guarda o XML do ZIP pelo ID');
 $r = bb_reindexar(bb_programa('Outro'));
@@ -196,6 +198,13 @@ rmdir("$tmpR/xml");
 array_map('unlink', array_filter(glob("$tmpR/{,.}*", GLOB_BRACE) ?: [], 'is_file'));
 @rmdir($tmpR);
 putenv("BANCAZEN_DADOS=$tmp");
+
+// Cadastro só com arquivos: PPG opcional no envio; substituição pelos PPGs do arquivo.
+confere(bb_programa('', '', '', false)['ppg'] === '', 'programa sem PPG aceito quando não exigido');
+$antesSub = ['A' => ['id' => 'A', 'ppg' => 'PROFIAP'], 'B' => ['id' => 'B', 'ppg' => 'Outro PPG'], 'C' => ['id' => 'C', 'ppg' => 'Profiap ']];
+[$depoisSub, $rSub] = doc_aplicar($antesSub, ['D' => ['id' => 'D', 'ppg' => 'PROFIAP']], true);
+confere(array_keys($depoisSub) === ['B', 'D'] && $rSub['removidos'] === 2, 'substituir troca só a lista dos PPGs presentes no arquivo');
+confere($rel['ppgPadrao'] > 0, 'linhas sem coluna ppg contadas (ficam com o PPG padrão)');
 
 // limpeza
 array_map('unlink', glob("$tmp/xml/*"));
