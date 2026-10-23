@@ -35,10 +35,20 @@ baixar_github() {
 }
 
 # Caminho 2: de dentro do servidor, pela conexão SSH do deploy.
-SSH_OPTS="-i $HOME/.ssh/id_deploy -p ${SSH_PORT:-22} -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=30"
+# Uma só conexão para todas as requisições: hospedagens compartilhadas
+# limitam conexões SSH seguidas (o deploy acabou de abrir várias).
+# (Caminho curto: o socket tem limite de 108 bytes.)
+CONTROLE_DIR=$(mktemp -d /tmp/vsite.XXXXXX)
+CONTROLE="$CONTROLE_DIR/%C"
+SSH_OPTS="-i $HOME/.ssh/id_deploy -p ${SSH_PORT:-22} -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=30 -o ControlMaster=auto -o ControlPath=$CONTROLE -o ControlPersist=120"
 tem_ssh() { [ -n "${SSH_HOST:-}" ] && [ -n "${SSH_USER:-}" ] && [ -f "$HOME/.ssh/id_deploy" ]; }
 NOTA=$(mktemp)
-trap 'rm -f "$RESP" "$NOTA"' EXIT
+encerrar() {
+  rm -f "$RESP" "$NOTA"
+  if tem_ssh; then ssh $SSH_OPTS -O exit "${SSH_USER}@${SSH_HOST}" >/dev/null 2>&1 || true; fi
+  rm -rf "$CONTROLE_DIR"
+}
+trap encerrar EXIT
 baixar_servidor() {
   # O servidor imprime o código na 1ª linha, um diagnóstico na 2ª e, em
   # seguida, até 4 KB do corpo. Códigos especiais: sem-curl e ssh (a conexão
