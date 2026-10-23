@@ -263,7 +263,16 @@ html.tz-theme .passo { background: var(--tz-accent); color: var(--tz-bg); }
 .doc-tabela th { background: #f2f2f2; }
 .doc-tabela .doc-num { text-align: right; white-space: nowrap; }
 .doc-escolhida td { font-weight: 700; }
-.doc-escolhidas { margin: 0 0 1rem 1.25rem; padding: 0; }
+.doc-identificacao { display: grid; grid-template-columns: max-content 1fr; gap: .15rem .75rem; margin: 0 0 1rem; }
+.doc-identificacao dt { font-weight: 700; }
+.doc-identificacao dd { margin: 0; }
+.doc-escolhidas { border: 1.5px solid #111; border-radius: .25rem; padding: .75rem 1rem; margin: 1.25rem 0; }
+.doc-escolhidas .doc-subtitulo { margin-top: 0; }
+.doc-escolhidas ol { margin: 0 0 0 1.25rem; padding: 0; font-size: 12.5pt; }
+.doc-escolhidas li { margin: .25rem 0; }
+.doc-papel { display: inline-block; margin-left: .5rem; padding: 0 .4rem; border: 1px solid #555; border-radius: .2rem; font-size: 9.5pt; }
+.doc-anexo { margin-top: 1.5rem; }
+.doc-tabela, .doc-escolhidas, .doc-assinaturas { break-inside: avoid; }
 .doc-local { margin-top: 1.5rem !important; text-align: right !important; }
 .doc-assinaturas { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-around; margin: 2.5rem 0 1.5rem; text-align: center; }
 .doc-assinaturas > div { min-width: 14rem; }

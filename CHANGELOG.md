@@ -7,6 +7,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- Relatório: novo texto (processo objetivo com a ferramenta bancaZen, com
+  autoria e endereço; método e critérios da busca; critérios éticos com o
+  número de pessoas retiradas e a declaração de ausência de vínculo);
+  identificação em bloco; membros externos escolhidos em destaque, com o
+  papel e sem repetir o índice; tabelas das indicações no final, depois das
+  assinaturas. Sem "Minha orientação", segue o texto de verificação não
+  realizada. [issue #67](../../issues/67)
+
+## [0.0.33] - 2026-10-23
+
 ### Adicionado
 - Seção **Relatório**: a pessoa discente marca as pessoas escolhidas
   (titular ou suplente) entre as indicações e gera a declaração da indicação
