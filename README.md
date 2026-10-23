@@ -15,7 +15,9 @@ mestrado** a partir de currículos Lattes.
 3. A página principal é dividida em seções, com ícones na barra superior:
    **Início** (apresentação e funcionamento), **Minha Dissertação**, **Minha
    orientação**, **Bancas sugeridas** e **Administração**. A pessoa discente
-   informa **título**, **resumo** e **palavras-chave** do trabalho, o próprio
+   informa **nome**, **universidade** (pessoas da mesma instituição são
+   desconsideradas como membro externo), **título**, **resumo** e
+   **palavras-chave** do trabalho, o próprio
    currículo Lattes e o da orientação, e recebe **duas listas de até 10 pessoas** com maior
    proximidade temática, numa escala de **0 a 1**, em ordem decrescente:
    - **Rede PROFIAP** (docentes do PPG PROFIAP);

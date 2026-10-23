@@ -49,7 +49,9 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
 ## Padrões de UI
 - Página principal em seções (abas com ícone na barra superior, nome visível
   a partir de 640px): `#inicio` (apresentação e funcionamento),
-  `#dissertacao`, `#orientacao`, `#bancas` (conferência, critérios, busca e
+  `#dissertacao` (nome e universidade da discente, que preenche o critério
+  de instituição a desconsiderar sem sobrescrever o digitado; título, resumo,
+  palavras-chave; nada disso é gravado no servidor), `#orientacao`, `#bancas` (conferência, critérios, busca e
   listas) e `#administracao` (`js/admin.js`, só consulta o servidor ao abrir).
   O endereço da seção fica na URL; botões `data-ir="<seção>"` trocam de
   seção (`layout.js`). `admin.html` só redireciona para `#administracao`.
