@@ -9,9 +9,14 @@
    PROFIAP ou Externa: bb_programa_efetivo e bb_grupo_do_ppg, em base.php).
 
    Formato aceito (ex.: a planilha "docentes PROFIAP 2025"): CSV separado por
-   ";" ou ",", com ou sem BOM, com cabeçalho. Colunas reconhecidas:
+   ";", "," ou tabulação, com ou sem BOM, com cabeçalho (maiúsculas, acentos,
+   espaços e hífens no nome da coluna não importam). Colunas reconhecidas:
      nome                                    obrigatória
-     lattes_id ou lattes_url (ou lattes)     obrigatória (16 dígitos)
+     lattes_id e/ou lattes_url (ou lattes)   obrigatória: o ID (16 dígitos) ou
+                                             o link http(s)://lattes.cnpq.br/ID;
+                                             com as duas colunas, se divergirem,
+                                             vale o link (o Excel arredonda
+                                             números de 16 dígitos)
      universidade_normalizada ou universidade (ou instituicao)
      categoria_normalizada ou categoria (ou situacao)
      ppg                                     opcional (senão, PROFIAP)
@@ -84,36 +89,63 @@ function doc_ler_csv(string $conteudo, array $padrao): array
     if (!preg_match('//u', $conteudo)) $conteudo = lattes_latin1($conteudo); // planilha salva em Latin-1
     $linhas = preg_split('/\r\n|\r|\n/', $conteudo);
     $cab = array_shift($linhas) ?? '';
-    $sep = substr_count($cab, ';') >= substr_count($cab, ',') ? ';' : ',';
-    $colunas = array_map(fn($c) => sim_sem_acento(trim($c)), str_getcsv($cab, $sep, '"', ''));
+    // Separador mais frequente no cabeçalho (empate: ";").
+    $sep = ';';
+    $max = 0;
+    foreach ([';', ',', "\t"] as $c) {
+        $n = substr_count($cab, $c);
+        if ($n > $max) { $max = $n; $sep = $c; }
+    }
+    // "ID Lattes", "Link do Lattes", "lattes-url" -> id_lattes, link_do_lattes, lattes_url.
+    $colunas = array_map(fn($c) => trim(preg_replace('/[^a-z0-9]+/', '_', sim_sem_acento(trim($c))), '_'), str_getcsv($cab, $sep, '"', ''));
     $col = function (array $nomes) use ($colunas) {
         foreach ($nomes as $n) { $i = array_search($n, $colunas, true); if ($i !== false) return $i; }
         return null;
     };
-    $iNome = $col(['nome', 'docente']);
-    $iLattes = $col(['lattes_id', 'lattes_url', 'lattes', 'id_lattes']);
+    $iNome = $col(['nome', 'docente', 'nome_completo']);
+    // Todas as colunas de Lattes: o link vem antes do número, porque o Excel
+    // arredonda números de 16 dígitos (último dígito vira 0).
+    $iLinks = array_values(array_filter(array_map(fn($n) => $col([$n]), ['lattes_url', 'url_lattes', 'link_lattes', 'link_do_lattes', 'curriculo_lattes', 'lattes']), fn($i) => $i !== null));
+    $iIds = array_values(array_filter(array_map(fn($n) => $col([$n]), ['lattes_id', 'id_lattes', 'id_do_lattes', 'numero_lattes']), fn($i) => $i !== null));
+    $iLattesTodas = array_values(array_unique(array_merge($iLinks, $iIds)));
+    $iLattes = $iLattesTodas[0] ?? null;
     $iUniv = $col(['universidade_normalizada', 'universidade', 'instituicao', 'ies']);
     $iSit = $col(['categoria_normalizada', 'categoria', 'situacao']);
     $iPpg = $col(['ppg', 'programa']);
-    $iEmail = $col(['email', 'e-mail', 'e_mail']);
+    $iEmail = $col(['email', 'e_mail', 'correio_eletronico']);
     if ($iNome === null || $iLattes === null) {
         throw new RuntimeException('o CSV precisa das colunas "nome" e "lattes_id" (ou "lattes_url")');
     }
 
     // Colunas que não são guardadas (ex.: e-mail), informadas no relatório.
-    $usadas = array_filter([$iNome, $iLattes, $iUniv, $iSit, $iPpg, $iEmail], fn($i) => $i !== null);
+    $usadas = array_filter(array_merge([$iNome, $iUniv, $iSit, $iPpg, $iEmail], $iLattesTodas), fn($i) => $i !== null);
     $descartadas = array_values(array_diff_key($colunas, array_flip($usadas)));
 
     $docentes = [];
-    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0, 'exemplos' => 0, 'ppgPadrao' => 0, 'emailInvalido' => 0,
+    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0, 'exemplos' => 0, 'ppgPadrao' => 0, 'emailInvalido' => 0, 'idDivergente' => [], 'idCientifico' => [],
             'colunasDescartadas' => $descartadas];
     foreach ($linhas as $linha) {
         if (trim($linha) === '') continue;
         $c = str_getcsv($linha, $sep, '"', '');
         $rel['linhas']++;
         $nome = doc_capitalizar((string) ($c[$iNome] ?? ''));
-        $id = vinc_id_lattes(preg_match('/\d{16}/', (string) ($c[$iLattes] ?? ''), $m) ? $m[0] : '');
-        if ($id === '') { $rel['semLattes'][] = $nome !== '' ? $nome : "linha {$rel['linhas']}"; continue; }
+        // ID de cada coluna de Lattes: 16 dígitos sozinhos ou no link.
+        $ids = [];
+        $cientifico = false;
+        foreach ($iLattesTodas as $i) {
+            $v = trim((string) ($c[$i] ?? ''));
+            if (preg_match('/(?<!\d)\d{16}(?!\d)/', $v, $m)) $ids[] = $m[0];
+            elseif (preg_match('/^\d+([.,]\d+)?e\+?\d+$/i', $v)) $cientifico = true;
+        }
+        $ids = array_values(array_unique($ids));
+        $rotulo = $nome !== '' ? $nome : "linha {$rel['linhas']}";
+        if (count($ids) > 1) $rel['idDivergente'][] = "$rotulo (" . implode(' x ', $ids) . "; vale {$ids[0]})";
+        $id = vinc_id_lattes($ids[0] ?? '');
+        if ($id === '') {
+            if ($cientifico) $rel['idCientifico'][] = $rotulo;
+            $rel['semLattes'][] = $rotulo;
+            continue;
+        }
         if ($id === DOC_ID_EXEMPLO) { $rel['exemplos']++; continue; } // linha de exemplo do modelo
         $situacao = $iSit !== null ? doc_situacao((string) ($c[$iSit] ?? '')) : '';
         if ($situacao === '') $rel['semSituacao']++;

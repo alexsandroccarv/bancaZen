@@ -363,7 +363,7 @@
                                 </thead>
                                 <tbody>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>nome</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">nome completo</td><td class="py-2">Maria Exemplo da Silva</td></tr>
-                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>lattes_id</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">ID Lattes com 16 dígitos (o link do Lattes também é aceito)</td><td class="py-2 font-mono">1234567890123456</td></tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>lattes_id</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">ID Lattes com 16 dígitos ou o link do Lattes; aceita também a coluna <code>lattes_url</code> (com as duas, se divergirem, vale o link)</td><td class="py-2 font-mono">1234567890123456 ou http://lattes.cnpq.br/1234567890123456</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>universidade</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">instituição do docente no programa</td><td class="py-2">Universidade Federal Exemplo</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>categoria</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">situação no programa: Permanente, Colaborador ou Visitante</td><td class="py-2">Permanente</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, PROFIAP (PROFIAP → Rede PROFIAP; outro → Externa)</td><td class="py-2">PROFIAP</td></tr>
@@ -372,8 +372,9 @@
                             </table>
                         </div>
                         <p class="text-xs text-gray-600 dark:text-gray-400">
-                            Separe as colunas por ponto e vírgula (<code>;</code>) ou vírgula, com o cabeçalho na
-                            primeira linha. No Excel, salve como "CSV UTF-8". As linhas de exemplo do modelo usam o
+                            Separe as colunas por ponto e vírgula (<code>;</code>), vírgula ou tabulação, com o
+                            cabeçalho na primeira linha. No Excel, formate a coluna do ID Lattes como Texto (como
+                            número, o Excel troca o último dígito por 0) e salve como "CSV UTF-8". As linhas de exemplo do modelo usam o
                             ID <code>0000000000000000</code> e são ignoradas na importação. A planilha do PROFIAP
                             (colunas <code>universidade_normalizada</code>, <code>categoria_normalizada</code> e
                             <code>lattes_url</code>) também é aceita sem alterações.
