@@ -113,6 +113,7 @@
                 ${r.exemplos ? `<li>${r.exemplos} linha(s) de exemplo do modelo ignorada(s).</li>` : ''}
                 ${r.semSituacao ? `<li>${r.semSituacao} sem situação no programa reconhecida.</li>` : ''}
                 ${r.ppgPadrao ? `<li>${r.ppgPadrao} linha(s) sem PPG ficaram com PROFIAP.</li>` : ''}
+                ${r.emailInvalido ? `<li>${r.emailInvalido} e-mail(s) inválido(s) ignorado(s).</li>` : ''}
                 ${r.colunasDescartadas.length ? `<li>Colunas não guardadas: ${esc(r.colunasDescartadas.join(', '))}.</li>` : ''}
             </ul>`;
     }
@@ -271,10 +272,10 @@
         const filtro = semAcento($('#docFiltroInput').value);
         const pendentes = $('#docPendentesInput').checked;
         const lista = docentes.filter((d) => (!pendentes || !d.temCurriculo)
-            && (!filtro || semAcento(`${d.nome} ${d.universidade} ${d.ppg} ${BANCAS[d.grupo]} ${d.situacao}`).includes(filtro)));
+            && (!filtro || semAcento(`${d.nome} ${d.universidade} ${d.ppg} ${BANCAS[d.grupo]} ${d.situacao} ${d.email || ''}`).includes(filtro)));
         const tbody = $('#docTabela');
         if (!lista.length) {
-            tbody.innerHTML = `<tr><td colspan="7" class="py-3 text-gray-500 dark:text-gray-400">${docentes.length ? 'Nenhum docente corresponde ao filtro.' : 'Envie um CSV com a lista para vê-la aqui.'}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="py-3 text-gray-500 dark:text-gray-400">${docentes.length ? 'Nenhum docente corresponde ao filtro.' : 'Envie um CSV com a lista para vê-la aqui.'}</td></tr>`;
             return;
         }
         tbody.innerHTML = lista.map((d) => `<tr class="border-b border-gray-200 dark:border-gray-700">
@@ -284,6 +285,7 @@
             <td class="py-2 pr-3">${esc(BANCAS[d.grupo] || '')}</td>
             <td class="py-2 pr-3">${esc(d.situacao) || '—'}</td>
             <td class="py-2 pr-3"><a href="https://lattes.cnpq.br/${esc(d.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline font-mono">${esc(d.id)}</a></td>
+            <td class="py-2 pr-3">${d.email ? `<a href="mailto:${esc(d.email)}" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(d.email)}</a>` : '—'}</td>
             <td class="py-2 whitespace-nowrap">${d.temCurriculo
                 ? '<i aria-hidden="true" class="fa-solid fa-circle-check text-green-700 dark:text-green-400"></i> enviado'
                 : '<i aria-hidden="true" class="fa-regular fa-clock text-gray-500"></i> pendente'}</td>

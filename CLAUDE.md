@@ -27,9 +27,10 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
 - Mesmo ID Lattes no upload: fica o de `DATA-ATUALIZACAO` mais recente.
 - Lista de docentes dos programas (`lib/docentes.php`, `docentes.json` na
   pasta de dados): importada de CSV pela Administração, **nunca versionada**
-  (a planilha do PROFIAP tem e-mails; `.gitignore` bloqueia `*.csv`). Guarda
+  (a planilha tem e-mails; `.gitignore` bloqueia `*.csv`). Guarda
   só nome, universidade, PPG, situação (Permanente/Colaborador/
-  Visitante) e ID Lattes; e-mails e outras colunas são descartados. Quem
+  Visitante), ID Lattes e e-mail (opcional, só na Administração; nunca em
+  `bb_publico`/`buscar.php`); outras colunas são descartadas. Quem
   está na lista tem universidade, PPG e situação da lista
   (`bb_programa_efetivo`); senão, valem os dados gravados com o XML (PPG
   da inclusão pelo servidor ou da correção na tabela; sem instituição, a do

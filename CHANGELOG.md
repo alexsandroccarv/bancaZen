@@ -7,6 +7,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Planilha de docentes: coluna `email` opcional (também no modelo do CSV).
+  O e-mail fica só na lista de docentes, na pasta de dados privada, e
+  aparece só na Administração; e-mail inválido é ignorado e informado. Nunca
+  sai nas sugestões públicas. [issue #35](../../issues/35)
+
+## [0.0.17] - 2026-10-23
+
 ### Alterado
 - "Cadastrar docentes e currículos" só com **Escolher arquivos** e
   **Escolher pasta**: saem os campos PPG, instituição, situação e a opção de

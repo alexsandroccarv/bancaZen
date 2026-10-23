@@ -15,8 +15,10 @@
      universidade_normalizada ou universidade (ou instituicao)
      categoria_normalizada ou categoria (ou situacao)
      ppg                                     opcional (senão, PROFIAP)
-   Qualquer outra coluna, como e-mail, é DESCARTADA: a lista guarda só o que
-   é exibido.
+     email (ou e-mail)                       opcional (inválido é ignorado)
+   Qualquer outra coluna é DESCARTADA. O e-mail fica só na lista (pasta de
+   dados privada) e só aparece na Administração; nunca nas respostas
+   públicas (bb_publico).
    ========================================================================== */
 
 // ID Lattes das linhas de exemplo do modelo: ignorado na importação.
@@ -28,9 +30,9 @@ const DOC_ID_EXEMPLO = '0000000000000000';
 function doc_modelo_csv(): string
 {
     $linhas = [
-        ['nome', 'lattes_id', 'universidade', 'categoria', 'ppg'],
-        ['Maria Exemplo da Silva', DOC_ID_EXEMPLO, 'Universidade Federal Exemplo', 'Permanente', 'PROFIAP'],
-        ['João Modelo Pereira', DOC_ID_EXEMPLO, 'Universidade Estadual Modelo', 'Colaborador', 'PROFIAP'],
+        ['nome', 'lattes_id', 'universidade', 'categoria', 'ppg', 'email'],
+        ['Maria Exemplo da Silva', DOC_ID_EXEMPLO, 'Universidade Federal Exemplo', 'Permanente', 'PROFIAP', 'maria@exemplo.br'],
+        ['João Modelo Pereira', DOC_ID_EXEMPLO, 'Universidade Estadual Modelo', 'Colaborador', 'PROFIAP', ''],
     ];
     return "\xEF\xBB\xBF" . implode("\r\n", array_map(fn($l) => implode(';', $l), $linhas)) . "\r\n";
 }
@@ -62,7 +64,7 @@ function doc_situacao(string $s): string
 }
 
 // Entre dois registros da mesma pessoa, fica o de maior prioridade; o nome
-// com acentuação (mais informativo) é preferido.
+// com acentuação (mais informativo) é preferido; sem e-mail, vale o do outro.
 function doc_mesclar(array $a, array $b): array
 {
     $pa = DOC_PRIORIDADE[$a['situacao']] ?? 0;
@@ -70,6 +72,7 @@ function doc_mesclar(array $a, array $b): array
     $m = $pb > $pa ? $b : $a;
     $acentos = fn($n) => strlen($n) - strlen(sim_sem_acento($n));
     $m['nome'] = $acentos($b['nome']) > $acentos($a['nome']) ? $b['nome'] : $a['nome'];
+    if (($m['email'] ?? '') === '') $m['email'] = ($a['email'] ?? '') !== '' ? $a['email'] : ($b['email'] ?? '');
     return $m;
 }
 
@@ -92,16 +95,17 @@ function doc_ler_csv(string $conteudo, array $padrao): array
     $iUniv = $col(['universidade_normalizada', 'universidade', 'instituicao', 'ies']);
     $iSit = $col(['categoria_normalizada', 'categoria', 'situacao']);
     $iPpg = $col(['ppg', 'programa']);
+    $iEmail = $col(['email', 'e-mail', 'e_mail']);
     if ($iNome === null || $iLattes === null) {
         throw new RuntimeException('o CSV precisa das colunas "nome" e "lattes_id" (ou "lattes_url")');
     }
 
     // Colunas que não são guardadas (ex.: e-mail), informadas no relatório.
-    $usadas = array_filter([$iNome, $iLattes, $iUniv, $iSit, $iPpg], fn($i) => $i !== null);
+    $usadas = array_filter([$iNome, $iLattes, $iUniv, $iSit, $iPpg, $iEmail], fn($i) => $i !== null);
     $descartadas = array_values(array_diff_key($colunas, array_flip($usadas)));
 
     $docentes = [];
-    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0, 'exemplos' => 0, 'ppgPadrao' => 0,
+    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0, 'exemplos' => 0, 'ppgPadrao' => 0, 'emailInvalido' => 0,
             'colunasDescartadas' => $descartadas];
     foreach ($linhas as $linha) {
         if (trim($linha) === '') continue;
@@ -115,10 +119,12 @@ function doc_ler_csv(string $conteudo, array $padrao): array
         if ($situacao === '') $rel['semSituacao']++;
         $ppg = $iPpg !== null ? trim((string) ($c[$iPpg] ?? '')) : '';
         if ($ppg === '') $rel['ppgPadrao']++;
+        $email = $iEmail !== null ? strtolower(trim((string) ($c[$iEmail] ?? ''))) : '';
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) { $rel['emailInvalido']++; $email = ''; }
         $d = [
             'id' => $id, 'nome' => $nome,
             'universidade' => $iUniv !== null ? doc_capitalizar((string) ($c[$iUniv] ?? '')) : '',
-            'ppg' => $ppg !== '' ? $ppg : $padrao['ppg'], 'situacao' => $situacao,
+            'ppg' => $ppg !== '' ? $ppg : $padrao['ppg'], 'situacao' => $situacao, 'email' => $email,
         ];
         if (isset($docentes[$id])) { $rel['duplicados']++; $docentes[$id] = doc_mesclar($docentes[$id], $d); }
         else $docentes[$id] = $d;

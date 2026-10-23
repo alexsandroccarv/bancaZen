@@ -340,7 +340,7 @@
                     </p>
                     <form id="envioForm" class="space-y-4">
                         <ul class="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
-                            <li>CSV: cada linha é um docente, com universidade, categoria e PPG (linha sem PPG fica com PROFIAP). A planilha substitui a lista anterior de cada PPG que traz: quem não está nela sai da lista. E-mails e outras colunas são descartados.</li>
+                            <li>CSV: cada linha é um docente, com universidade, categoria e PPG (linha sem PPG fica com PROFIAP). E-mail opcional. A planilha substitui a lista anterior de cada PPG que traz: quem não está nela sai da lista. Outras colunas são descartadas.</li>
                             <li>XML/ZIP: currículo de quem não está na planilha fica guardado sem dados e fora da busca, até a planilha trazer a pessoa. Mesmo ID Lattes: fica o de atualização mais recente.</li>
                         </ul>
                     <details class="space-y-2">
@@ -366,7 +366,8 @@
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>lattes_id</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">ID Lattes com 16 dígitos (o link do Lattes também é aceito)</td><td class="py-2 font-mono">1234567890123456</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>universidade</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">instituição do docente no programa</td><td class="py-2">Universidade Federal Exemplo</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>categoria</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">situação no programa: Permanente, Colaborador ou Visitante</td><td class="py-2">Permanente</td></tr>
-                                    <tr><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, vale o PPG do formulário (PROFIAP → Rede PROFIAP; outro → Externa)</td><td class="py-2">PROFIAP</td></tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, PROFIAP (PROFIAP → Rede PROFIAP; outro → Externa)</td><td class="py-2">PROFIAP</td></tr>
+                                    <tr><td class="py-2 pr-3"><code>email</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">e-mail de contato; fica só na Administração, nunca nas sugestões públicas</td><td class="py-2">maria@exemplo.br</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -468,7 +469,7 @@
                         <p id="docTotais" class="text-sm font-medium"></p>
                         <div class="flex flex-wrap gap-2 items-center">
                             <label for="docFiltroInput" class="sr-only">Filtrar docentes</label>
-                            <input id="docFiltroInput" type="search" placeholder="Filtrar por nome, universidade, PPG ou situação" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 sm:flex-1">
+                            <input id="docFiltroInput" type="search" placeholder="Filtrar por nome, universidade, PPG, situação ou e-mail" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 sm:flex-1">
                             <label class="flex items-center gap-2 text-sm whitespace-nowrap"><input id="docPendentesInput" type="checkbox"> Só sem currículo</label>
                         </div>
                         <div class="overflow-x-auto max-h-[32rem] overflow-y-auto scroll-area">
@@ -482,6 +483,7 @@
                                         <th scope="col" class="py-2 pr-3">Banca</th>
                                         <th scope="col" class="py-2 pr-3">Situação</th>
                                         <th scope="col" class="py-2 pr-3">Lattes</th>
+                                        <th scope="col" class="py-2 pr-3">E-mail</th>
                                         <th scope="col" class="py-2">Currículo</th>
                                     </tr>
                                 </thead>
