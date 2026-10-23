@@ -428,31 +428,10 @@
                         repetido sempre que novos arquivos forem copiados.
                     </p>
                     <form id="reForm" class="space-y-4">
-                        <div class="grid gap-4 sm:grid-cols-3">
-                            <div>
-                                <label for="rePpgInput" class="block text-sm font-medium mb-1">PPG <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
-                                <datalist id="ppgLista"></datalist>
-                                <datalist id="instLista"></datalist>
-                                <input id="rePpgInput" type="text" list="ppgLista" placeholder="PROFIAP" aria-describedby="reAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                            </div>
-                            <div>
-                                <label for="reInstInput" class="block text-sm font-medium mb-1">Instituição <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
-                                <input id="reInstInput" type="text" list="instLista" aria-describedby="reAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                            </div>
-                            <div>
-                                <label for="reSituacaoInput" class="block text-sm font-medium mb-1">Situação no programa <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
-                                <select id="reSituacaoInput" aria-describedby="reAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                    <option value="">Não informada</option>
-                                    <option>Permanente</option>
-                                    <option>Colaborador</option>
-                                    <option>Visitante</option>
-                                </select>
-                            </div>
-                        </div>
-                        <p id="reAjuda" class="text-xs text-gray-600 dark:text-gray-400">
-                            O programa de cada pessoa vem da planilha de docentes ou do que já está cadastrado. Os campos
-                            acima valem só para as demais; sem PPG, elas ficam guardadas sem dados (fora da busca) e são
-                            listadas.
+                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                            Universidade, PPG e situação de cada pessoa vêm da planilha de docentes (ou do que já estava
+                            cadastrado). Quem não está na planilha fica guardado sem dados, fora da busca, e aparece na
+                            conferência até a planilha trazê-lo.
                         </p>
                         <label class="flex items-center gap-2 text-sm">
                             <input id="reOrganizarInput" type="checkbox"> Depois de incluir, apagar as cópias com outro nome (cada currículo fica guardado como <code>&lt;ID Lattes&gt;.xml</code>)
@@ -463,6 +442,8 @@
                         </div>
                     </form>
                     <div id="reRelatorio" class="text-sm space-y-2" aria-live="polite"></div>
+                    <datalist id="ppgLista"></datalist>
+                    <datalist id="instLista"></datalist>
                 </section>
 
                 <section aria-labelledby="docentesTitulo">

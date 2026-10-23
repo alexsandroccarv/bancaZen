@@ -238,7 +238,8 @@ O índice da busca (`corpus.json`) é montado quando os currículos são enviado
 pela Administração. XMLs ou ZIPs copiados direto para `<dados>/xml/` só
 entram na busca depois de incluídos: na **Administração**, seção "Currículos
 guardados no servidor" (botões **Simular** e **Incluir na busca**, em lotes
-de 25 arquivos), ou por este comando, no servidor, na pasta do site:
+de 25 arquivos; os dados de cada pessoa vêm só da planilha de docentes), ou
+por este comando, no servidor, na pasta do site:
 
 ```bash
 cd ~/public_html/labs/bancaZen
@@ -248,9 +249,9 @@ BANCAZEN_DADOS=~/dados/bancaZen php api/cli/reindexar.php --ppg=PROFIAP
 
 - `--simular` mostra o resultado sem gravar.
 - O programa de cada pessoa vem do índice (se já estava nele) ou da lista de
-  docentes; `--ppg` (com `--instituicao` e `--situacao`, opcionais) vale para
-  as demais. Sem `--ppg`, elas ficam de fora e são listadas: importe antes a
-  lista de docentes do programa ou rode com `--ppg`.
+  docentes; `--ppg` (com `--instituicao` e `--situacao`, opcionais, só no
+  comando) vale para as demais. Sem `--ppg`, elas são guardadas sem dados,
+  fora da busca, e listadas, até a planilha trazê-las.
 - Mesmo ID Lattes: fica o de `DATA-ATUALIZACAO` mais recente.
 - Cada currículo é gravado como `<ID>.xml`. Os arquivos originais com outro
   nome continuam lá; `--organizar` apaga essas cópias depois de gravadas.
