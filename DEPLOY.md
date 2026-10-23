@@ -232,6 +232,33 @@ Só o hash (`password_hash`) é gravado em `bancazen-dados/admin.json`.
 
 ---
 
+## Currículos copiados direto para o servidor (rsync, FTP)
+
+O índice da busca (`corpus.json`) é montado quando os currículos são enviados
+pela Administração. XMLs ou ZIPs copiados direto para `<dados>/xml/` só
+entram na busca depois deste comando, no servidor, na pasta do site:
+
+```bash
+cd ~/public_html/labs/bancaZen
+BANCAZEN_DADOS=~/dados/bancaZen php api/cli/reindexar.php --simular
+BANCAZEN_DADOS=~/dados/bancaZen php api/cli/reindexar.php --ppg=PROFIAP
+```
+
+- `--simular` mostra o resultado sem gravar.
+- O programa de cada pessoa vem do índice (se já estava nele) ou da lista de
+  docentes; `--ppg` (com `--instituicao` e `--situacao`, opcionais) vale para
+  as demais. Sem `--ppg`, elas ficam de fora e são listadas: importe antes a
+  lista de docentes do programa ou rode com `--ppg`.
+- Mesmo ID Lattes: fica o de `DATA-ATUALIZACAO` mais recente.
+- Cada currículo é gravado como `<ID>.xml`. Os arquivos originais com outro
+  nome continuam lá; `--organizar` apaga essas cópias depois de gravadas.
+- Pode ser repetido (por exemplo, depois de copiar novos XMLs).
+
+O comando lê `BANCAZEN_DADOS` do ambiente; sem ela, usa a pasta gravada no
+build (`api/lib/config-dados.php`), a mesma do site.
+
+---
+
 ## Backend: bloqueios e limites
 
 **Bloquear `api/lib` e `api/cli`.** No Apache o `api/.htaccess` já faz isso

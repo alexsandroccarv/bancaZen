@@ -7,6 +7,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Comando `php api/cli/reindexar.php`, no servidor: monta ou completa o índice
+  da busca a partir dos XML/ZIP copiados direto para a pasta de dados (rsync,
+  FTP), com a regra do mesmo ID. O programa vem do índice, da lista de
+  docentes ou de `--ppg`; `--simular` mostra sem gravar e `--organizar` apaga
+  as cópias com outro nome depois de gravadas. [issue #29](../../issues/29)
+
+## [0.0.14] - 2026-10-23
+
 ### Corrigido
 - Verificação do site a partir do servidor: todas as requisições usam uma só
   conexão SSH, porque a hospedagem recusa conexões seguidas. DEPLOY.md explica

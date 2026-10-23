@@ -159,6 +159,38 @@ confere(bb_publico($antigo)['universidade'] === 'Inst. do Lattes', 'sem institui
 $docAntigo = ['0000000000000002' => ['id' => '0000000000000002', 'nome' => 'X', 'universidade' => 'U', 'ppg' => 'PPG Y', 'grupo' => 'profiap', 'situacao' => '']];
 confere(bb_grupo($antigo, $docAntigo) === 'outro', 'lista de docentes antiga com "grupo": vale o PPG da lista');
 
+// Índice montado a partir dos XMLs copiados direto para <dados>/xml/ (rsync).
+$tmpR = sys_get_temp_dir() . '/bb-reindex-' . bin2hex(random_bytes(4));
+putenv("BANCAZEN_DADOS=$tmpR");
+mkdir("$tmpR/xml", 0750, true);
+foreach (['curriculo-1.xml' => 'a.xml', 'curriculo-2.xml' => 'b.XML', 'curriculo-3.xml' => 'c.xml', 'curriculo-5.zip' => 'd.zip'] as $de => $para) copy(__DIR__ . "/fixtures/$de", "$tmpR/xml/$para");
+file_put_contents("$tmpR/xml/leia-me.txt", 'ignorado');
+file_put_contents("$tmpR/xml/quebrado.xml", '<nada/>');
+bb_alterar_docentes(fn($d) => [['0000000000000001' => ['id' => '0000000000000001', 'nome' => 'Ana', 'universidade' => 'Univ. da Lista', 'ppg' => 'PROFIAP', 'situacao' => 'Permanente']], null]);
+$sim = bb_reindexar(null, true);
+confere($sim['arquivos'] === 5 && $sim['novo'] === 1 && count($sim['semPpg']) === 3, 'reindexar simulado: só quem está na lista entra sem --ppg');
+confere(count($sim['erros']) === 1 && !is_file("$tmpR/corpus.json"), 'reindexar simulado: erro do arquivo inválido e nada gravado');
+$r = bb_reindexar(null);
+confere($r['novo'] === 1 && $r['total'] === 1, 'reindexar sem --ppg grava só quem está na lista');
+$r = bb_reindexar(bb_programa('PPG em Teste', 'Univ. Padrão'));
+$c = bb_carregar_corpus();
+confere($r['novo'] === 3 && $r['total'] === 4 && !$r['semPpg'], 'reindexar com --ppg inclui os demais');
+confere($c['0000000000000001']['programa']['ppg'] === 'PROFIAP' && $c['0000000000000002']['programa']['ppg'] === 'PPG em Teste', 'reindexar: programa da lista ou do índice prevalece sobre o --ppg');
+confere(is_file("$tmpR/xml/0000000000000005.xml"), 'reindexar guarda o XML do ZIP pelo ID');
+$r = bb_reindexar(bb_programa('Outro'));
+confere($r['total'] === 4 && $r['novo'] === 0 && bb_carregar_corpus()['0000000000000002']['programa']['ppg'] === 'PPG em Teste', 'reindexar de novo não duplica nem troca o programa');
+confere(count($r['comOutroNome']) === 4 && $r['organizados'] === 0 && is_file("$tmpR/xml/a.xml"), 'reindexar aponta as cópias com outro nome sem apagá-las');
+$r = bb_reindexar(null, false, true);
+$resta = array_map('basename', glob("$tmpR/xml/*"));
+sort($resta);
+confere($r['organizados'] === 4 && $resta === ['0000000000000001.xml', '0000000000000002.xml', '0000000000000003.xml', '0000000000000005.xml', 'leia-me.txt', 'quebrado.xml'], 'reindexar --organizar apaga só as cópias já gravadas');
+confere(bb_reindexar(null)['total'] === 4, 'índice intacto depois de organizar');
+array_map('unlink', glob("$tmpR/xml/*"));
+rmdir("$tmpR/xml");
+array_map('unlink', array_filter(glob("$tmpR/{,.}*", GLOB_BRACE) ?: [], 'is_file'));
+@rmdir($tmpR);
+putenv("BANCAZEN_DADOS=$tmp");
+
 // limpeza
 array_map('unlink', glob("$tmp/xml/*"));
 rmdir("$tmp/xml");
