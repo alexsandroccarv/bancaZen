@@ -7,6 +7,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Corrigido
+- Planilha de docentes: o ID Lattes é lido como número
+  (`1533188485721174`) ou link (`http://lattes.cnpq.br/1533188485721174`,
+  também `https`, `www`, barra final e espaços), em qualquer coluna de Lattes
+  (`lattes_id`, `lattes_url`, "ID Lattes", "Link do Lattes"...). Com as duas
+  colunas, se divergirem, vale o link, e a divergência é informada; IDs em
+  notação científica do Excel são apontados; número com mais de 16 dígitos
+  não é recortado. CSV separado por tabulação também é aceito.
+  [issue #43](../../issues/43)
+
+## [0.0.21] - 2026-10-23
+
 ### Adicionado
 - Administração: seção **Zona de risco** para limpar a base de dados.
   Escolha entre apagar os currículos (índice e todos os arquivos de `xml/`)

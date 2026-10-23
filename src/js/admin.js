@@ -114,6 +114,8 @@
                 ${r.semSituacao ? `<li>${r.semSituacao} sem situação no programa reconhecida.</li>` : ''}
                 ${r.ppgPadrao ? `<li>${r.ppgPadrao} linha(s) sem PPG ficaram com PROFIAP.</li>` : ''}
                 ${r.emailInvalido ? `<li>${r.emailInvalido} e-mail(s) inválido(s) ignorado(s).</li>` : ''}
+                ${r.idCientifico && r.idCientifico.length ? `<li>ID Lattes em notação científica do Excel (ex.: 1,53319E+15), sem como recuperar: ${esc(r.idCientifico.join('; '))}. Formate a coluna como Texto ou use o link do Lattes.</li>` : ''}
+                ${r.idDivergente && r.idDivergente.length ? `<li>ID diferente entre o número e o link do Lattes (vale o link, porque o Excel arredonda números de 16 dígitos): ${esc(r.idDivergente.join('; '))}.</li>` : ''}
                 ${r.colunasDescartadas.length ? `<li>Colunas não guardadas: ${esc(r.colunasDescartadas.join(', '))}.</li>` : ''}
             </ul>`;
     }

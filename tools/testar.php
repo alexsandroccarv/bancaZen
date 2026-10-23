@@ -233,6 +233,26 @@ confere(lattes_ler_arquivo('a.xml', $comNs)[0]['pessoa']['id'] === '000000000000
 confere(lattes_ler_arquivo('a.xml', gzencode($cv1))[0]['pessoa']['id'] === '0000000000000001', 'XML compactado com gzip');
 confere(lattes_ler_arquivo('a.xml', chunk_split(base64_encode(file_get_contents("$dir/curriculo-5.zip")), 76))[0]['pessoa']['id'] === '0000000000000005', 'ZIP em base64 com extensão .xml');
 
+// ID Lattes na planilha: número ou link, cabeçalhos variados, tabulação.
+$csvIds = "Nome;ID Lattes\n"
+    . "Pessoa Numero;1533188485721174\n"
+    . "Pessoa Link Http;http://lattes.cnpq.br/1533188485721175\n"
+    . "Pessoa Link Https;https://lattes.cnpq.br/1533188485721176/\n"
+    . "Pessoa Link Www; http://www.lattes.cnpq.br/1533188485721177 \n"
+    . "Pessoa Longa;15331884857211780\n"
+    . "Pessoa Cientifica;1,53319E+15\n";
+[$dIds, $rIds] = doc_ler_csv($csvIds, ['ppg' => 'PROFIAP']);
+confere(array_map('strval', array_keys($dIds)) === ['1533188485721174', '1533188485721175', '1533188485721176', '1533188485721177'], 'ID Lattes como número ou link (http, https, www, barra final, espaços)');
+confere(in_array('Pessoa Longa', $rIds['semLattes'], true) && $rIds['idCientifico'] === ['Pessoa Cientifica'], 'número com mais de 16 dígitos não é recortado; notação científica informada');
+$csvDuas = "nome\tlattes_id\tLink do Lattes\n"
+    . "Igual\t1533188485721174\thttp://lattes.cnpq.br/1533188485721174\n"
+    . "Arredondado\t1533188485721170\thttp://lattes.cnpq.br/1533188485721179\n"
+    . "So Numero\t1533188485721171\t\n"
+    . "So Link\t\thttp://lattes.cnpq.br/1533188485721172\n";
+[$dDuas, $rDuas] = doc_ler_csv($csvDuas, ['ppg' => 'PROFIAP']);
+confere(array_map('strval', array_keys($dDuas)) === ['1533188485721174', '1533188485721179', '1533188485721171', '1533188485721172'], 'CSV com tabulação e duas colunas de Lattes: vale o link');
+confere(count($rDuas['idDivergente']) === 1 && str_contains($rDuas['idDivergente'][0], 'Arredondado') && !$rDuas['colunasDescartadas'], 'divergência entre número e link informada; colunas de Lattes não descartadas');
+
 // limpeza
 array_map('unlink', glob("$tmp/xml/*"));
 rmdir("$tmp/xml");
