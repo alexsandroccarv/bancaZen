@@ -8,6 +8,23 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- Minha Dissertação: o Lattes da pessoa discente fica logo abaixo de "Meu
+  nome"; "Minha universidade" vira caixa de seleção com as universidades da
+  base (planilha de docentes e currículos, pelo endpoint público
+  `api/universidades.php`) e a opção "Outra (digitar)"; em orientação e
+  coorientação, o nome vem antes do Lattes. [issue #61](../../issues/61)
+
+### Adicionado
+- Conformidade ética só pelo nome: sem currículo, o nome da pessoa
+  discente, do(a) orientador(a) ou do(a) coorientador(a) é procurado nas
+  coautorias e orientações de cada pessoa indicada; o resultado diz quando a
+  verificação foi só pelo nome. Currículo informado por link/ID é aceito
+  mesmo sem dados de programa. Os nomes da orientação entram no JSON
+  exportado. [issue #61](../../issues/61)
+
+## [0.0.30] - 2026-10-23
+
+### Alterado
 - "Minha orientação" passa a ser um trecho de "Minha Dissertação", e a aba
   própria sai da barra superior; links antigos (`#orientacao`) e os botões
   que levavam até ela abrem "Minha Dissertação" no trecho da orientação.

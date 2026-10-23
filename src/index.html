@@ -180,16 +180,33 @@
                 </div>
                 <p id="jsonStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">Quanto mais completos o resumo e as palavras-chave, melhor a comparação com os currículos.</p>
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div>
-                        <label for="nomeInput" class="block text-sm font-medium mb-1">Meu nome</label>
-                        <input id="nomeInput" type="text" autocomplete="name" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                <div>
+                    <label for="nomeInput" class="block text-sm font-medium mb-1">Meu nome</label>
+                    <input id="nomeInput" type="text" autocomplete="name" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                </div>
+                <div class="envolvido space-y-1" data-papel="discente">
+                    <p class="text-sm font-medium" id="discenteRotulo">Meu currículo Lattes <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional, para a conformidade ética)</span></p>
+                    <div class="grid gap-2 sm:grid-cols-2">
+                        <div>
+                            <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
+                            <input id="discenteArquivo" type="file" accept=".xml,.zip" aria-describedby="discenteRotulo discenteStatus" class="block w-full text-sm">
+                        </div>
+                        <div>
+                            <label for="discenteId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
+                            <input id="discenteId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="discenteRotulo discenteStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
                     </div>
-                    <div>
-                        <label for="universidadeInput" class="block text-sm font-medium mb-1">Minha universidade</label>
-                        <input id="universidadeInput" type="text" autocomplete="organization" aria-describedby="universidadeAjuda" placeholder="Ex.: Universidade Federal de São Paulo" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                        <p id="universidadeAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Pessoas desta instituição são desconsideradas como membro externo (critério ajustável em Bancas sugeridas).</p>
-                    </div>
+                    <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
+                </div>
+                <div>
+                    <label for="universidadeInput" class="block text-sm font-medium mb-1">Minha universidade</label>
+                    <select id="universidadeInput" aria-describedby="universidadeAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        <option value="">Selecione…</option>
+                        <option value="__outra__">Outra (digitar)</option>
+                    </select>
+                    <label for="universidadeOutraInput" class="sr-only">Nome da universidade</label>
+                    <input id="universidadeOutraInput" type="text" autocomplete="organization" placeholder="Digite o nome da universidade" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 mt-2" hidden>
+                    <p id="universidadeAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Pessoas desta instituição são desconsideradas como membro externo (critério ajustável em Bancas sugeridas).</p>
                 </div>
                     <div>
                         <label for="tituloInput" class="block text-sm font-medium mb-1">Título do trabalho</label>
@@ -207,29 +224,20 @@
                 <section id="orientacao" class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700" aria-labelledby="orientacaoTitulo">
                     <h3 id="orientacaoTitulo" class="text-base font-bold">Minha orientação <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Recomendada. Informe o currículo Lattes da pessoa discente e da orientação: eles são usados
-                        para retirar das sugestões quem tem coautoria em publicações ou relação de orientação com
-                        alguma dessas pessoas (conformidade ética). Sem eles, a busca funciona, mas o resultado avisa
-                        que os vínculos não foram verificados. Os arquivos enviados aqui são usados só na consulta e
-                        não são guardados.
+                        Recomendada. Informe o nome e o currículo Lattes da orientação (o seu fica logo abaixo de
+                        "Meu nome"): eles são usados para retirar das sugestões quem tem coautoria em publicações ou
+                        relação de orientação com alguma dessas pessoas (conformidade ética). Só com o nome, a
+                        verificação é parcial: procura o nome nas coautorias e orientações de cada pessoa indicada.
+                        Sem nome nem currículo, a busca funciona, mas o resultado avisa que os vínculos não foram
+                        verificados. Os arquivos enviados aqui são usados só na consulta e não são guardados.
                     </p>
                 <div class="space-y-4">
-                            <div class="envolvido space-y-1" data-papel="discente">
-                                <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
-                                <div class="grid gap-2 sm:grid-cols-2">
-                                    <div>
-                                        <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
-                                        <input id="discenteArquivo" type="file" accept=".xml,.zip" aria-describedby="discenteRotulo discenteStatus" class="block w-full text-sm">
-                                    </div>
-                                    <div>
-                                        <label for="discenteId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
-                                        <input id="discenteId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="discenteRotulo discenteStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                    </div>
-                                </div>
-                                <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                            </div>
                             <div class="envolvido space-y-1" data-papel="orientador">
                                 <p class="text-sm font-medium" id="orientadorRotulo">Orientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                                <div>
+                                    <label for="orientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome do(a) orientador(a)</label>
+                                    <input id="orientadorNome" type="text" autocomplete="off" aria-describedby="orientadorRotulo orientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                </div>
                                 <div class="grid gap-2 sm:grid-cols-2">
                                     <div>
                                         <label for="orientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
@@ -244,6 +252,10 @@
                             </div>
                             <div class="envolvido space-y-1" data-papel="coorientador">
                                 <p class="text-sm font-medium" id="coorientadorRotulo">Coorientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                                <div>
+                                    <label for="coorientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome do(a) coorientador(a)</label>
+                                    <input id="coorientadorNome" type="text" autocomplete="off" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                </div>
                                 <div class="grid gap-2 sm:grid-cols-2">
                                     <div>
                                         <label for="coorientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>

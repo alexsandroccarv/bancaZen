@@ -80,11 +80,15 @@
 
     /* --------------------------- conferência ------------------------------ */
     // O que já foi informado nas seções 2 e 3, mostrado antes da busca.
+    // Nome de cada envolvida: o da discente é "Meu nome".
+    const nomeEnvolvido = (k) => $(k === 'discente' ? '#nomeInput' : `#${k}Nome`).value.trim();
     function situacaoEnvolvido(k) {
         const arq = $(`#${k}Arquivo`).files[0];
         if (arq) return { ok: true, texto: `arquivo ${arq.name}` };
         const id = ($(`#${k}Id`).value.match(/\d{16}/) || [])[0];
         if (id) return { ok: true, texto: `Lattes ${id}` };
+        const nome = nomeEnvolvido(k);
+        if (nome) return { ok: true, texto: `só o nome, ${nome} (verificação parcial)` };
         return { ok: false, texto: PAPEIS[k].obrigatorio ? 'falta informar' : 'não informado (opcional)' };
     }
     function dissertacaoPreenchida() {
@@ -92,14 +96,14 @@
     }
     // Nome e universidade da pessoa discente ficam só no navegador.
     function discente() {
-        return { nome: $('#nomeInput').value.trim(), universidade: $('#universidadeInput').value.trim() };
+        return { nome: $('#nomeInput').value.trim(), universidade: valorUniversidade() };
     }
     // A universidade da pessoa discente preenche o critério "Desconsiderar
     // pessoas desta instituição", sem sobrescrever o que ela digitou lá.
     let excluirAutomatico = '';
     function sincronizarExcluir() {
         const campo = $('#excluirInput');
-        const univ = $('#universidadeInput').value.trim();
+        const univ = valorUniversidade();
         if (campo.value.trim() === '' || campo.value === excluirAutomatico) {
             campo.value = univ;
             excluirAutomatico = univ;
@@ -154,6 +158,7 @@
             const arq = $(`#${k}Arquivo`).files[0];
             if (arq) fd.append(`${k}Arquivo`, arq);
             fd.append(`${k}Id`, $(`#${k}Id`).value);
+            fd.append(`${k}Nome`, nomeEnvolvido(k));
         }
 
         const btn = $('#buscarBtn');
@@ -170,7 +175,8 @@
                 return;
             }
             for (const k of ENVOLVIDOS) {
-                $(`#${k}Status`).textContent = dados.envolvidos && dados.envolvidos[k] ? `Currículo considerado: ${dados.envolvidos[k]}.` : '';
+                const e = dados.envolvidos && dados.envolvidos[k];
+                $(`#${k}Status`).textContent = !e ? '' : (e.soNome ? `Considerado só pelo nome: ${e.nome}.` : `Currículo considerado: ${e}.`);
             }
             renderListas(dados.listas || []);
             renderConformidade(dados.conformidade, dados.listas || []);
@@ -262,7 +268,7 @@
         const retirados = listas.reduce((n, l) => n + (l.retirados || []).length, 0);
         const pessoas = considerados.map((p) => `<li><span class="font-medium">${esc(p.papel)}:</span> ${p.id
             ? `<a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(p.nome)}</a>`
-            : esc(p.nome)}</li>`).join('');
+            : esc(p.nome)}${p.soNome ? ' <span class="text-gray-600 dark:text-gray-400">(só pelo nome: sem o currículo, as produções desta pessoa não foram conferidas)</span>' : ''}</li>`).join('');
         caixa.innerHTML = `<div class="rounded-lg border border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800 p-4 space-y-2">
             <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Conformidade ética verificada</h4>
             <p class="text-sm">Vínculos (coautoria, orientação ou mesma pessoa) conferidos com os currículos de:</p>
@@ -296,13 +302,63 @@
         sec.focus();
     }
 
+    /* ------------------------- Minha universidade -------------------------- */
+    // Caixa de seleção com as universidades da base (api/universidades.php) e
+    // "Outra (digitar)", que mostra um campo de texto.
+    const OUTRA = '__outra__';
+    let universidadePendente = null; // valor importado antes de a lista chegar
+    function valorUniversidade() {
+        const sel = $('#universidadeInput');
+        return sel.value === OUTRA ? $('#universidadeOutraInput').value.trim() : sel.value.trim();
+    }
+    function mostrarOutra() {
+        $('#universidadeOutraInput').hidden = $('#universidadeInput').value !== OUTRA;
+    }
+    function definirUniversidade(v) {
+        const sel = $('#universidadeInput');
+        v = String(v || '').trim();
+        const opcao = [...sel.options].find((o) => o.value !== OUTRA && semAcento(o.value) === semAcento(v));
+        if (!v) sel.value = '';
+        else if (opcao) sel.value = opcao.value;
+        else {
+            sel.value = OUTRA;
+            $('#universidadeOutraInput').value = v;
+            if (sel.options.length <= 2) universidadePendente = v; // a lista ainda não chegou
+        }
+        mostrarOutra();
+        sincronizarExcluir();
+    }
+    async function carregarUniversidades() {
+        try {
+            const r = await fetch('api/universidades.php');
+            const lista = r.ok ? ((await r.json()).universidades || []) : [];
+            const sel = $('#universidadeInput');
+            const atual = valorUniversidade();
+            const outra = sel.querySelector(`option[value="${OUTRA}"]`);
+            for (const u of lista) {
+                const o = document.createElement('option');
+                o.value = u;
+                o.textContent = u;
+                sel.insertBefore(o, outra);
+            }
+            const pendente = universidadePendente;
+            universidadePendente = null;
+            if (pendente || atual) definirUniversidade(pendente || atual);
+        } catch (_) {
+            // Sem a lista, "Outra (digitar)" continua disponível.
+        }
+    }
+
     /* ------------------- exportar/importar (arquivo JSON) ------------------ */
     // Os dados de Minha Dissertação (com Minha orientação e os critérios da
     // busca) num arquivo JSON, só no computador da pessoa: nada vai ao
     // servidor. Os arquivos XML/ZIP do Lattes não entram (só links/IDs).
     const CAMPOS_JSON = {
-        dissertacao: { nome: '#nomeInput', universidade: '#universidadeInput', titulo: '#tituloInput', resumo: '#resumoInput', palavrasChave: '#palavrasInput' },
-        orientacao: { discente: '#discenteId', orientador: '#orientadorId', coorientador: '#coorientadorId', periodo: '#periodoInput' },
+        dissertacao: { nome: '#nomeInput', titulo: '#tituloInput', resumo: '#resumoInput', palavrasChave: '#palavrasInput' },
+        orientacao: {
+            discente: '#discenteId', orientadorNome: '#orientadorNome', orientador: '#orientadorId',
+            coorientadorNome: '#coorientadorNome', coorientador: '#coorientadorId', periodo: '#periodoInput',
+        },
         criterios: { excluirInstituicao: '#excluirInput', somenteDoutores: '#doutoresInput' },
     };
     function exportarJson() {
@@ -314,6 +370,7 @@
                 dados[grupo][chave] = el.type === 'checkbox' ? el.checked : el.value;
             }
         }
+        dados.dissertacao.universidade = valorUniversidade();
         const nome = semAcento(dados.dissertacao.nome).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'dissertacao';
         const url = URL.createObjectURL(new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }));
         const a = document.createElement('a');
@@ -346,6 +403,7 @@
                     el.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             }
+            if (typeof dados.dissertacao.universidade === 'string') definirUniversidade(dados.dissertacao.universidade);
             renderConferencia();
             status.textContent = `Dados importados de ${arquivo.name}.`;
         } catch (e) {
@@ -368,7 +426,13 @@
             // A base pode ter mudado (ex.: envio pela Administração nesta página).
             if (tab === 'bancas' || tab === 'inicio') carregarStatus();
         });
-        $('#universidadeInput').addEventListener('input', sincronizarExcluir);
+        $('#universidadeInput').addEventListener('change', () => {
+            mostrarOutra();
+            if ($('#universidadeInput').value === OUTRA) $('#universidadeOutraInput').focus();
+            sincronizarExcluir();
+        });
+        $('#universidadeOutraInput').addEventListener('input', sincronizarExcluir);
+        carregarUniversidades();
         $('#exportarJsonBtn').addEventListener('click', exportarJson);
         $('#importarJsonBtn').addEventListener('click', () => $('#importarJsonInput').click());
         $('#importarJsonInput').addEventListener('change', (e) => {

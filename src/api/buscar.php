@@ -9,6 +9,8 @@
      (sem nenhuma, a conformidade ética não é verificada e o resultado avisa):
        <papel>Arquivo  XML/ZIP do Lattes  -> lido em memória, NÃO é gravado
        <papel>Id       link ou ID Lattes de currículo que já está na base
+       <papel>Nome     nome; sem currículo, a verificação é só pelo nome
+                       (coautorias e orientações nos currículos indicados)
    Devolve duas listas (Rede PROFIAP e Externa, pelo PPG), cada uma com as 10
    pessoas mais próximas SEM vínculo e as retiradas por vínculo, só com os
    campos de exibição (bb_publico), e 'conformidade' (verificada ou não, e
@@ -31,7 +33,8 @@ bb_exigir_metodo('POST');
 $docentes = bb_carregar_docentes();
 // Currículo sem dados (fora da lista de docentes e sem PPG no envio) fica
 // fora da busca até a lista trazer a pessoa.
-$corpus = array_filter(bb_carregar_corpus(), fn($p) => bb_tem_dados($p, $docentes));
+$todos = bb_carregar_corpus();
+$corpus = array_filter($todos, fn($p) => bb_tem_dados($p, $docentes));
 if (!$corpus) bb_erro('Nenhum currículo cadastrado ainda. Procure a administração do programa.', 503);
 
 $texto = fn($k) => trim((string) ($_POST[$k] ?? ''));
@@ -59,15 +62,23 @@ foreach (ENVOLVIDOS as $env) {
             bb_erro("{$env['papel']}: não foi possível ler {$arq['name']} ({$e->getMessage()}).");
         }
     } elseif (($id = vinc_id_lattes(preg_match('/\d{16}/', $texto($env['chave'] . 'Id'), $m) ? $m[0] : '')) !== '') {
-        $pessoa = isset($corpus[$id]) ? bb_carregar_pessoa($corpus[$id]) : null;
+        // Qualquer currículo guardado serve, mesmo sem dados de programa.
+        $pessoa = isset($todos[$id]) ? bb_carregar_pessoa($todos[$id]) : null;
         if (!$pessoa) bb_erro("{$env['papel']}: currículo não encontrado na base. Envie o arquivo XML ou ZIP do Lattes.");
     } elseif ($texto($env['chave'] . 'Id') !== '') {
         bb_erro("{$env['papel']}: informe um link ou ID Lattes válido (16 dígitos).");
     }
+    $soNome = false;
+    if (!$pessoa && ($nome = bb_cortar($texto($env['chave'] . 'Nome'), 200)) !== '') {
+        // Sem currículo: registro mínimo com o nome. vinc_verificar procura o
+        // nome nas coautorias e orientações de cada pessoa indicada.
+        $pessoa = ['id' => '', 'nome' => $nome, 'citacoes' => []];
+        $soNome = true;
+    }
     if ($pessoa) {
         $envolvidos[] = ['papel' => $env['papel'], 'pessoa' => $pessoa];
-        $avisos[$env['chave']] = $pessoa['nome'];
-        $considerados[] = ['papel' => $env['papel'], 'nome' => $pessoa['nome'], 'id' => vinc_id_lattes($pessoa['id'] ?? '')];
+        $avisos[$env['chave']] = $soNome ? ['nome' => $pessoa['nome'], 'soNome' => true] : $pessoa['nome'];
+        $considerados[] = ['papel' => $env['papel'], 'nome' => $pessoa['nome'], 'id' => vinc_id_lattes($pessoa['id'] ?? ''), 'soNome' => $soNome];
     }
 }
 
