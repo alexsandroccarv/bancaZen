@@ -7,6 +7,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Corrigido
+- Verificação do site depois do deploy: requisições com User-Agent de
+  navegador e, se o site não responder aos executores do GitHub (bloqueio de
+  IPs de data center pela hospedagem), a mesma verificação é refeita de dentro
+  do servidor, pela conexão SSH do deploy; o log diz qual caminho funcionou e
+  só há falha se o site não responder nem a partir do servidor. Corrige também
+  argumentos com espaços nos comandos remotos do deploy (`printf %q`).
+  [issue #23](../../issues/23)
+
+## [0.0.11] - 2026-10-23
+
 ### Adicionado
 - Minha Dissertação: campos **Meu nome** e **Minha universidade**. A
   universidade preenche o critério "Desconsiderar pessoas desta instituição"

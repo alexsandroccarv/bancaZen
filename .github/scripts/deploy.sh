@@ -137,7 +137,8 @@ fi
 
 # ---- Verificações no servidor (antes de copiar qualquer coisa) ----
 # O script remoto recebe os caminhos como argumentos ($1 site, $2 dados).
-remoto bash -s -- "$DEPLOY_PATH" "$DADOS" <<'REMOTO'
+# (printf %q: o ssh junta os argumentos num só comando de texto.)
+remoto "bash -s -- $(printf '%q ' "$DEPLOY_PATH" "$DADOS")" <<'REMOTO'
 set -euo pipefail
 SITE="$1"; DADOS="$2"
 aviso() { echo "::warning::$*"; }
