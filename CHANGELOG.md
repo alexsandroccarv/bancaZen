@@ -7,6 +7,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Minha Dissertação: campos **Meu nome** e **Minha universidade**. A
+  universidade preenche o critério "Desconsiderar pessoas desta instituição"
+  (sem sobrescrever o que a pessoa digitou); nome e universidade aparecem na
+  conferência "Antes de buscar" e no título do resultado. Ficam só no
+  navegador. [issue #21](../../issues/21)
+
+## [0.0.10] - 2026-10-23
+
 ### Alterado
 - Cadastro unificado na Administração: um só formulário recebe a lista de
   docentes (CSV) e os currículos (XML/ZIP), com PPG (obrigatório) e

@@ -87,14 +87,33 @@
     function dissertacaoPreenchida() {
         return ['#tituloInput', '#resumoInput', '#palavrasInput'].filter((id) => $(id).value.trim()).length;
     }
+    // Nome e universidade da pessoa discente ficam só no navegador.
+    function discente() {
+        return { nome: $('#nomeInput').value.trim(), universidade: $('#universidadeInput').value.trim() };
+    }
+    // A universidade da pessoa discente preenche o critério "Desconsiderar
+    // pessoas desta instituição", sem sobrescrever o que ela digitou lá.
+    let excluirAutomatico = '';
+    function sincronizarExcluir() {
+        const campo = $('#excluirInput');
+        const univ = $('#universidadeInput').value.trim();
+        if (campo.value.trim() === '' || campo.value === excluirAutomatico) {
+            campo.value = univ;
+            excluirAutomatico = univ;
+        }
+    }
+
     function renderConferencia() {
         const n = dissertacaoPreenchida();
+        const eu = discente();
         const item = (ok, opcional, rotulo, texto, secao) => `<li class="flex items-center gap-2">
             <i aria-hidden="true" class="fa-solid ${ok ? 'fa-circle-check text-green-700 dark:text-green-400' : (opcional ? 'fa-circle-minus text-gray-500' : 'fa-circle-xmark text-red-700 dark:text-red-400')}"></i>
             <span><span class="font-medium">${esc(rotulo)}:</span> ${esc(texto)}</span>
             <button type="button" data-ir="${secao}" class="ml-auto text-brand-600 dark:text-accent-400 hover:underline">${ok ? 'editar' : 'preencher'}</button>
         </li>`;
         $('#conferencia').innerHTML =
+            item(Boolean(eu.nome && eu.universidade), true, 'Meus dados',
+                [eu.nome, eu.universidade].filter(Boolean).join(' · ') || 'nome e universidade não informados', 'dissertacao') +
             item(n > 0, false, 'Minha Dissertação', n === 3 ? 'título, resumo e palavras-chave' : (n ? `${n} de 3 campos preenchidos` : 'falta preencher'), 'dissertacao') +
             ENVOLVIDOS.map((k) => {
                 const s = situacaoEnvolvido(k);
@@ -218,6 +237,10 @@
     function renderListas(listas) {
         const sec = $('#resultado');
         sec.classList.remove('hidden');
+        const eu = discente();
+        $('#resultadoTitulo').textContent = eu.nome || eu.universidade
+            ? `Pessoas mais próximas do tema: sugestões para ${[eu.nome, eu.universidade].filter(Boolean).join(' · ')}`
+            : 'Pessoas mais próximas do tema';
         $('#listas').innerHTML = listas.map((l, n) => {
             const resumo = l.resultados.length
                 ? `${l.resultados.length} pessoa(s) entre ${l.total} currículo(s) desta lista.`
@@ -249,6 +272,7 @@
             // A base pode ter mudado (ex.: envio pela Administração nesta página).
             if (tab === 'bancas' || tab === 'inicio') carregarStatus();
         });
+        $('#universidadeInput').addEventListener('input', sincronizarExcluir);
         renderConferencia();
         carregarStatus();
     }
