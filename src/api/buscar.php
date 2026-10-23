@@ -23,7 +23,10 @@ const ENVOLVIDOS = [
 ];
 
 bb_exigir_metodo('POST');
-$corpus = bb_carregar_corpus();
+$docentes = bb_carregar_docentes();
+// Currículo sem dados (fora da lista de docentes e sem PPG no envio) fica
+// fora da busca até a lista trazer a pessoa.
+$corpus = array_filter(bb_carregar_corpus(), fn($p) => bb_tem_dados($p, $docentes));
 if (!$corpus) bb_erro('Nenhum currículo cadastrado ainda. Procure a administração do programa.', 503);
 
 $texto = fn($k) => trim((string) ($_POST[$k] ?? ''));
@@ -75,7 +78,6 @@ $busca = sim_buscar($indice, $consulta, [
 ]);
 // O filtro de instituição também vale para a instituição do programa.
 $excluir = trim(sim_sem_acento($texto('excluirInstituicao')));
-$docentes = bb_carregar_docentes();
 
 $periodo = (int) $texto('periodo');
 $desdeAno = in_array($periodo, [5, 10], true) ? (int) date('Y') - $periodo + 1 : 0;

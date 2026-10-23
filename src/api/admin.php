@@ -6,10 +6,13 @@
      POST entrar     senha
      POST sair
      GET  listar     -> currículos da base (campos de exibição + programa)
-     POST enviar     arquivos[] (XML/ZIP), ppg, instituicao, situacao
+     POST enviar     arquivos[] (XML/ZIP); ppg, instituicao, situacao opcionais
+                     (os dados vêm da lista de docentes; sem eles, o currículo
+                     fica sem dados, fora da busca)
      POST programa   id, ppg, instituicao, situacao   (corrige o programa)
      GET  docentes   -> lista de docentes dos programas, com currículo enviado ou não
-     POST importar-docentes   arquivo (CSV), ppg, substituir (1/0)
+     POST importar-docentes   arquivo (CSV); ppg (padrão das linhas sem a coluna,
+                              senão PROFIAP) e substituir (padrão 1) opcionais
    O grupo da banca (Rede PROFIAP ou Externa) vem do PPG: bb_grupo_do_ppg.
      GET  modelo-docentes     -> modelo do CSV da lista de docentes (download;
                                  sem dados da base, não exige sessão)
@@ -62,7 +65,7 @@ try {
             if (!bb_admin_logado()) bb_erro('Sessão expirada. Entre de novo.', 401);
             $docentes = bb_carregar_docentes();
             $lista = array_map(fn($p) => bb_publico($p, $docentes) + [
-                'grupo' => bb_grupo($p, $docentes), 'naLista' => isset($docentes[$p['id']]), 'recebidoEm' => $p['recebidoEm'] ?? '', 'origem' => $p['origem'] ?? '',
+                'grupo' => bb_grupo($p, $docentes), 'naLista' => isset($docentes[$p['id']]), 'semDados' => !bb_tem_dados($p, $docentes), 'recebidoEm' => $p['recebidoEm'] ?? '', 'origem' => $p['origem'] ?? '',
             ], array_values(bb_carregar_corpus()));
             usort($lista, fn($a, $b) => strcmp(sim_sem_acento($a['nome']), sim_sem_acento($b['nome'])));
             bb_json(['curriculos' => $lista]);
@@ -70,10 +73,11 @@ try {
         case 'enviar':
             bb_exigir_metodo('POST');
             bb_exigir_admin();
-            $programa = bb_programa($post('ppg'), $post('instituicao'), $post('situacao'));
+            $programa = bb_programa($post('ppg'), $post('instituicao'), $post('situacao'), false);
             $arquivos = $_FILES['arquivos'] ?? null;
             if (!$arquivos || !is_array($arquivos['name'])) bb_erro('Nenhum arquivo recebido.');
-            $relatorio = bb_alterar_corpus(function (array $corpus) use ($arquivos, $programa) {
+            $docentes = bb_carregar_docentes();
+            $relatorio = bb_alterar_corpus(function (array $corpus) use ($arquivos, $programa, $docentes) {
                 $rel = [];
                 foreach ($arquivos['name'] as $i => $nome) {
                     if ($arquivos['error'][$i] !== UPLOAD_ERR_OK) {
@@ -89,6 +93,7 @@ try {
                                 'nome' => $it['pessoa']['nome'], 'id' => $it['pessoa']['id'],
                                 'atualizacao' => $it['pessoa']['atualizacao'],
                                 'atualizacaoAnterior' => $r['anterior']['atualizacao'] ?? '',
+                                'semDados' => !bb_tem_dados($r['pessoa'], $docentes),
                             ];
                         }
                     } catch (Throwable $e) {
@@ -132,15 +137,14 @@ try {
         case 'importar-docentes':
             bb_exigir_metodo('POST');
             bb_exigir_admin();
-            $ppg = $post('ppg');
-            if ($ppg === '') bb_erro('Informe o PPG.');
+            $ppg = $post('ppg') !== '' ? $post('ppg') : BB_PPG_REDE;
             $arq = $_FILES['arquivo'] ?? null;
             if (!$arq || ($arq['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) bb_erro('Nenhum arquivo CSV recebido.');
             [$novos, $rel] = doc_ler_csv((string) file_get_contents($arq['tmp_name']), ['ppg' => bb_cortar($ppg, 200)]);
             if (!$novos) bb_erro($rel['exemplos'] && !$rel['semLattes']
                 ? 'O arquivo só tem as linhas de exemplo do modelo: substitua-as pelos docentes do programa (com o ID Lattes de cada um).'
                 : 'Nenhum docente com Lattes encontrado no arquivo.');
-            $rel += bb_alterar_docentes(fn($atuais) => doc_aplicar($atuais, $novos, $ppg, $post('substituir') === '1'));
+            $rel += bb_alterar_docentes(fn($atuais) => doc_aplicar($atuais, $novos, $post('substituir') !== '0'));
             bb_json(['relatorio' => $rel]);
 
         case 'reindexar':

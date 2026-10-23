@@ -331,42 +331,18 @@
                 <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="envioTitulo">
                     <h3 id="envioTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Cadastrar docentes e currículos</h3>
                     <p class="text-sm">
-                        Envie, num só lugar, a <strong>lista de docentes</strong> de um programa (CSV) e os
+                        Envie, num só lugar, a <strong>planilha de docentes</strong> (CSV) e os
                         <strong>currículos Lattes</strong> (XML exportado pela Plataforma Lattes ou o ZIP que a
-                        plataforma entrega). Tudo fica guardado no servidor, fora da área pública do site. A lista
-                        da banca vem do <strong>PPG</strong>: PPG <code>PROFIAP</code> entra em
-                        <strong>Rede PROFIAP</strong>; qualquer outro PPG entra em <strong>Externa</strong>.
+                        plataforma entrega). Os dados de cada pessoa (universidade, PPG e situação) vêm da planilha,
+                        pelo ID Lattes. Tudo fica guardado no servidor, fora da área pública do site. A lista da banca
+                        vem do <strong>PPG</strong>: PPG <code>PROFIAP</code> entra em <strong>Rede PROFIAP</strong>;
+                        qualquer outro PPG entra em <strong>Externa</strong>.
                     </p>
                     <form id="envioForm" class="space-y-4">
-                        <div class="grid gap-4 sm:grid-cols-3">
-                            <div>
-                                <label for="ppgInput" class="block text-sm font-medium mb-1">PPG</label>
-                                <input id="ppgInput" type="text" list="ppgLista" required value="PROFIAP" aria-describedby="ppgAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                <datalist id="ppgLista"></datalist>
-                                <p id="ppgAjuda" class="text-xs text-gray-600 dark:text-gray-400 mt-1" aria-live="polite"></p>
-                            </div>
-                            <div>
-                                <label for="instInput" class="block text-sm font-medium mb-1">Instituição <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
-                                <input id="instInput" type="text" list="instLista" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                <datalist id="instLista"></datalist>
-                            </div>
-                            <div>
-                                <label for="situacaoInput" class="block text-sm font-medium mb-1">Situação no programa <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
-                                <select id="situacaoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                    <option value="">Não informada</option>
-                                    <option>Permanente</option>
-                                    <option>Colaborador</option>
-                                    <option>Visitante</option>
-                                </select>
-                            </div>
-                        </div>
                         <ul class="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
-                            <li>CSV: cada linha é um docente; as colunas do arquivo (universidade, categoria, ppg) prevalecem sobre os campos acima. E-mails e outras colunas são descartados.</li>
-                            <li>XML/ZIP: para quem está na lista de docentes, valem os dados da lista; senão, os campos acima (sem instituição, vale a do Lattes). Mesmo ID Lattes: fica o de atualização mais recente.</li>
+                            <li>CSV: cada linha é um docente, com universidade, categoria e PPG (linha sem PPG fica com PROFIAP). A planilha substitui a lista anterior de cada PPG que traz: quem não está nela sai da lista. E-mails e outras colunas são descartados.</li>
+                            <li>XML/ZIP: currículo de quem não está na planilha fica guardado sem dados e fora da busca, até a planilha trazer a pessoa. Mesmo ID Lattes: fica o de atualização mais recente.</li>
                         </ul>
-                        <label class="flex items-center gap-2 text-sm">
-                            <input id="docSubstituirInput" type="checkbox" checked> Ao enviar um CSV, substituir a lista anterior do mesmo PPG (quem não estiver no arquivo sai da lista)
-                        </label>
                     <details class="space-y-2">
                         <summary class="cursor-pointer font-semibold" id="modeloTitulo">Modelo do arquivo CSV da lista de docentes</summary>
                         <div class="flex flex-wrap items-center justify-end gap-2">
@@ -418,6 +394,28 @@
                     <div id="relatorio" class="text-sm space-y-2" aria-live="polite"></div>
                 </section>
 
+                <section class="space-y-3" aria-labelledby="cfTitulo">
+                    <h3 id="cfTitulo" class="text-lg font-bold">Conferência: currículos e planilha</h3>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="rounded-lg border border-gray-300 dark:border-gray-600 p-4 space-y-2">
+                            <p><span id="cfSemDadosN" class="text-3xl font-bold">–</span> <span class="font-medium">XML(s) sem dados na planilha</span></p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">Currículos guardados de pessoas que não estão na planilha de docentes: ficam fora da busca até a planilha trazê-las (pelo ID Lattes).</p>
+                            <details>
+                                <summary class="cursor-pointer text-sm font-semibold">Ver lista</summary>
+                                <ul id="cfSemDadosLista" class="text-sm list-disc list-inside mt-2 max-h-64 overflow-y-auto scroll-area"></ul>
+                            </details>
+                        </div>
+                        <div class="rounded-lg border border-gray-300 dark:border-gray-600 p-4 space-y-2">
+                            <p><span id="cfSemXmlN" class="text-3xl font-bold">–</span> <span class="font-medium">docente(s) da planilha sem XML</span></p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">Pessoas da planilha cujo currículo Lattes ainda não foi enviado: não aparecem nas sugestões.</p>
+                            <details>
+                                <summary class="cursor-pointer text-sm font-semibold">Ver lista</summary>
+                                <ul id="cfSemXmlLista" class="text-sm list-disc list-inside mt-2 max-h-64 overflow-y-auto scroll-area"></ul>
+                            </details>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="servidorTitulo">
                     <h3 id="servidorTitulo" class="text-lg font-bold">Currículos guardados no servidor</h3>
                     <p class="text-sm">
@@ -430,6 +428,8 @@
                         <div class="grid gap-4 sm:grid-cols-3">
                             <div>
                                 <label for="rePpgInput" class="block text-sm font-medium mb-1">PPG <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
+                                <datalist id="ppgLista"></datalist>
+                                <datalist id="instLista"></datalist>
                                 <input id="rePpgInput" type="text" list="ppgLista" placeholder="PROFIAP" aria-describedby="reAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                             </div>
                             <div>
@@ -447,8 +447,9 @@
                             </div>
                         </div>
                         <p id="reAjuda" class="text-xs text-gray-600 dark:text-gray-400">
-                            O programa de cada pessoa vem do que já está cadastrado ou da lista de docentes. Os campos
-                            acima valem só para as demais; sem PPG, elas ficam de fora e são listadas.
+                            O programa de cada pessoa vem da planilha de docentes ou do que já está cadastrado. Os campos
+                            acima valem só para as demais; sem PPG, elas ficam guardadas sem dados (fora da busca) e são
+                            listadas.
                         </p>
                         <label class="flex items-center gap-2 text-sm">
                             <input id="reOrganizarInput" type="checkbox"> Depois de incluir, apagar as cópias com outro nome (cada currículo fica guardado como <code>&lt;ID Lattes&gt;.xml</code>)

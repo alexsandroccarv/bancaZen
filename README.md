@@ -4,10 +4,13 @@ Aplicação web que indica **membros externos para banca de defesa de
 mestrado** a partir de currículos Lattes.
 
 1. Na seção **Administração**, um formulário único recebe a **lista de
-   docentes** de cada programa (CSV com nome, universidade, situação no
-   programa e Lattes; e-mails são descartados) e os **currículos** (XML
-   exportado pela Plataforma Lattes, ou o ZIP que o contém), com o **PPG** e,
-   opcionalmente, instituição e situação. A lista da banca vem do PPG:
+   docentes** (planilha CSV com nome, universidade, situação no programa,
+   PPG e Lattes; e-mails são descartados) e os **currículos** (XML exportado
+   pela Plataforma Lattes, ou o ZIP que o contém), só com a escolha dos
+   arquivos ou da pasta: os dados de cada pessoa vêm da planilha, pelo ID
+   Lattes. Currículo de quem não está na planilha fica guardado sem dados e
+   fora da busca; a conferência mostra esses currículos e os docentes da
+   planilha ainda sem XML. A lista da banca vem do PPG:
    **PROFIAP → Rede PROFIAP**; qualquer outro PPG → **Externa**.
 2. Se o mesmo ID Lattes já existir, fica o currículo com a data de
    atualização mais recente. A tabela de docentes mostra quem ainda não tem
