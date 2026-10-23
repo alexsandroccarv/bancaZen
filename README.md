@@ -5,7 +5,7 @@ mestrado** a partir de currículos Lattes.
 
 1. Na seção **Administração**, um formulário único recebe a **lista de
    docentes** (planilha CSV com nome, universidade, situação no programa,
-   PPG e Lattes; e-mails são descartados) e os **currículos** (XML exportado
+   PPG, Lattes e, opcionalmente, e-mail, visível só na Administração) e os **currículos** (XML exportado
    pela Plataforma Lattes, ou o ZIP que o contém), só com a escolha dos
    arquivos ou da pasta: os dados de cada pessoa vêm da planilha, pelo ID
    Lattes. Currículo de quem não está na planilha fica guardado sem dados e

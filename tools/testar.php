@@ -112,8 +112,13 @@ confere(bb_publico($c['0000000000000001'])['ppg'] === 'PPG em Administração', 
 confere($rel['linhas'] === 5 && $rel['importados'] === 3, 'docentes: 5 linhas, 3 pessoas');
 confere($rel['duplicados'] === 1, 'docentes: duplicidade pelo ID Lattes');
 confere($rel['semLattes'] === ['Sem Lattes Nenhum'], 'docentes: linha sem Lattes informada');
-confere(in_array('email', $rel['colunasDescartadas'], true), 'docentes: coluna de e-mail descartada');
-confere(!str_contains(json_encode($docs), '@'), 'docentes: nenhum e-mail guardado');
+confere(!in_array('email', $rel['colunasDescartadas'], true) && in_array('seq', $rel['colunasDescartadas'], true), 'docentes: e-mail guardado, outras colunas descartadas');
+confere($docs['0000000000000001']['email'] === 'ana@exemplo.br', 'docentes: e-mail da planilha');
+confere($docs['0000000000000004']['email'] === 'diego@exemplo.br', 'docentes: duplicidade sem e-mail fica com o do outro registro');
+[$docsEmail, $relEmail] = doc_ler_csv("nome;lattes_id;e-mail\nFulano;1111222233334444;invalido@\nCiclana;1111222233334445;\n", ['ppg' => 'PROFIAP']);
+confere($docsEmail['1111222233334444']['email'] === '' && $docsEmail['1111222233334445']['email'] === '' && $relEmail['emailInvalido'] === 1, 'docentes: e-mail opcional; inválido ignorado e contado');
+$pubDoc = bb_publico(['id' => '0000000000000001', 'nome' => 'Ana', 'programa' => ['ppg' => 'X']], $docs);
+confere(!str_contains(json_encode($pubDoc), '@'), 'docentes: e-mail nunca sai na resposta pública');
 confere($docs['0000000000000001']['nome'] === 'Ana Fictícia Souza', 'docentes: nome em caixa alta convertido');
 confere($docs['0000000000000001']['universidade'] === 'Universidade Federal Exemplo', 'docentes: universidade convertida');
 confere($docs['0000000000000099']['universidade'] === 'Universidade Federal da Fronteira-Sul', 'docentes: hífen e partículas');
