@@ -28,7 +28,10 @@ ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
   regra para PROFIAP e outros programas: quem está na lista tem grupo,
   universidade, PPG e situação da lista (`bb_programa_efetivo`); senão,
   valem os dados do envio do XML. Exibição: Nome, Universidade, PPG,
-  Situação no programa e Link do Lattes.
+  Situação no programa e Link do Lattes. Modelo do CSV: `doc_modelo_csv()`
+  (download em `api/admin.php?acao=modelo-docentes`; gerado, não é arquivo,
+  porque `*.csv` é bloqueado); linhas com ID `0000000000000000` são exemplos
+  e são ignoradas.
 - Conformidade ética: pessoa com vínculo (coautoria, orientação, mesma
   pessoa) nunca entra nas listas; aparece à parte com o motivo.
   "Confirmado" = ID Lattes ou nome completo; "provável" = sobrenome + ao

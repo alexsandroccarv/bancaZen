@@ -10,6 +10,8 @@
      POST programa   id, grupo, ppg, instituicao, situacao   (corrige o programa)
      GET  docentes   -> lista de docentes dos programas, com currículo enviado ou não
      POST importar-docentes   arquivo (CSV), grupo, ppg, substituir (1/0)
+     GET  modelo-docentes     -> modelo do CSV da lista de docentes (download;
+                                 sem dados da base, não exige sessão)
      POST remover    id
    Todas as ações, exceto sessao e entrar, exigem sessão; as que alteram
    dados exigem também o token anti-CSRF no cabeçalho X-CSRF.
@@ -110,6 +112,15 @@ try {
             usort($lista, fn($a, $b) => strcmp(sim_sem_acento($a['nome']), sim_sem_acento($b['nome'])));
             bb_json(['docentes' => $lista]);
 
+        case 'modelo-docentes':
+            bb_exigir_metodo('GET');
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename="modelo-docentes-bancazen.csv"');
+            header('Cache-Control: no-store');
+            header('X-Content-Type-Options: nosniff');
+            echo doc_modelo_csv();
+            exit;
+
         case 'importar-docentes':
             bb_exigir_metodo('POST');
             bb_exigir_admin();
@@ -120,7 +131,9 @@ try {
             $arq = $_FILES['arquivo'] ?? null;
             if (!$arq || ($arq['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) bb_erro('Nenhum arquivo CSV recebido.');
             [$novos, $rel] = doc_ler_csv((string) file_get_contents($arq['tmp_name']), ['grupo' => $grupo, 'ppg' => bb_cortar($ppg, 200)]);
-            if (!$novos) bb_erro('Nenhum docente com Lattes encontrado no arquivo.');
+            if (!$novos) bb_erro($rel['exemplos'] && !$rel['semLattes']
+                ? 'O arquivo só tem as linhas de exemplo do modelo: substitua-as pelos docentes do programa (com o ID Lattes de cada um).'
+                : 'Nenhum docente com Lattes encontrado no arquivo.');
             $rel += bb_alterar_docentes(fn($atuais) => doc_aplicar($atuais, $novos, $ppg, $post('substituir') === '1'));
             bb_json(['relatorio' => $rel]);
 

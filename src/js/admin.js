@@ -198,6 +198,7 @@
                 <ul class="list-disc list-inside">
                     ${r.duplicados ? `<li>${r.duplicados} pessoa(s) repetida(s) no arquivo foram unidas (prevalece a situação Permanente).</li>` : ''}
                     ${r.semLattes.length ? `<li>Sem Lattes, não importado(s): ${esc(r.semLattes.join('; '))}.</li>` : ''}
+                    ${r.exemplos ? `<li>${r.exemplos} linha(s) de exemplo do modelo ignorada(s).</li>` : ''}
                     ${r.semSituacao ? `<li>${r.semSituacao} sem situação no programa reconhecida.</li>` : ''}
                     ${r.colunasDescartadas.length ? `<li>Colunas não guardadas: ${esc(r.colunasDescartadas.join(', '))}.</li>` : ''}
                 </ul>`;

@@ -20,6 +20,22 @@
    é exibido.
    ========================================================================== */
 
+// ID Lattes das linhas de exemplo do modelo: ignorado na importação.
+const DOC_ID_EXEMPLO = '0000000000000000';
+
+// Modelo do arquivo CSV oferecido na Administração: separado por ";", em
+// UTF-8 com BOM (abre direto no Excel em português), com cabeçalho e duas
+// linhas de exemplo fictícias (ID Lattes DOC_ID_EXEMPLO).
+function doc_modelo_csv(): string
+{
+    $linhas = [
+        ['nome', 'lattes_id', 'universidade', 'categoria', 'ppg'],
+        ['Maria Exemplo da Silva', DOC_ID_EXEMPLO, 'Universidade Federal Exemplo', 'Permanente', 'PROFIAP'],
+        ['João Modelo Pereira', DOC_ID_EXEMPLO, 'Universidade Estadual Modelo', 'Colaborador', 'PROFIAP'],
+    ];
+    return "\xEF\xBB\xBF" . implode("\r\n", array_map(fn($l) => implode(';', $l), $linhas)) . "\r\n";
+}
+
 // Prioridade quando a mesma pessoa aparece mais de uma vez.
 const DOC_PRIORIDADE = ['Permanente' => 3, 'Colaborador' => 2, 'Visitante' => 1];
 const DOC_MINUSCULAS = ['de', 'da', 'do', 'das', 'dos', 'e', 'del', 'di', 'du', 'em', 'na', 'no'];
@@ -86,7 +102,7 @@ function doc_ler_csv(string $conteudo, array $padrao): array
     $descartadas = array_values(array_diff_key($colunas, array_flip($usadas)));
 
     $docentes = [];
-    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0,
+    $rel = ['linhas' => 0, 'importados' => 0, 'duplicados' => 0, 'semLattes' => [], 'semSituacao' => 0, 'exemplos' => 0,
             'colunasDescartadas' => $descartadas];
     foreach ($linhas as $linha) {
         if (trim($linha) === '') continue;
@@ -95,6 +111,7 @@ function doc_ler_csv(string $conteudo, array $padrao): array
         $nome = doc_capitalizar((string) ($c[$iNome] ?? ''));
         $id = vinc_id_lattes(preg_match('/\d{16}/', (string) ($c[$iLattes] ?? ''), $m) ? $m[0] : '');
         if ($id === '') { $rel['semLattes'][] = $nome !== '' ? $nome : "linha {$rel['linhas']}"; continue; }
+        if ($id === DOC_ID_EXEMPLO) { $rel['exemplos']++; continue; } // linha de exemplo do modelo
         $situacao = $iSit !== null ? doc_situacao((string) ($c[$iSit] ?? '')) : '';
         if ($situacao === '') $rel['semSituacao']++;
         $ppg = $iPpg !== null ? trim((string) ($c[$iPpg] ?? '')) : '';

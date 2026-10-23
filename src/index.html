@@ -325,6 +325,41 @@
                         <code>categoria</code>), mesmo antes de enviar os XMLs. Para quem está na lista, valem a
                         universidade, o PPG e a situação da lista. Outras colunas, como e-mail, são descartadas.
                     </p>
+                    <div class="space-y-2" aria-labelledby="modeloTitulo" role="group">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <h4 id="modeloTitulo" class="font-semibold">Modelo do arquivo CSV</h4>
+                            <a href="api/admin.php?acao=modelo-docentes" download="modelo-docentes-bancazen.csv" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium">
+                                <i aria-hidden="true" class="fa-solid fa-file-csv"></i> Baixar modelo (CSV)
+                            </a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <caption class="sr-only">Colunas do arquivo CSV da lista de docentes</caption>
+                                <thead class="border-b border-gray-300 dark:border-gray-600">
+                                    <tr>
+                                        <th scope="col" class="py-2 pr-3">Coluna</th>
+                                        <th scope="col" class="py-2 pr-3">Obrigatória</th>
+                                        <th scope="col" class="py-2 pr-3">Conteúdo</th>
+                                        <th scope="col" class="py-2">Exemplo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>nome</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">nome completo</td><td class="py-2">Maria Exemplo da Silva</td></tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>lattes_id</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">ID Lattes com 16 dígitos (o link do Lattes também é aceito)</td><td class="py-2 font-mono">1234567890123456</td></tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>universidade</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">instituição do docente no programa</td><td class="py-2">Universidade Federal Exemplo</td></tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>categoria</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">situação no programa: Permanente, Colaborador ou Visitante</td><td class="py-2">Permanente</td></tr>
+                                    <tr><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, vale o PPG informado abaixo</td><td class="py-2">PROFIAP</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                            Separe as colunas por ponto e vírgula (<code>;</code>) ou vírgula, com o cabeçalho na
+                            primeira linha. No Excel, salve como "CSV UTF-8". As linhas de exemplo do modelo usam o
+                            ID <code>0000000000000000</code> e são ignoradas na importação. A planilha do PROFIAP
+                            (colunas <code>universidade_normalizada</code>, <code>categoria_normalizada</code> e
+                            <code>lattes_url</code>) também é aceita sem alterações.
+                        </p>
+                    </div>
                     <form id="docentesForm" class="space-y-4">
                         <fieldset class="space-y-2">
                             <legend class="text-sm font-medium">Grupo</legend>

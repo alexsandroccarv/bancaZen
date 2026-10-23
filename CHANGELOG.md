@@ -8,6 +8,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Adicionado
+- Modelo do arquivo CSV da lista de docentes na Administração: botão
+  "Baixar modelo (CSV)" (separado por `;`, UTF-8 com BOM, gerado por
+  `api/admin.php?acao=modelo-docentes`) e tabela com as colunas, a
+  obrigatoriedade e exemplos. As linhas de exemplo (ID Lattes
+  `0000000000000000`) são ignoradas na importação. [issue #17](../../issues/17)
+
+## [0.0.8] - 2026-10-21
+
+### Adicionado
 - Lista de docentes dos programas: importação de CSV na Administração (ex.:
   "docentes PROFIAP 2025", 611 linhas, 608 pessoas), antes mesmo dos XMLs,
   com tabela que mostra quem já tem currículo enviado. Guarda só nome,
