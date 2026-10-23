@@ -149,6 +149,64 @@ function bb_guardar_curriculo(array &$corpus, array $pessoa, string $xmlBytes, a
     return ['situacao' => $atual ? 'substituido' : 'novo', 'pessoa' => $pessoa, 'anterior' => $atual];
 }
 
+// Monta ou completa o índice a partir dos XML/ZIP já guardados em
+// <dados>/xml/ (por exemplo, copiados por rsync), com a regra do mesmo ID.
+// Programa de cada pessoa: o já gravado no índice; senão, o da lista de
+// docentes; senão, $padrao (bb_programa). Sem nenhum deles, a pessoa fica de
+// fora e vai para 'semPpg'. Com $simular, nada é gravado. 'comOutroNome'
+// lista os arquivos já gravados como <ID>.xml com outro nome (cópias); com
+// $organizar, são apagados depois de o índice ser gravado.
+function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = false): array
+{
+    $dir = bb_preparar_dados();
+    $docentes = bb_carregar_docentes();
+    $arquivos = array_values(array_filter(glob("$dir/xml/*") ?: [], fn($a) => is_file($a) && preg_match('/\.(xml|zip)$/i', $a)));
+    sort($arquivos);
+    $rel = ['arquivos' => count($arquivos), 'novo' => 0, 'substituido' => 0, 'mantido' => 0, 'semPpg' => [], 'comOutroNome' => [], 'erros' => []];
+    $processar = function (array $corpus) use ($arquivos, $docentes, $padrao, $simular, &$rel) {
+        foreach ($arquivos as $arq) {
+            $nome = basename($arq);
+            $ids = [];
+            try {
+                foreach (lattes_ler_arquivo($nome, (string) file_get_contents($arq)) as $it) {
+                    $p = $it['pessoa'];
+                    $id = vinc_id_lattes($p['id']);
+                    if ($id === '') throw new RuntimeException('currículo sem identificador Lattes (NUMERO-IDENTIFICADOR)');
+                    $d = $docentes[$id] ?? null;
+                    $programa = ($corpus[$id]['programa']['ppg'] ?? '') !== '' ? $corpus[$id]['programa']
+                        : (($d['ppg'] ?? '') !== '' ? bb_programa($d['ppg'], $d['universidade'] ?? '', $d['situacao'] ?? '') : $padrao);
+                    if (!$programa) {
+                        $rel['semPpg'][] = ['arquivo' => $p['origem'], 'nome' => $p['nome'], 'id' => $id];
+                        $ids = null;
+                        continue;
+                    }
+                    if ($ids !== null) $ids[] = $id;
+                    if ($simular) {
+                        $atual = $corpus[$id] ?? null;
+                        $sit = $atual && ($atual['atualizacao'] ?? '') > ($p['atualizacao'] ?? '') ? 'mantido' : ($atual ? 'substituido' : 'novo');
+                        if ($sit !== 'mantido') $corpus[$id] = ['id' => $id, 'programa' => $programa] + $p;
+                    } else {
+                        $sit = bb_guardar_curriculo($corpus, $p, $it['xml'], $programa)['situacao'];
+                    }
+                    $rel[$sit]++;
+                }
+                // Tudo do arquivo já está em <ID>.xml: o arquivo é uma cópia.
+                if ($ids && (count($ids) > 1 || $nome !== "{$ids[0]}.xml")) $rel['comOutroNome'][] = $arq;
+            } catch (Throwable $e) {
+                $rel['erros'][] = "$nome: " . $e->getMessage();
+            }
+        }
+        return [$corpus, count($corpus)];
+    };
+    $rel['total'] = $simular ? $processar(bb_carregar_corpus())[1] : bb_alterar_corpus($processar);
+    $rel['organizados'] = 0;
+    if ($organizar && !$simular) {
+        foreach ($rel['comOutroNome'] as $arq) $rel['organizados'] += (int) @unlink($arq);
+    }
+    $rel['comOutroNome'] = array_map('basename', $rel['comOutroNome']);
+    return $rel;
+}
+
 // Campos que podem sair do servidor (nada de produções, coautores ou XML).
 // Exibição: Nome, Universidade, PPG, Situação no programa e Link do Lattes.
 function bb_publico(array $p, array $docentes = []): array

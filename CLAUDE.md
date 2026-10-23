@@ -45,6 +45,9 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   `tools/fixtures/`; discente e orientadora em `tools/fixtures/envolvidos/`).
   Currículos reais não entram em `tools/fixtures/`.
 - Senha da administração: `php api/cli/definir-senha.php` no servidor.
+- XMLs copiados direto para `<dados>/xml/` (rsync/FTP) só entram na busca
+  com `php api/cli/reindexar.php` (`bb_reindexar`; `--simular`, `--ppg`,
+  `--organizar`; programa: índice > lista de docentes > `--ppg`).
 
 ## Padrões de UI
 - Página principal em seções (abas com ícone na barra superior, nome visível
