@@ -2,11 +2,16 @@
 
 ## Visão geral
 Aplicação web (site estático + backend PHP) que indica membros externos
-para banca de defesa de mestrado: a administração envia currículos Lattes
-(XML/ZIP) com grupo (PROFIAP ou outro programa), PPG e instituição; a partir
-do título, resumo e palavras-chave do trabalho, mostra duas listas de até 10
-pessoas (PROFIAP e outros programas) com maior proximidade temática (0 a 1,
-ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
+para banca de defesa de mestrado: a administração cadastra, num formulário
+único, a lista de docentes (CSV) e os currículos Lattes (XML/ZIP) com PPG,
+instituição e situação; a partir do título, resumo e palavras-chave do
+trabalho, mostra duas listas de até 10 pessoas com maior proximidade temática
+(0 a 1, ordem decrescente), sem vínculo com discente/orientação: **Rede
+PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
+- **O grupo da banca vem só do PPG** (`bb_grupo_do_ppg`: PROFIAP, sem
+  diferenciar maiúsculas/acentos/espaços, → Rede PROFIAP; outro → Externa).
+  Não há campo "grupo" nos formulários; um "grupo" gravado por versões
+  anteriores é ignorado.
 
 ## Lattes e proximidade
 - **Currículos e índice nunca são públicos**: nada de XML no repositório
@@ -23,11 +28,11 @@ ordem decrescente), sem vínculo com discente/orientação. Base: templateZen.
 - Lista de docentes dos programas (`lib/docentes.php`, `docentes.json` na
   pasta de dados): importada de CSV pela Administração, **nunca versionada**
   (a planilha do PROFIAP tem e-mails; `.gitignore` bloqueia `*.csv`). Guarda
-  só nome, universidade, PPG, grupo, situação (Permanente/Colaborador/
-  Visitante) e ID Lattes; e-mails e outras colunas são descartados. Mesma
-  regra para PROFIAP e outros programas: quem está na lista tem grupo,
-  universidade, PPG e situação da lista (`bb_programa_efetivo`); senão,
-  valem os dados do envio do XML. Exibição: Nome, Universidade, PPG,
+  só nome, universidade, PPG, situação (Permanente/Colaborador/
+  Visitante) e ID Lattes; e-mails e outras colunas são descartados. Quem
+  está na lista tem universidade, PPG e situação da lista
+  (`bb_programa_efetivo`); senão, valem os dados do envio do XML (sem
+  instituição informada, a do Lattes). Exibição: Nome, Universidade, PPG,
   Situação no programa e Link do Lattes. Modelo do CSV: `doc_modelo_csv()`
   (download em `api/admin.php?acao=modelo-docentes`; gerado, não é arquivo,
   porque `*.csv` é bloqueado); linhas com ID `0000000000000000` são exemplos

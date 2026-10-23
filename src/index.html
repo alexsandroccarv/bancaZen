@@ -124,7 +124,7 @@
                     <ol class="space-y-3 list-none p-0">
                         <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Minha Dissertação</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe o título, o resumo e as palavras-chave do seu trabalho.</p></div></li>
                         <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></span><div><p class="font-semibold">Minha orientação</p><p class="text-sm text-gray-600 dark:text-gray-400">Envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base.</p></div></li>
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Bancas sugeridas</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 pessoas, da maior para a menor proximidade: currículos do PROFIAP e currículos de outros programas (para o segundo membro externo).</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Bancas sugeridas</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 pessoas, da maior para a menor proximidade: Rede PROFIAP (docentes do PPG PROFIAP) e Externa (docentes de outros PPGs, para o segundo membro externo).</p></div></li>
                     </ol>
                 </section>
 
@@ -287,7 +287,7 @@
                     <h3 id="resultadoTitulo" class="text-lg font-bold">Pessoas mais próximas do tema</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
                         Duas listas, cada uma com até 10 pessoas sem vínculo identificado, da maior para a menor
-                        proximidade (0 a 1): currículos do PROFIAP e currículos de outros programas (segundo membro externo).
+                        proximidade (0 a 1): Rede PROFIAP (PPG PROFIAP) e Externa (outros PPGs, para o segundo membro externo).
                     </p>
                     <div id="listas" class="space-y-8"></div>
                 </section>
@@ -317,17 +317,48 @@
                     <button type="button" id="sairBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium"><i aria-hidden="true" class="fa-solid fa-right-from-bracket"></i> Sair</button>
                 </div>
 
-                <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="docentesTitulo">
-                    <h3 id="docentesTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Lista de docentes dos programas</h3>
+                <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="envioTitulo">
+                    <h3 id="envioTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Cadastrar docentes e currículos</h3>
                     <p class="text-sm">
-                        Importe a lista de docentes de um programa (CSV com as colunas <code>nome</code>,
-                        <code>lattes_id</code> ou <code>lattes_url</code>, <code>universidade</code> e
-                        <code>categoria</code>), mesmo antes de enviar os XMLs. Para quem está na lista, valem a
-                        universidade, o PPG e a situação da lista. Outras colunas, como e-mail, são descartadas.
+                        Envie, num só lugar, a <strong>lista de docentes</strong> de um programa (CSV) e os
+                        <strong>currículos Lattes</strong> (XML exportado pela Plataforma Lattes ou o ZIP que a
+                        plataforma entrega). Tudo fica guardado no servidor, fora da área pública do site. A lista
+                        da banca vem do <strong>PPG</strong>: PPG <code>PROFIAP</code> entra em
+                        <strong>Rede PROFIAP</strong>; qualquer outro PPG entra em <strong>Externa</strong>.
                     </p>
-                    <div class="space-y-2" aria-labelledby="modeloTitulo" role="group">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <h4 id="modeloTitulo" class="font-semibold">Modelo do arquivo CSV</h4>
+                    <form id="envioForm" class="space-y-4">
+                        <div class="grid gap-4 sm:grid-cols-3">
+                            <div>
+                                <label for="ppgInput" class="block text-sm font-medium mb-1">PPG</label>
+                                <input id="ppgInput" type="text" list="ppgLista" required value="PROFIAP" aria-describedby="ppgAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <datalist id="ppgLista"></datalist>
+                                <p id="ppgAjuda" class="text-xs text-gray-600 dark:text-gray-400 mt-1" aria-live="polite"></p>
+                            </div>
+                            <div>
+                                <label for="instInput" class="block text-sm font-medium mb-1">Instituição <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
+                                <input id="instInput" type="text" list="instLista" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <datalist id="instLista"></datalist>
+                            </div>
+                            <div>
+                                <label for="situacaoInput" class="block text-sm font-medium mb-1">Situação no programa <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
+                                <select id="situacaoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                    <option value="">Não informada</option>
+                                    <option>Permanente</option>
+                                    <option>Colaborador</option>
+                                    <option>Visitante</option>
+                                </select>
+                            </div>
+                        </div>
+                        <ul class="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
+                            <li>CSV: cada linha é um docente; as colunas do arquivo (universidade, categoria, ppg) prevalecem sobre os campos acima. E-mails e outras colunas são descartados.</li>
+                            <li>XML/ZIP: para quem está na lista de docentes, valem os dados da lista; senão, os campos acima (sem instituição, vale a do Lattes). Mesmo ID Lattes: fica o de atualização mais recente.</li>
+                        </ul>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input id="docSubstituirInput" type="checkbox" checked> Ao enviar um CSV, substituir a lista anterior do mesmo PPG (quem não estiver no arquivo sai da lista)
+                        </label>
+                    <details class="space-y-2">
+                        <summary class="cursor-pointer font-semibold" id="modeloTitulo">Modelo do arquivo CSV da lista de docentes</summary>
+                        <div class="flex flex-wrap items-center justify-end gap-2">
                             <a href="api/admin.php?acao=modelo-docentes" download="modelo-docentes-bancazen.csv" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium">
                                 <i aria-hidden="true" class="fa-solid fa-file-csv"></i> Baixar modelo (CSV)
                             </a>
@@ -348,7 +379,7 @@
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>lattes_id</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">ID Lattes com 16 dígitos (o link do Lattes também é aceito)</td><td class="py-2 font-mono">1234567890123456</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>universidade</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">instituição do docente no programa</td><td class="py-2">Universidade Federal Exemplo</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>categoria</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">situação no programa: Permanente, Colaborador ou Visitante</td><td class="py-2">Permanente</td></tr>
-                                    <tr><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, vale o PPG informado abaixo</td><td class="py-2">PROFIAP</td></tr>
+                                    <tr><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, vale o PPG do formulário (PROFIAP → Rede PROFIAP; outro → Externa)</td><td class="py-2">PROFIAP</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -359,29 +390,25 @@
                             (colunas <code>universidade_normalizada</code>, <code>categoria_normalizada</code> e
                             <code>lattes_url</code>) também é aceita sem alterações.
                         </p>
-                    </div>
-                    <form id="docentesForm" class="space-y-4">
-                        <fieldset class="space-y-2">
-                            <legend class="text-sm font-medium">Grupo</legend>
-                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupoDocentes" value="profiap" checked> PROFIAP</label>
-                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupoDocentes" value="outro"> Outro programa</label>
-                        </fieldset>
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label for="docPpgInput" class="block text-sm font-medium mb-1">PPG (se o arquivo não tiver a coluna <code>ppg</code>)</label>
-                                <input id="docPpgInput" type="text" list="ppgLista" value="PROFIAP" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                            </div>
-                            <div>
-                                <label for="docArquivoInput" class="block text-sm font-medium mb-1">Arquivo CSV</label>
-                                <input id="docArquivoInput" type="file" accept=".csv,text/csv" required class="block w-full text-sm">
-                            </div>
+                    </details>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                                <i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i> Escolher arquivos
+                                <input id="arquivosInput" type="file" accept=".csv,.xml,.zip,text/csv" multiple class="sr-only">
+                            </label>
+                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
+                                <i aria-hidden="true" class="fa-solid fa-folder-open"></i> Escolher pasta
+                                <input id="pastaInput" type="file" webkitdirectory multiple class="sr-only">
+                            </label>
+                            <span id="selecionados" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Nenhum arquivo escolhido.</span>
                         </div>
-                        <label class="flex items-center gap-2 text-sm">
-                            <input id="docSubstituirInput" type="checkbox" checked> Substituir a lista anterior deste PPG (quem não estiver no arquivo sai da lista)
-                        </label>
-                        <button type="submit" id="importarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50"><i aria-hidden="true" class="fa-solid fa-file-import"></i> Importar lista</button>
+                        <button type="submit" id="enviarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50" disabled><i aria-hidden="true" class="fa-solid fa-upload"></i> Enviar</button>
                     </form>
-                    <div id="docRelatorio" class="text-sm space-y-1" aria-live="polite"></div>
+                    <div id="relatorio" class="text-sm space-y-2" aria-live="polite"></div>
+                </section>
+
+                <section class="space-y-3" aria-labelledby="docentesTitulo">
+                    <h3 id="docentesTitulo" class="text-lg font-bold">Lista de docentes</h3>
                     <div class="space-y-2">
                         <p id="docTotais" class="text-sm font-medium"></p>
                         <div class="flex flex-wrap gap-2 items-center">
@@ -397,6 +424,7 @@
                                         <th scope="col" class="py-2 pr-3">Nome</th>
                                         <th scope="col" class="py-2 pr-3">Universidade</th>
                                         <th scope="col" class="py-2 pr-3">PPG</th>
+                                        <th scope="col" class="py-2 pr-3">Banca</th>
                                         <th scope="col" class="py-2 pr-3">Situação</th>
                                         <th scope="col" class="py-2 pr-3">Lattes</th>
                                         <th scope="col" class="py-2">Currículo</th>
@@ -406,57 +434,6 @@
                             </table>
                         </div>
                     </div>
-                </section>
-
-                <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="envioTitulo">
-                    <h3 id="envioTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Enviar currículos Lattes</h3>
-                    <p class="text-sm">
-                        Envie o XML exportado pela Plataforma Lattes ou o ZIP que a plataforma entrega. Os arquivos
-                        ficam guardados no servidor, fora da área pública do site. Se um currículo com o mesmo ID
-                        Lattes já existir, fica o de data de atualização mais recente.
-                    </p>
-                    <form id="envioForm" class="space-y-4">
-                        <fieldset class="space-y-2">
-                            <legend class="text-sm font-medium">Grupo</legend>
-                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupo" value="profiap" checked> PROFIAP (primeira lista)</label>
-                            <label class="flex items-center gap-2 text-sm"><input type="radio" name="grupo" value="outro"> Outro programa (segunda lista: segundo membro externo)</label>
-                        </fieldset>
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label for="ppgInput" class="block text-sm font-medium mb-1">PPG</label>
-                                <input id="ppgInput" type="text" list="ppgLista" required value="PROFIAP" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                <datalist id="ppgLista"></datalist>
-                            </div>
-                            <div>
-                                <label for="instInput" class="block text-sm font-medium mb-1">Instituição</label>
-                                <input id="instInput" type="text" list="instLista" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                <datalist id="instLista"></datalist>
-                            </div>
-                        </div>
-                        <div class="sm:w-1/2">
-                            <label for="situacaoInput" class="block text-sm font-medium mb-1">Situação no programa</label>
-                            <select id="situacaoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                <option value="">Não informada</option>
-                                <option>Permanente</option>
-                                <option>Colaborador</option>
-                                <option>Visitante</option>
-                            </select>
-                        </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">PPG, instituição e situação valem para todos os arquivos deste envio. Para quem está na lista de docentes, valem os dados da lista.</p>
-                        <div class="flex flex-wrap gap-2 items-center">
-                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
-                                <i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i> Escolher arquivos
-                                <input id="arquivosInput" type="file" accept=".xml,.zip" multiple class="sr-only">
-                            </label>
-                            <label class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium cursor-pointer">
-                                <i aria-hidden="true" class="fa-solid fa-folder-open"></i> Escolher pasta
-                                <input id="pastaInput" type="file" webkitdirectory multiple class="sr-only">
-                            </label>
-                            <span id="selecionados" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Nenhum arquivo escolhido.</span>
-                        </div>
-                        <button type="submit" id="enviarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50" disabled><i aria-hidden="true" class="fa-solid fa-upload"></i> Enviar</button>
-                    </form>
-                    <div id="relatorio" class="text-sm space-y-1" aria-live="polite"></div>
                 </section>
 
                 <section class="space-y-3" aria-labelledby="baseTitulo">
@@ -471,7 +448,7 @@
                             <thead class="border-b border-gray-300 dark:border-gray-600">
                                 <tr>
                                     <th scope="col" class="py-2 pr-3">Nome</th>
-                                    <th scope="col" class="py-2 pr-3">Grupo</th>
+                                    <th scope="col" class="py-2 pr-3">Banca</th>
                                     <th scope="col" class="py-2 pr-3">Universidade · PPG</th>
                                     <th scope="col" class="py-2 pr-3">Situação</th>
                                     <th scope="col" class="py-2 pr-3">Atualização do Lattes</th>

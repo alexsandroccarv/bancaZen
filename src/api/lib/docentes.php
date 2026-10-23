@@ -2,12 +2,11 @@
 /* ==========================================================================
    bancaZen — Lista de docentes dos programas (importação de CSV)
    --------------------------------------------------------------------------
-   A lista diz quem é docente de qual programa (PROFIAP ou outro), com
-   universidade, PPG e situação no programa (Permanente, Colaborador,
-   Visitante), e pode ser importada antes dos XMLs do Lattes. A mesma regra
-   vale para os dois grupos: quando a pessoa está na lista, os dados da lista
-   valem para a exibição e para separar as listas de sugestões
-   (bb_programa_efetivo, em base.php).
+   A lista diz quem é docente de qual PPG, com universidade e situação no
+   programa (Permanente, Colaborador, Visitante), e pode ser importada antes
+   dos XMLs do Lattes. Quando a pessoa está na lista, os dados da lista valem
+   para a exibição e para separar as listas de sugestões pelo PPG (Rede
+   PROFIAP ou Externa: bb_programa_efetivo e bb_grupo_do_ppg, em base.php).
 
    Formato aceito (ex.: a planilha "docentes PROFIAP 2025"): CSV separado por
    ";" ou ",", com ou sem BOM, com cabeçalho. Colunas reconhecidas:
@@ -75,7 +74,7 @@ function doc_mesclar(array $a, array $b): array
 }
 
 // Lê o CSV e devolve [docentes por id, relatório].
-// $padrao = ['grupo' => ..., 'ppg' => ...] (PPG usado quando o arquivo não tem a coluna).
+// $padrao = ['ppg' => ...] (PPG usado quando a linha não tem a coluna ppg).
 function doc_ler_csv(string $conteudo, array $padrao): array
 {
     $conteudo = preg_replace('/^\xEF\xBB\xBF/', '', $conteudo);
@@ -118,7 +117,7 @@ function doc_ler_csv(string $conteudo, array $padrao): array
         $d = [
             'id' => $id, 'nome' => $nome,
             'universidade' => $iUniv !== null ? doc_capitalizar((string) ($c[$iUniv] ?? '')) : '',
-            'ppg' => $ppg !== '' ? $ppg : $padrao['ppg'], 'grupo' => $padrao['grupo'], 'situacao' => $situacao,
+            'ppg' => $ppg !== '' ? $ppg : $padrao['ppg'], 'situacao' => $situacao,
         ];
         if (isset($docentes[$id])) { $rel['duplicados']++; $docentes[$id] = doc_mesclar($docentes[$id], $d); }
         else $docentes[$id] = $d;

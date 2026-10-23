@@ -7,6 +7,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- Cadastro unificado na Administração: um só formulário recebe a lista de
+  docentes (CSV) e os currículos (XML/ZIP), com PPG (obrigatório) e
+  instituição e situação (opcionais; sem instituição, vale a do Lattes). Sai
+  o campo "Grupo": a lista da banca vem do PPG, **PROFIAP → Rede PROFIAP** e
+  qualquer outro PPG → **Externa**, inclusive para os dados já guardados (o
+  "grupo" gravado antes é ignorado). Listas e tabelas com os rótulos Rede
+  PROFIAP e Externa. [issue #19](../../issues/19)
+
+## [0.0.9] - 2026-10-23
+
 ### Adicionado
 - Modelo do arquivo CSV da lista de docentes na Administração: botão
   "Baixar modelo (CSV)" (separado por `;`, UTF-8 com BOM, gerado por

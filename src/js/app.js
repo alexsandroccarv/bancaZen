@@ -7,7 +7,7 @@
    seção que falta (botões data-ir, tratados em layout.js).
    O navegador só envia o formulário: a comparação com os currículos e a
    verificação de vínculos rodam no servidor (api/buscar.php), que devolve
-   duas listas (PROFIAP e outros programas) com até 10 pessoas sem vínculo
+   duas listas (Rede PROFIAP e Externa, pelo PPG) com até 10 pessoas sem vínculo
    cada, mais as retiradas por vínculo. Os currículos e o índice processado
    nunca chegam ao navegador.
    ========================================================================== */
@@ -36,7 +36,7 @@
         return url ? `<a href="${url}" target="_blank" rel="noopener" class="hover:underline">${esc(p.nome)}</a>` : esc(p.nome);
     }
     // Ficha da pessoa: Universidade, PPG, Situação no programa e Link do
-    // Lattes (o nome vem no título). Mesma ficha para PROFIAP e outros programas.
+    // Lattes (o nome vem no título). Mesma ficha para as duas listas.
     function ficha(p) {
         const url = urlLattes(p);
         const campo = (rotulo, valor) => `<div class="ficha-campo"><dt>${rotulo}</dt><dd>${valor}</dd></div>`;
@@ -220,10 +220,10 @@
         sec.classList.remove('hidden');
         $('#listas').innerHTML = listas.map((l, n) => {
             const resumo = l.resultados.length
-                ? `${l.resultados.length} pessoa(s) entre ${l.total} currículo(s) deste grupo.`
+                ? `${l.resultados.length} pessoa(s) entre ${l.total} currículo(s) desta lista.`
                 : (l.total
-                    ? `Nenhum dos ${l.total} currículo(s) deste grupo tem termos em comum com o trabalho sem ter vínculo identificado.`
-                    : 'Nenhum currículo cadastrado neste grupo.');
+                    ? `Nenhum dos ${l.total} currículo(s) desta lista tem termos em comum com o trabalho sem ter vínculo identificado.`
+                    : 'Nenhum currículo cadastrado nesta lista.');
             return `<section class="space-y-3" aria-labelledby="lista-${l.grupo}">
                 <h3 id="lista-${l.grupo}" class="text-base font-bold">${n + 1}. ${esc(l.titulo)}</h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">${esc(resumo)}</p>

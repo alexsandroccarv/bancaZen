@@ -6,10 +6,11 @@
      POST entrar     senha
      POST sair
      GET  listar     -> currículos da base (campos de exibição + programa)
-     POST enviar     arquivos[] (XML/ZIP), grupo, ppg, instituicao, situacao
-     POST programa   id, grupo, ppg, instituicao, situacao   (corrige o programa)
+     POST enviar     arquivos[] (XML/ZIP), ppg, instituicao, situacao
+     POST programa   id, ppg, instituicao, situacao   (corrige o programa)
      GET  docentes   -> lista de docentes dos programas, com currículo enviado ou não
-     POST importar-docentes   arquivo (CSV), grupo, ppg, substituir (1/0)
+     POST importar-docentes   arquivo (CSV), ppg, substituir (1/0)
+   O grupo da banca (Rede PROFIAP ou Externa) vem do PPG: bb_grupo_do_ppg.
      GET  modelo-docentes     -> modelo do CSV da lista de docentes (download;
                                  sem dados da base, não exige sessão)
      POST remover    id
@@ -63,7 +64,7 @@ try {
         case 'enviar':
             bb_exigir_metodo('POST');
             bb_exigir_admin();
-            $programa = bb_programa($post('grupo'), $post('ppg'), $post('instituicao'), $post('situacao'));
+            $programa = bb_programa($post('ppg'), $post('instituicao'), $post('situacao'));
             $arquivos = $_FILES['arquivos'] ?? null;
             if (!$arquivos || !is_array($arquivos['name'])) bb_erro('Nenhum arquivo recebido.');
             $relatorio = bb_alterar_corpus(function (array $corpus) use ($arquivos, $programa) {
@@ -95,7 +96,7 @@ try {
         case 'programa':
             bb_exigir_metodo('POST');
             bb_exigir_admin();
-            $programa = bb_programa($post('grupo'), $post('ppg'), $post('instituicao'), $post('situacao'));
+            $programa = bb_programa($post('ppg'), $post('instituicao'), $post('situacao'));
             $id = vinc_id_lattes($post('id'));
             bb_alterar_corpus(function (array $corpus) use ($id, $programa) {
                 if (!isset($corpus[$id])) throw new RuntimeException('currículo não encontrado');
@@ -108,7 +109,8 @@ try {
             bb_exigir_metodo('GET');
             if (!bb_admin_logado()) bb_erro('Sessão expirada. Entre de novo.', 401);
             $corpus = bb_carregar_corpus();
-            $lista = array_map(fn($d) => $d + ['temCurriculo' => isset($corpus[$d['id']])], array_values(bb_carregar_docentes()));
+            // O grupo calculado do PPG prevalece sobre um "grupo" gravado antes.
+            $lista = array_map(fn($d) => ['temCurriculo' => isset($corpus[$d['id']]), 'grupo' => bb_grupo_do_ppg($d['ppg'])] + $d, array_values(bb_carregar_docentes()));
             usort($lista, fn($a, $b) => strcmp(sim_sem_acento($a['nome']), sim_sem_acento($b['nome'])));
             bb_json(['docentes' => $lista]);
 
@@ -124,13 +126,11 @@ try {
         case 'importar-docentes':
             bb_exigir_metodo('POST');
             bb_exigir_admin();
-            $grupo = $post('grupo');
-            if (!isset(BB_GRUPOS[$grupo])) bb_erro('Grupo inválido.');
-            $ppg = $post('ppg') !== '' ? $post('ppg') : ($grupo === 'profiap' ? 'PROFIAP' : '');
+            $ppg = $post('ppg');
             if ($ppg === '') bb_erro('Informe o PPG.');
             $arq = $_FILES['arquivo'] ?? null;
             if (!$arq || ($arq['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) bb_erro('Nenhum arquivo CSV recebido.');
-            [$novos, $rel] = doc_ler_csv((string) file_get_contents($arq['tmp_name']), ['grupo' => $grupo, 'ppg' => bb_cortar($ppg, 200)]);
+            [$novos, $rel] = doc_ler_csv((string) file_get_contents($arq['tmp_name']), ['ppg' => bb_cortar($ppg, 200)]);
             if (!$novos) bb_erro($rel['exemplos'] && !$rel['semLattes']
                 ? 'O arquivo só tem as linhas de exemplo do modelo: substitua-as pelos docentes do programa (com o ID Lattes de cada um).'
                 : 'Nenhum docente com Lattes encontrado no arquivo.');

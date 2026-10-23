@@ -14,7 +14,8 @@
    Conteúdo:
      xml/<id>.xml   XML original de cada currículo (um por ID Lattes)
      corpus.json    índice processado { id: registro }; cada registro leva
-                    'programa' => ['grupo' => 'profiap'|'outro', 'ppg', 'instituicao', 'situacao']
+                    'programa' => ['ppg', 'instituicao', 'situacao'] (o grupo da
+                    banca vem do PPG: bb_grupo_do_ppg)
      docentes.json  lista de docentes dos programas { id Lattes: docente }
                     (lib/docentes.php), importada de CSV, sem e-mails
      admin.json     hash da senha da administração (php api/cli/definir-senha.php)
@@ -80,35 +81,49 @@ function bb_alterar_corpus(callable $fn) { return bb_alterar_json('corpus.json',
 function bb_carregar_docentes(): array { return bb_carregar_json('docentes.json'); }
 function bb_alterar_docentes(callable $fn) { return bb_alterar_json('docentes.json', $fn); }
 
-const BB_GRUPOS = ['profiap' => 'PROFIAP', 'outro' => 'Outros programas'];
+// Listas da banca. O grupo vem só do PPG (campo padronizado): PPG = PROFIAP
+// -> Rede PROFIAP; qualquer outro PPG -> Externa.
+const BB_GRUPOS = ['profiap' => 'Rede PROFIAP', 'outro' => 'Externa'];
+const BB_PPG_REDE = 'PROFIAP';
+
+function bb_grupo_do_ppg(string $ppg): string
+{
+    return sim_sem_acento(trim($ppg)) === sim_sem_acento(BB_PPG_REDE) ? 'profiap' : 'outro';
+}
 
 const BB_SITUACOES = ['Permanente', 'Colaborador', 'Visitante'];
 
-// Programa informado na administração: grupo, nome do PPG, instituição e
-// (opcional) situação no programa.
-function bb_programa(string $grupo, string $ppg, string $instituicao, string $situacao = ''): array
+// Programa informado na administração: PPG (obrigatório) e, opcionais,
+// instituição e situação no programa.
+function bb_programa(string $ppg, string $instituicao = '', string $situacao = ''): array
 {
-    if (!isset(BB_GRUPOS[$grupo])) throw new RuntimeException('grupo inválido');
-    $ppg = trim($ppg) !== '' ? trim($ppg) : ($grupo === 'profiap' ? 'PROFIAP' : '');
-    if ($ppg === '' || trim($instituicao) === '') throw new RuntimeException('informe o PPG e a instituição');
+    $ppg = trim($ppg);
+    if ($ppg === '') throw new RuntimeException('informe o PPG');
     $situacao = trim($situacao);
     if ($situacao !== '' && !in_array($situacao, BB_SITUACOES, true)) throw new RuntimeException('situação inválida');
-    return ['grupo' => $grupo, 'ppg' => bb_cortar($ppg, 200), 'instituicao' => bb_cortar(trim($instituicao), 200), 'situacao' => $situacao];
+    return ['ppg' => bb_cortar($ppg, 200), 'instituicao' => bb_cortar(trim($instituicao), 200), 'situacao' => $situacao];
 }
 function bb_cortar(string $s, int $n): string
 {
     return function_exists('mb_substr') ? mb_substr($s, 0, $n, 'UTF-8') : substr($s, 0, $n);
 }
-// Programa efetivo de um currículo. A mesma regra vale para PROFIAP e para
-// outros programas: se a pessoa está na lista de docentes, valem os dados da
-// lista (grupo, universidade, PPG, situação); senão, os informados no envio
-// do XML. Registros sem programa (não deveria haver) contam como PROFIAP, o
-// grupo original da base.
+// Programa efetivo de um currículo: se a pessoa está na lista de docentes,
+// valem PPG, universidade e situação da lista; senão, os informados no envio
+// do XML (sem instituição informada, vale a do endereço profissional do
+// Lattes). O grupo da banca é sempre calculado do PPG; um "grupo" gravado
+// por versões anteriores é ignorado.
 function bb_programa_efetivo(array $p, array $docentes = []): array
 {
     $d = $docentes[$p['id'] ?? ''] ?? null;
-    if ($d) return ['grupo' => $d['grupo'], 'ppg' => $d['ppg'], 'instituicao' => $d['universidade'], 'situacao' => $d['situacao'] ?? ''];
-    return ($p['programa'] ?? []) + ['grupo' => 'profiap', 'ppg' => '', 'instituicao' => '', 'situacao' => ''];
+    $prog = $d
+        ? ['ppg' => $d['ppg'], 'instituicao' => $d['universidade'], 'situacao' => $d['situacao'] ?? '']
+        : [
+            'ppg' => $p['programa']['ppg'] ?? '',
+            'instituicao' => ($p['programa']['instituicao'] ?? '') !== '' ? $p['programa']['instituicao'] : ($p['instituicao'] ?? ''),
+            'situacao' => $p['programa']['situacao'] ?? '',
+        ];
+    $prog['grupo'] = bb_grupo_do_ppg($prog['ppg']);
+    return $prog;
 }
 function bb_grupo(array $p, array $docentes = []): string
 {
