@@ -338,13 +338,14 @@
         // Na Rede PROFIAP o PPG é sempre PROFIAP: só aparece na Externa.
         const ppg = grupo === 'outro' && d.ppg ? `<span class="doc-ppg">${esc(d.ppg)}</span>` : '';
         const situacao = d.situacao ? `<span class="doc-situacao">${esc(d.situacao)}</span>` : '';
+        // Situação do currículo só com ícone, no início da linha; o texto fica
+        // na dica (title) e para leitores de tela.
+        const cv = d.temCurriculo ? 'Currículo enviado' : 'Currículo pendente';
         return `<li class="doc-linha">
+            <span class="doc-cv ${d.temCurriculo ? 'doc-cv-enviado' : 'doc-cv-pendente'}" title="${cv}"><i aria-hidden="true" class="${d.temCurriculo ? 'fa-solid fa-circle-check text-green-700 dark:text-green-400' : 'fa-regular fa-clock'}"></i><span class="sr-only">${cv}</span></span>
             <span class="doc-nome">${esc(d.nome)} ${situacao}${ppg}</span>
             <a class="doc-lattes text-brand-600 dark:text-accent-400 hover:underline" href="https://lattes.cnpq.br/${esc(d.id)}" target="_blank" rel="noopener" title="ID Lattes ${esc(d.id)}" aria-label="Currículo Lattes de ${esc(d.nome)} (abre em nova aba)"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i> Lattes</a>
             <span class="doc-email">${d.email ? `<a href="mailto:${esc(d.email)}" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(d.email)}</a>` : ''}</span>
-            <span class="doc-cv">${d.temCurriculo
-                ? '<i aria-hidden="true" class="fa-solid fa-circle-check text-green-700 dark:text-green-400"></i> enviado'
-                : '<i aria-hidden="true" class="fa-regular fa-clock"></i> pendente'}</span>
         </li>`;
     }
 
