@@ -198,6 +198,21 @@ confere que:
 
 Se alguma verificação falhar, o workflow fica vermelho.
 
+### Verificação do site
+
+A verificação acessa o site como um visitante, a partir dos executores do
+GitHub (que ficam em data centers do Azure). Muitas hospedagens compartilhadas
+bloqueiam IPs de data center ou programas automáticos, e respondem 404 ou
+403 mesmo com o site funcionando no navegador. Por isso, se o acesso a partir
+do GitHub falhar, a mesma verificação é refeita **de dentro do servidor**,
+pela conexão SSH do deploy (com o `curl` do servidor):
+
+| Resultado | Significado |
+|---|---|
+| `OK: site publicado verificado` | o site respondeu ao GitHub |
+| aviso "responde normalmente a partir do servidor" + `OK (a partir do servidor)` | o site está no ar; a hospedagem bloqueia o GitHub (não é preciso fazer nada) |
+| erro "também falhou quando verificado de dentro do servidor" | problema real: confira o `SITE_URL` (o endereço que abre o bancaZen no navegador, sem `#` e sem barra final) e a configuração do site |
+
 ---
 
 ## Passo 5: senha da administração (uma vez, e para trocar)
@@ -252,6 +267,8 @@ site (que o deploy preserva).
 | `não está vazia e não tem o marcador .bancazen-deploy` | Primeiro deploy numa pasta com outro conteúdo. Esvazie a pasta ou, se ela já é do bancaZen, crie o marcador com `touch`. |
 | `Pasta de dados criada ... Dê a posse ao usuário do PHP` | O deploy criou a pasta com o usuário de deploy; o PHP precisa escrever nela: `sudo chown -R www-data:www-data /var/www/bancazen-dados`. |
 | `Senha da administração não definida` | Faça o Passo 5. |
+| `O site responde normalmente a partir do servidor, mas não aos executores do GitHub` (aviso) | A hospedagem bloqueia os IPs do GitHub; o site está no ar e a publicação é considerada OK (seção "Verificação do site"). Para a verificação direta funcionar, peça ao suporte para liberar o acesso de IPs de data center. |
+| `O site também falhou quando verificado de dentro do servidor` | O `SITE_URL` não é o endereço público do site, ou o site não está respondendo. |
 | `api/status.php devolveu código PHP` | O servidor web não executa PHP nessa pasta. Instale/habilite o PHP (8.0+) no site. |
 | `api/lib/... expõe código-fonte` ou `respondeu com conteúdo` | Bloqueie `api/lib` e `api/cli` (seção "Backend"). No Apache, confira o `AllowOverride`. |
 | `rsync indisponível/falhou: usando o envio por tar` | O servidor não tem rsync; o deploy usou tar por SSH, com o mesmo resultado. Instalar o rsync deixa o envio incremental. |

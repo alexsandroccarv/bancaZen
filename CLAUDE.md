@@ -107,7 +107,8 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
 - Publicação: `deploy.yml` roda DEPOIS do `version-bump.yml` na `main`
   (`workflow_run`), valida de novo e publica o `dist/` por rsync/SSH
   (`.github/scripts/deploy.sh`), depois testa o site
-  (`.github/scripts/verificar-site.sh`). Manual: Actions → Publicar (só `main`).
+  (`.github/scripts/verificar-site.sh`; se a hospedagem bloquear os IPs do
+  GitHub, refaz a verificação de dentro do servidor por SSH e só avisa). Manual: Actions → Publicar (só `main`).
 - Segredos (repositório ou ambiente `producao`): `SSH_KEY`, `SSH_HOST`,
   `SSH_USER`, `DEPLOY_PATH`; opcionais `SSH_PORT`, `SSH_KNOWN_HOSTS`.
 - Variáveis: `SITE_URL` (metatags, `sitemap.xml`, verificação pós-deploy) e

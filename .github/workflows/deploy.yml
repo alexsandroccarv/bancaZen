@@ -64,8 +64,14 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           BANCAZEN_DADOS: ${{ vars.BANCAZEN_DADOS }}
 
+      # Se o site não responder aos executores do GitHub (bloqueio de IPs de
+      # data center pela hospedagem), a verificação é refeita de dentro do
+      # servidor, pela mesma conexão SSH do deploy.
       - name: Verificar o site publicado
         if: steps.deploy.outputs.publicado == 'sim'
         run: bash .github/scripts/verificar-site.sh
         env:
           SITE_URL: ${{ vars.SITE_URL }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
