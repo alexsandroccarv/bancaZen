@@ -84,12 +84,12 @@ confere(!vinc_chaves_combinam(vinc_chave('SILVA, J.'), vinc_chave('João Pedro S
 confere(vinc_chaves_combinam(vinc_chave('SILVA, J. P.'), vinc_chave('João Pedro da Silva Junior')), 'partículas e sufixos');
 
 /* ---------------------- base: mesmo ID e programa ------------------------ */
-$prof = bb_programa('profiap', '', 'Universidade Federal Exemplo');
-confere($prof['ppg'] === 'PROFIAP', 'PPG padrão do grupo PROFIAP');
-$outro = bb_programa('outro', 'PPG em Administração', 'Universidade Estadual Teste');
+$prof = bb_programa('PROFIAP', 'Universidade Federal Exemplo');
+confere($prof['ppg'] === 'PROFIAP', 'PPG informado');
+$outro = bb_programa('PPG em Administração', 'Universidade Estadual Teste');
 $erro = '';
-try { bb_programa('outro', '', 'X'); } catch (RuntimeException $e) { $erro = $e->getMessage(); }
-confere($erro !== '', 'PPG obrigatório para outro programa');
+try { bb_programa('', 'X'); } catch (RuntimeException $e) { $erro = $e->getMessage(); }
+confere($erro !== '', 'PPG obrigatório');
 
 $xmlAna = $brutos[array_search('0000000000000001', array_column($pessoas, 'id'), true)]['xml'];
 $r1 = bb_alterar_corpus(function ($c) use ($ana, $xmlAna, $prof) { $r = bb_guardar_curriculo($c, $ana, $xmlAna, $prof); return [$c, $r]; });
@@ -108,7 +108,7 @@ confere(!isset(bb_publico($c['0000000000000001'])['producoes']), 'saída públic
 confere(bb_publico($c['0000000000000001'])['ppg'] === 'PPG em Administração', 'saída pública com PPG');
 
 /* --------------------------- lista de docentes -------------------------- */
-[$docs, $rel] = doc_ler_csv(file_get_contents("$dir/docentes.csv"), ['grupo' => 'profiap', 'ppg' => 'PROFIAP']);
+[$docs, $rel] = doc_ler_csv(file_get_contents("$dir/docentes.csv"), ['ppg' => 'PROFIAP']);
 confere($rel['linhas'] === 5 && $rel['importados'] === 3, 'docentes: 5 linhas, 3 pessoas');
 confere($rel['duplicados'] === 1, 'docentes: duplicidade pelo ID Lattes');
 confere($rel['semLattes'] === ['Sem Lattes Nenhum'], 'docentes: linha sem Lattes informada');
@@ -124,10 +124,10 @@ confere($docs['0000000000000099']['situacao'] === 'Visitante', 'docentes: situa�
 // linhas de exemplo são ignoradas.
 $modelo = doc_modelo_csv();
 confere(str_starts_with($modelo, "\xEF\xBB\xBF") && str_contains($modelo, 'nome;lattes_id;universidade;categoria;ppg'), 'modelo: BOM e cabeçalho');
-[$doModelo, $relModelo] = doc_ler_csv($modelo, ['grupo' => 'profiap', 'ppg' => 'PROFIAP']);
+[$doModelo, $relModelo] = doc_ler_csv($modelo, ['ppg' => 'PROFIAP']);
 confere($doModelo === [] && $relModelo['exemplos'] === 2 && $relModelo['linhas'] === 2 && $relModelo['colunasDescartadas'] === [], 'modelo: colunas reconhecidas e exemplos ignorados');
 $preenchido = str_replace('Maria Exemplo da Silva;0000000000000000', 'Maria Exemplo da Silva;0000000000000077', $modelo);
-[$umDoModelo] = doc_ler_csv($preenchido, ['grupo' => 'profiap', 'ppg' => 'Outro']);
+[$umDoModelo] = doc_ler_csv($preenchido, ['ppg' => 'Outro']);
 confere(isset($umDoModelo['0000000000000077']) && $umDoModelo['0000000000000077']['ppg'] === 'PROFIAP' && $umDoModelo['0000000000000077']['situacao'] === 'Permanente', 'modelo preenchido: coluna ppg prevalece sobre o formulário');
 
 // Substituir a lista do mesmo PPG retira quem não está no arquivo novo; outro PPG fica.
@@ -138,15 +138,26 @@ confere(!isset($juntos['0000000000000050']) && isset($juntos['0000000000000060']
 confere(isset($juntos['0000000000000050']), 'docentes: sem substituir, mantém os anteriores');
 
 // Mesma regra para os dois grupos: a lista prevalece sobre o informado no envio.
-$diego = $porId['0000000000000004'] + ['programa' => bb_programa('outro', 'PPG Qualquer', 'Outra Universidade', 'Colaborador')];
+$diego = $porId['0000000000000004'] + ['programa' => bb_programa('PPG Qualquer', 'Outra Universidade', 'Colaborador')];
 $pubDiego = bb_publico($diego, $docs);
 confere(bb_grupo($diego, $docs) === 'profiap' && $pubDiego['ppg'] === 'PROFIAP', 'programa efetivo: lista de docentes prevalece');
 confere($pubDiego['universidade'] === 'Universidade Estadual Teste' && $pubDiego['situacao'] === 'Permanente', 'programa efetivo: universidade e situação da lista');
 $semLista = bb_publico($diego, []);
 confere($semLista['ppg'] === 'PPG Qualquer' && $semLista['situacao'] === 'Colaborador' && bb_grupo($diego) === 'outro', 'programa efetivo: sem a lista, vale o envio');
 $erro = '';
-try { bb_programa('outro', 'PPG', 'Inst', 'Diretor'); } catch (RuntimeException $e) { $erro = $e->getMessage(); }
+try { bb_programa('PPG', 'Inst', 'Diretor'); } catch (RuntimeException $e) { $erro = $e->getMessage(); }
 confere($erro !== '', 'situação inválida recusada');
+
+/* ---------------- lista da banca pelo PPG (Rede PROFIAP / Externa) -------- */
+foreach (['PROFIAP', 'profiap', ' Profiap ', 'PRÓFIAP'] as $ppg) confere(bb_grupo_do_ppg($ppg) === 'profiap', "PPG \"$ppg\" -> Rede PROFIAP");
+foreach (['PPG em Administração', 'PROFIAP-UFX', 'Rede', ''] as $ppg) confere(bb_grupo_do_ppg($ppg) === 'outro', "PPG \"$ppg\" -> Externa");
+confere(BB_GRUPOS === ['profiap' => 'Rede PROFIAP', 'outro' => 'Externa'], 'rótulos das listas');
+// Registros de versões anteriores, com "grupo" gravado, seguem o PPG.
+$antigo = ['id' => '0000000000000002', 'nome' => 'X', 'instituicao' => 'Inst. do Lattes', 'programa' => ['grupo' => 'outro', 'ppg' => 'PROFIAP', 'instituicao' => '']];
+confere(bb_grupo($antigo) === 'profiap', 'grupo gravado antes é ignorado: vale o PPG');
+confere(bb_publico($antigo)['universidade'] === 'Inst. do Lattes', 'sem instituição no envio, vale a do Lattes');
+$docAntigo = ['0000000000000002' => ['id' => '0000000000000002', 'nome' => 'X', 'universidade' => 'U', 'ppg' => 'PPG Y', 'grupo' => 'profiap', 'situacao' => '']];
+confere(bb_grupo($antigo, $docAntigo) === 'outro', 'lista de docentes antiga com "grupo": vale o PPG da lista');
 
 // limpeza
 array_map('unlink', glob("$tmp/xml/*"));

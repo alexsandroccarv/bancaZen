@@ -8,7 +8,7 @@
      para cada envolvida (discente, orientador, coorientador):
        <papel>Arquivo  XML/ZIP do Lattes  -> lido em memória, NÃO é gravado
        <papel>Id       link ou ID Lattes de currículo que já está na base
-   Devolve duas listas (PROFIAP e outros programas), cada uma com as 10
+   Devolve duas listas (Rede PROFIAP e Externa, pelo PPG), cada uma com as 10
    pessoas mais próximas SEM vínculo e as retiradas por vínculo, só com os
    campos de exibição (bb_publico). O índice completo e os XML nunca saem do
    servidor.
