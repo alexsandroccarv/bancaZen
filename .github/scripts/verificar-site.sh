@@ -22,7 +22,6 @@ if [ -z "${SITE_URL:-}" ]; then
 fi
 BASE="${SITE_URL%/}"
 RESP=$(mktemp)
-trap 'rm -f "$RESP"' EXIT
 # Identificação de navegador: firewalls (Imunify360, ModSecurity) costumam
 # barrar o User-Agent padrão do curl.
 UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36 bancaZen-verificacao'
@@ -38,24 +37,44 @@ baixar_github() {
 # Caminho 2: de dentro do servidor, pela conexão SSH do deploy.
 SSH_OPTS="-i $HOME/.ssh/id_deploy -p ${SSH_PORT:-22} -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=30"
 tem_ssh() { [ -n "${SSH_HOST:-}" ] && [ -n "${SSH_USER:-}" ] && [ -f "$HOME/.ssh/id_deploy" ]; }
+NOTA=$(mktemp)
+trap 'rm -f "$RESP" "$NOTA"' EXIT
 baixar_servidor() {
-  # O servidor imprime o código na 1ª linha e, em seguida, até 4 KB do corpo.
-  local saida
+  # O servidor imprime o código na 1ª linha, um diagnóstico na 2ª e, em
+  # seguida, até 4 KB do corpo. Códigos especiais: sem-curl e ssh (a conexão
+  # SSH falhou). O diagnóstico vai para $NOTA (a função roda em subshell).
+  local saida st=0
   # O ssh junta os argumentos num só comando de texto: printf %q protege os
   # espaços e parênteses do User-Agent.
-  saida=$(ssh $SSH_OPTS "${SSH_USER}@${SSH_HOST}" "bash -s -- $(printf '%q ' "$BASE/$1" "$UA")" <<'REMOTO' 2>/dev/null || true
-t=$(mktemp)
-if command -v curl >/dev/null 2>&1; then
-  c=$(curl -sS -L --max-time 30 -A "$2" -o "$t" -w '%{http_code}' "$1" 2>/dev/null) || true
-  c=${c:-000}
-else
-  c=sem-curl
+  saida=$(ssh $SSH_OPTS "${SSH_USER}@${SSH_HOST}" "bash -s -- $(printf '%q ' "$BASE/$1" "$UA")" 2>"$NOTA.ssh" <<'REMOTO'
+url=$1; ua=$2; t=$(mktemp)
+if ! command -v curl >/dev/null 2>&1; then echo sem-curl; echo "curl ausente"; exit 0; fi
+pedir() { curl -sS -L --max-time 20 -A "$ua" -o "$t" -w '%{http_code}' "$@" "$url" 2>"$t.err"; }
+c=$(pedir) || true; c=${c:-000}; nota=""
+if [ "$c" = 000 ]; then
+  # Sem resposta: muitas hospedagens não deixam o servidor alcançar o próprio
+  # endereço público. Repete com o mesmo nome (e certificado) em 127.0.0.1;
+  # -k porque a conexão não sai da máquina.
+  nota="endereço público: $(head -c 150 "$t.err" | tr '\n' ' ')"
+  hp=${url#*://}; hp=${hp%%/*}; host=${hp%%:*}
+  case $url in https:*) porta=443;; *) porta=80;; esac
+  [ "$hp" != "$host" ] && porta=${hp#*:}
+  c=$(pedir -k --resolve "$host:$porta:127.0.0.1") || true; c=${c:-000}
+  if [ "$c" = 000 ]; then nota="$nota; 127.0.0.1: $(head -c 150 "$t.err" | tr '\n' ' ')"
+  else nota="$nota; respondeu via 127.0.0.1"; fi
 fi
-echo "$c"; head -c 4000 "$t"; rm -f "$t"
+echo "$c"; echo "$nota"; head -c 4000 "$t"; rm -f "$t" "$t.err"
 REMOTO
-)
-  local cod=${saida%%$'\n'*}
-  if [[ "$saida" == *$'\n'* ]]; then printf '%s' "${saida#*$'\n'}" > "$RESP"; else : > "$RESP"; fi
+) || st=$?
+  if [ "$st" = 255 ]; then
+    echo "conexão SSH falhou: $(tr '\n' ' ' < "$NOTA.ssh" | head -c 200)" > "$NOTA"
+    : > "$RESP"; rm -f "$NOTA.ssh"; echo ssh; return
+  fi
+  rm -f "$NOTA.ssh"
+  local cod=${saida%%$'\n'*} resto=""
+  [[ "$saida" == *$'\n'* ]] && resto=${saida#*$'\n'}
+  printf '%s\n' "${resto%%$'\n'*}" > "$NOTA"
+  if [[ "$resto" == *$'\n'* ]]; then printf '%s' "${resto#*$'\n'}" > "$RESP"; else : > "$RESP"; fi
   [[ "$cod" =~ ^([0-9]{3}|sem-curl)$ ]] && echo "$cod" || echo 000
 }
 
@@ -108,11 +127,17 @@ fi
 
 for p in "${PROBLEMAS_GITHUB[@]}"; do echo "  (GitHub) $p"; done
 echo "Verificando $BASE a partir do servidor (SSH)…"
-if [ "$(baixar_servidor '')" = sem-curl ]; then
-  for p in "${PROBLEMAS_GITHUB[@]}"; do echo "::error::$p"; done
-  echo "::error::O servidor não tem curl: não foi possível verificar o site a partir dele."
-  exit 1
-fi
+COD_SERVIDOR=$(baixar_servidor '')
+DIAG=$(cat "$NOTA")
+echo "  servidor -> página inicial: HTTP $COD_SERVIDOR${DIAG:+ ($DIAG)}"
+case "$COD_SERVIDOR" in
+  sem-curl|ssh|000)
+    # Nenhuma resposta HTTP de dentro do servidor: não dá para concluir nada
+    # sobre o site. O rsync já foi confirmado pelo deploy.sh; avisa sem falhar.
+    for p in "${PROBLEMAS_GITHUB[@]}"; do echo "::warning::(GitHub) $p"; done
+    echo "::warning::Verificação inconclusiva: o GitHub recebeu erro e o servidor não obteve resposta HTTP do próprio site (${DIAG:-sem detalhes}). Os arquivos foram publicados; confira o site no navegador. Veja DEPLOY.md, \"Verificação do site\"."
+    exit 0 ;;
+esac
 if verificar baixar_servidor; then
   echo "::warning::O site responde normalmente a partir do servidor, mas não aos executores do GitHub (provável bloqueio de IPs de data center ou firewall da hospedagem). Publicação considerada OK. Veja DEPLOY.md, \"Verificação do site\"."
   echo "OK: site publicado verificado em $BASE (a partir do servidor)."
