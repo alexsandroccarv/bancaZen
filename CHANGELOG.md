@@ -8,6 +8,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Corrigido
+- Verificação do site a partir do servidor: todas as requisições usam uma só
+  conexão SSH, porque a hospedagem recusa conexões seguidas. DEPLOY.md explica
+  o 404 obtido também de dentro do servidor (`SITE_URL` diferente do endereço
+  do site). [issue #27](../../issues/27)
+
+## [0.0.13] - 2026-10-23
+
+### Corrigido
 - Verificação do site a partir do servidor: quando a requisição não tem
   resposta (HTTP 000), o log mostra o motivo (erro do `curl` ou da conexão
   SSH) e a requisição é repetida apontando o endereço para `127.0.0.1`, pois

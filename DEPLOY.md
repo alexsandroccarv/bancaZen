@@ -273,6 +273,7 @@ site (que o deploy preserva).
 | `Senha da administração não definida` | Faça o Passo 5. |
 | `O site responde normalmente a partir do servidor, mas não aos executores do GitHub` (aviso) | A hospedagem bloqueia os IPs do GitHub; o site está no ar e a publicação é considerada OK (seção "Verificação do site"). Para a verificação direta funcionar, peça ao suporte para liberar o acesso de IPs de data center. |
 | `Verificação inconclusiva` (aviso) | Nem o GitHub nem o servidor obtiveram resposta do site. O aviso traz o erro do `curl` (por exemplo, `Could not resolve host` ou `Failed to connect`) ou da conexão SSH. Se o site abre no navegador, não é preciso fazer nada. |
+| `servidor -> página inicial: HTTP 404` e erro "também falhou" | O endereço do `SITE_URL` não chega à pasta do site, nem a partir do próprio servidor. Use o endereço que aparece na barra do navegador quando o bancaZen abre (o domínio do site, não o nome do servidor SSH), sem `#` e sem barra final. |
 | `O site também falhou quando verificado de dentro do servidor` | O `SITE_URL` não é o endereço público do site, ou o site não está respondendo. |
 | `api/status.php devolveu código PHP` | O servidor web não executa PHP nessa pasta. Instale/habilite o PHP (8.0+) no site. |
 | `api/lib/... expõe código-fonte` ou `respondeu com conteúdo` | Bloqueie `api/lib` e `api/cli` (seção "Backend"). No Apache, confira o `AllowOverride`. |
