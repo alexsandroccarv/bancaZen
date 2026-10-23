@@ -73,21 +73,18 @@
     /* ------------------------------ documento ----------------------------- */
     function paragrafoEtico(c, retirados) {
         const considerados = (c && c.considerados) || [];
-        const comCurriculo = considerados.filter((p) => !p.soNome).map((p) => `${p.nome} (${p.papel.toLowerCase()})`);
-        const soNome = considerados.filter((p) => p.soNome).map((p) => `${p.nome} (${p.papel.toLowerCase()})`);
         const vinculos = 'coautoria em publicações, relação de orientação ou identidade de pessoa';
+        // Sem currículo nem nome da autoria e da orientação, a ferramenta não
+        // verificou vínculos: o texto não atribui a ela essa verificação.
         if (!considerados.length) {
             return `<p>A verificação automática de vínculos não foi realizada, pois os currículos e os nomes da autoria e da
                 orientação não foram informados na ferramenta. Declaro que as pessoas escolhidas não têm vínculo
                 pré-existente (${vinculos}) com a autoria do trabalho nem com a orientação.</p>`;
         }
-        const fontes = [];
-        if (comCurriculo.length) fontes.push(`a partir dos currículos Lattes de ${juntar(comCurriculo)}`);
-        if (soNome.length) fontes.push(`apenas pelo nome, sem o currículo, de ${juntar(soNome)}`);
         return `<p>Foram observados critérios éticos. A ferramenta retirou das indicações as pessoas com vínculo
-            pré-existente (${vinculos}) com a autoria do trabalho ou com a orientação, verificado ${juntar(fontes)}.
-            ${retirados === 1 ? 'Uma pessoa foi retirada' : `${retirados} pessoas foram retiradas`} das indicações por esse motivo.
-            ${soNome.length ? 'Na verificação apenas pelo nome, as publicações da própria pessoa não puderam ser conferidas; para ela, declaro também a ausência de vínculo pré-existente com as pessoas escolhidas.' : ''}</p>`;
+            pré-existente (${vinculos}) com a autoria do trabalho ou com a orientação.
+            ${retirados === 1 ? '1 pessoa foi retirada' : `${retirados} pessoas foram retiradas`} das indicações por esse motivo.
+            Declaro também a ausência de vínculo pré-existente com as pessoas escolhidas.</p>`;
     }
     function tabelaIndicacoes(l, marcadas) {
         if (!l.resultados.length) return `<p><strong>${esc(l.titulo)}:</strong> sem indicações.</p>`;
@@ -128,7 +125,7 @@
         const retirados = resultado.listas.reduce((n, l) => n + (l.retirados || []).length, 0);
         const cr = resultado.criterios;
         const criterios = [
-            cr.excluirInstituicao ? `desconsideradas as pessoas da instituição "${cr.excluirInstituicao}"` : '',
+            cr.excluirInstituicao ? 'desconsideradas as pessoas da própria instituição' : '',
             cr.somenteDoutores ? 'somente pessoas com doutorado concluído' : '',
             cr.periodo ? `coautorias dos últimos ${cr.periodo} anos` : 'coautorias de todo o período',
         ].filter(Boolean);
@@ -150,27 +147,35 @@
                 <p>${esc(programa || branco)}</p>
             </div>
             <h3 class="doc-titulo">Declaração de indicação de membros externos para a banca de ${tipo}</h3>
-            <p>Eu, ${esc(d.nome || branco)}, discente do ${esc(programa || branco)}, responsável pelo trabalho intitulado
-                "${esc(d.titulo || branco)}", sob orientação de ${esc(orientador || branco)}${coorientador ? ` e coorientação de ${esc(coorientador)}` : ''},
-                declaro que a escolha dos membros externos da banca de ${tipo} seguiu um processo objetivo de
-                indicação, apoiado pela ferramenta bancaZen.</p>
+            <dl class="doc-identificacao">
+                <dt>Discente</dt><dd>${esc(d.nome || branco)}</dd>
+                <dt>Trabalho</dt><dd>${esc(d.titulo || branco)}</dd>
+                <dt>Orientação</dt><dd>${esc(orientador || branco)}</dd>
+                ${coorientador ? `<dt>Coorientação</dt><dd>${esc(coorientador)}</dd>` : ''}
+            </dl>
+            <p>A escolha dos membros externos da banca de ${tipo} seguiu um processo objetivo de indicação, apoiado pela
+                ferramenta bancaZen, desenvolvida por ${esc(autor)} e disponível em ${esc(enderecoSite())}.</p>
             <p>A ferramenta comparou o título, o resumo e as palavras-chave do trabalho com os currículos Lattes cadastrados,
                 pelo modelo BM25, e calculou para cada pessoa um índice de proximidade temática de 0 a 1. As indicações foram
                 apresentadas em duas listas, Rede PROFIAP e Externa, em ordem decrescente do índice. Critérios da busca:
                 ${esc(criterios.join('; '))}.</p>
             ${paragrafoEtico(resultado.conformidade, retirados)}
-            <h4 class="doc-subtitulo">Indicações do bancaZen</h4>
-            <p class="doc-nota">Busca realizada em ${esc(dataHora(resultado.em))}. Índice de proximidade de 0 a 1.</p>
-            ${resultado.listas.map((l) => tabelaIndicacoes(l, marcadas)).join('')}
-            <h4 class="doc-subtitulo">Pessoas escolhidas</h4>
-            <ol class="doc-escolhidas">
-                ${lista.map((x) => `<li>${esc(x.pessoa.nome)}, ${esc(x.pessoa.universidade || x.pessoa.instituicao || '')}, ${esc(PAPEIS_BANCA[x.papel].toLowerCase())}
-                    (lista ${esc(x.lista)}, ${x.posicao}ª indicação, índice ${fmt.format(x.score)})</li>`).join('')}
-            </ol>
+            <div class="doc-escolhidas">
+                <h4 class="doc-subtitulo">Membros externos escolhidos</h4>
+                <ol>
+                    ${lista.map((x) => `<li><strong>${esc(x.pessoa.nome)}</strong>, ${esc(x.pessoa.universidade || x.pessoa.instituicao || '')}
+                        <span class="doc-papel">${esc(PAPEIS_BANCA[x.papel])}</span></li>`).join('')}
+                </ol>
+            </div>
             <p class="doc-local">${esc(local || branco)}, ${esc(dataExtenso(agora))}.</p>
             <div class="doc-assinaturas">
                 <div><span class="doc-linha-assinatura"></span>${esc(d.nome || 'Discente')}<br><small>Discente</small></div>
                 <div><span class="doc-linha-assinatura"></span>${esc(orientador || 'Orientação')}<br><small>Orientação</small></div>
+            </div>
+            <div class="doc-anexo">
+                <h4 class="doc-subtitulo">Indicações do bancaZen</h4>
+                <p class="doc-nota">Busca realizada em ${esc(dataHora(resultado.em))}. Índice de proximidade de 0 a 1; em negrito, as pessoas escolhidas.</p>
+                ${resultado.listas.map((l) => tabelaIndicacoes(l, marcadas)).join('')}
             </div>
             <div class="doc-rodape">
                 <p>Documento gerado em ${esc(dataHora(agora))} pelo bancaZen ${esc(versao)} (${esc(enderecoSite())}).</p>
