@@ -43,6 +43,31 @@ confere(str_starts_with($ana['resumo'], 'Professora') && !str_contains($ana['res
 confere(in_array('Accountability', $ana['palavrasChave'], true), 'palavras-chave');
 confere(!str_contains(json_encode($ana), 'nao@extrair.br'), 'e-mail não é extraído');
 confere($porId['0000000000000005']['nome'] === 'Elisa Zipada Teste', 'leitura de ZIP');
+confere(count($ana['bancas']) === 3 && $ana['bancas'][0]['t'] === 'Banca sobre tema qualquer de outra pessoa 0', 'títulos das bancas de mestrado');
+confere(($ana['producoes'][0]['tp'] ?? '') === 'a' && $ana['versao'] === LATTES_VERSAO, 'artigos marcados; versão do extrator');
+
+/* ---------------------------------- BM25 --------------------------------- */
+// Pessoas fictícias mínimas para conferir as propriedades do BM25.
+$pp = fn($id, $resumo, $extra = []) => ['id' => $id, 'nome' => "Pessoa $id", 'resumo' => $resumo] + $extra;
+$focado = $pp('A', 'auditoria governamental');
+$extenso = $pp('B', 'auditoria governamental ' . str_repeat('logística transporte armazenagem estoque frota ', 40));
+$repete1 = $pp('C', 'controladoria municipal');
+$repete8 = $pp('D', str_repeat('controladoria ', 8) . 'municipal');
+$bancaSo = $pp('E', 'saúde coletiva', ['bancas' => [['t' => 'Ouvidoria pública e participação', 'a' => '2025']]]);
+$neutros = array_map(fn($i) => $pp("N$i", 'logística empresarial e cadeia de suprimentos'), range(1, 6));
+$ib = sim_criar_indice(array_merge([$focado, $extenso, $repete1, $repete8, $bancaSo], $neutros), 2026);
+$nota = function (string $texto, string $id) use ($ib) {
+    foreach (sim_buscar($ib, ['titulo' => $texto], ['limite' => INF])['resultados'] as $r) if ($r['pessoa']['id'] === $id) return $r['score'];
+    return 0.0;
+};
+confere($nota('auditoria governamental', 'A') > $nota('auditoria governamental', 'B'), 'BM25: currículo extenso não ganha só pelo volume');
+$n1 = $nota('controladoria', 'C');
+$n8 = $nota('controladoria', 'D');
+confere($n8 > $n1 && $n8 < 2 * $n1, 'BM25: repetir o termo rende cada vez menos (saturação)');
+confere($nota('ouvidoria pública', 'E') > 0, 'títulos das bancas entram na busca');
+foreach (sim_buscar($ib, ['titulo' => 'auditoria governamental controladoria ouvidoria'], ['limite' => INF])['resultados'] as $r) {
+    confere($r['score'] > 0 && $r['score'] < 1, 'BM25: proximidade entre 0 e 1');
+}
 
 /* ------------------------------- proximidade ----------------------------- */
 $indice = sim_criar_indice($pessoas, 2026);
@@ -203,13 +228,21 @@ $leves = bb_carregar_corpus();
 confere(!isset(reset($leves)['producoes']) && is_file("$tmpR/pessoas/0000000000000001.json"), 'corpus.json leve; registro completo em pessoas/');
 $compl = bb_carregar_pessoa($leves['0000000000000001']);
 confere(!empty($compl['producoes']) && $compl['programa']['ppg'] === 'PROFIAP', 'registro completo com produções e o programa do corpus');
+// Registro gravado por versão anterior do extrator: relido do XML guardado.
+$velho = json_decode(file_get_contents("$tmpR/pessoas/0000000000000001.json"), true);
+unset($velho['bancas']);
+$velho['versao'] = 1;
+file_put_contents("$tmpR/pessoas/0000000000000001.json", json_encode($velho));
+$relido = bb_carregar_pessoa($leves['0000000000000001']);
+confere(count($relido['bancas']) === 3 && $relido['programa']['ppg'] === 'PROFIAP', 'registro antigo relido do XML (títulos das bancas), programa mantido');
+confere(json_decode(file_get_contents("$tmpR/pessoas/0000000000000001.json"), true)['versao'] === LATTES_VERSAO, 'registro relido regravado na versão atual');
 // Índice em partes no disco: mesmo ranking da busca em memória.
 $meta = bb_indice_garantir();
 confere($meta['N'] === count($leves) && is_dir("$tmpR/indice/termos"), 'índice de busca gravado em partes');
 $consultaT = ['titulo' => 'Governança pública e transparência', 'resumo' => 'controle social nos municípios', 'palavrasChave' => ['accountability']];
 $docsT = [];
-foreach ($meta['ids'] as $k => $id) $docsT[$k] = ['pessoa' => $leves[$id], 'norma' => $meta['normas'][$k]];
-$disco = sim_buscar_partes($consultaT, ['limite' => INF], bb_indice_leitor(), $docsT);
+foreach ($meta['ids'] as $k => $id) $docsT[$k] = ['pessoa' => $leves[$id], 'comprimento' => $meta['comprimentos'][$k]];
+$disco = sim_buscar_partes($consultaT, ['limite' => INF], bb_indice_leitor(), $docsT, $meta['media']);
 $memoria = sim_buscar(sim_criar_indice(array_map('bb_carregar_pessoa', array_values($leves))), $consultaT, ['limite' => INF]);
 $resumoR = fn($r) => array_map(fn($x) => $x['pessoa']['id'] . ':' . round($x['score'], 4) . ':' . implode(',', $x['termos']), $r['resultados']);
 confere($resumoR($disco) === $resumoR($memoria) && count($disco['resultados']) > 0, 'busca no índice em partes = busca em memória (ordem, proximidade e termos)');

@@ -46,14 +46,17 @@ coautorias é configurável (todo o período, 10 ou 5 anos). A etapa "Minha
 orientação" é opcional: o resultado mostra quem foi considerado na
 verificação ou avisa que ela não foi feita.
 
-**Como a proximidade é calculada.** Cada currículo vira um vetor de termos
+**Como a proximidade é calculada.** Cada currículo vira um conjunto de termos
 (resumo, linhas de pesquisa, áreas do conhecimento, palavras-chave, títulos
-da formação, dos projetos, das produções e das orientações), com pesos por
-campo e peso menor para produções com mais de 10 anos. O trabalho informado
-vira outro vetor (palavras-chave e título pesam mais que o resumo). Os
+da formação, dos projetos, dos artigos e demais produções, das orientações e
+das bancas de mestrado, doutorado e qualificação de que a pessoa participou),
+com pesos por campo (artigos e bancas acima das demais produções) e peso
+menor para produções com mais de 10 anos. O trabalho informado
+vira a consulta (palavras-chave e título pesam mais que o resumo). Os
 termos passam por remoção de acentos e de palavras vazias, radical leve e
-bigramas; a ponderação é TF-IDF e a proximidade é o cosseno entre os
-vetores (0 a 1). Filtros opcionais: desconsiderar a instituição do programa
+bigramas; a pontuação é BM25 (IDF, saturação da frequência e ajuste ao
+tamanho do currículo), e a proximidade (0 a 1) é a pontuação dividida pelo
+máximo que a consulta poderia alcançar. Filtros opcionais: desconsiderar a instituição do programa
 e manter só doutores.
 
 **Código.** Backend em PHP 8 sem dependências, em `src/api/`:

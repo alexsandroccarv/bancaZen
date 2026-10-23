@@ -7,6 +7,22 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- Busca com o modelo BM25 no lugar de TF-IDF e cosseno: saturação da
+  frequência (repetir o termo rende cada vez menos) e ajuste ao tamanho do
+  currículo (currículos extensos não levam vantagem só pelo volume). A
+  proximidade (0 a 1) é a pontuação dividida pelo máximo que a consulta
+  poderia alcançar. [issue #57](../../issues/57)
+
+### Adicionado
+- Títulos dos trabalhos avaliados em bancas de mestrado, doutorado e
+  qualificação entram na busca; artigos em periódicos ganham peso próprio,
+  acima das demais produções; projetos seguem com nome e descrição.
+  Registros lidos pela versão anterior do extrator são relidos do XML
+  guardado ao montar o índice, sem novo envio. [issue #57](../../issues/57)
+
+## [0.0.28] - 2026-10-23
+
 ### Corrigido
 - Busca com "Erro 200" na base real: o PHP ficava sem memória (pico de
   790 MB com 620 currículos) e a hospedagem devolvia a página de erro. O

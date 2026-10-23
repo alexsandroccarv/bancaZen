@@ -132,14 +132,18 @@
                     <h2 id="calculoTitulo" class="text-lg font-bold">Como a proximidade é calculada</h2>
                     <p>
                         Cada currículo é descrito pelos termos do resumo, das linhas de pesquisa, das áreas do
-                        conhecimento, das palavras-chave, dos títulos da formação, dos projetos, das produções e das
-                        orientações. O seu trabalho é descrito da mesma forma, com peso maior para as palavras-chave
+                        conhecimento, das palavras-chave, dos títulos da formação, dos projetos (nome e descrição),
+                        dos artigos e demais produções, das orientações e dos trabalhos que a pessoa avaliou em
+                        bancas de mestrado, doutorado e qualificação. Artigos e bancas pesam mais que as demais
+                        produções. O seu trabalho é descrito da mesma forma, com peso maior para as palavras-chave
                         e o título.
                     </p>
                     <p>
-                        Termos raros entre os currículos valem mais do que termos comuns a todos (TF-IDF), e
-                        produções com mais de 10 anos pesam menos. A proximidade é o cosseno entre os dois perfis,
-                        numa escala de 0 a 1: 0 indica nenhum termo em comum e 1 indica o mesmo perfil de termos.
+                        A pontuação segue o modelo BM25: termos raros entre os currículos valem mais do que termos
+                        comuns a todos, repetir o mesmo termo rende cada vez menos e currículos muito extensos não
+                        levam vantagem só pelo volume. Produções com mais de 10 anos pesam menos. A proximidade, de 0
+                        a 1, é a pontuação dividida pelo máximo que o seu trabalho poderia alcançar: 0 indica nenhum
+                        termo em comum.
                         A lista ajuda a encontrar nomes; a escolha da banca segue as regras do seu programa.
                     </p>
                 </section>

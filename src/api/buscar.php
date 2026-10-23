@@ -76,13 +76,13 @@ foreach (ENVOLVIDOS as $env) {
 $meta = bb_indice_garantir();
 $docs = [];
 foreach ($meta['ids'] as $k => $id) {
-    if (isset($corpus[$id])) $docs[$k] = ['pessoa' => $corpus[$id], 'norma' => $meta['normas'][$k] ?? 0];
+    if (isset($corpus[$id])) $docs[$k] = ['pessoa' => $corpus[$id], 'comprimento' => $meta['comprimentos'][$k] ?? 0];
 }
 $busca = sim_buscar_partes($consulta, [
     'limite' => INF,
     'excluirInstituicao' => $texto('excluirInstituicao'),
     'somenteDoutores' => $texto('somenteDoutores') === '1',
-], bb_indice_leitor(), $docs);
+], bb_indice_leitor(), $docs, (float) ($meta['media'] ?? 0));
 // O filtro de instituição também vale para a instituição do programa.
 $excluir = trim(sim_sem_acento($texto('excluirInstituicao')));
 
