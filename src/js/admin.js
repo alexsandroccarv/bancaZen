@@ -309,23 +309,43 @@
         const pendentes = $('#docPendentesInput').checked;
         const lista = docentes.filter((d) => (!pendentes || !d.temCurriculo)
             && (!filtro || semAcento(`${d.nome} ${d.universidade} ${d.ppg} ${BANCAS[d.grupo]} ${d.situacao} ${d.email || ''}`).includes(filtro)));
-        const tbody = $('#docTabela');
+        const caixa = $('#docGrupos');
         if (!lista.length) {
-            tbody.innerHTML = `<tr><td colspan="8" class="py-3 text-gray-500 dark:text-gray-400">${docentes.length ? 'Nenhum docente corresponde ao filtro.' : 'Envie um CSV com a lista para vê-la aqui.'}</td></tr>`;
+            caixa.innerHTML = `<p class="py-3 text-gray-500 dark:text-gray-400">${docentes.length ? 'Nenhum docente corresponde ao filtro.' : 'Envie a planilha (CSV) para ver a lista aqui.'}</p>`;
             return;
         }
-        tbody.innerHTML = lista.map((d) => `<tr class="border-b border-gray-200 dark:border-gray-700">
-            <td class="py-2 pr-3">${esc(d.nome)}</td>
-            <td class="py-2 pr-3">${esc(d.universidade) || '—'}</td>
-            <td class="py-2 pr-3">${esc(d.ppg)}</td>
-            <td class="py-2 pr-3">${esc(BANCAS[d.grupo] || '')}</td>
-            <td class="py-2 pr-3">${esc(d.situacao) || '—'}</td>
-            <td class="py-2 pr-3"><a href="https://lattes.cnpq.br/${esc(d.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline font-mono">${esc(d.id)}</a></td>
-            <td class="py-2 pr-3">${d.email ? `<a href="mailto:${esc(d.email)}" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(d.email)}</a>` : '—'}</td>
-            <td class="py-2 whitespace-nowrap">${d.temCurriculo
+        // Agrupa por banca (Rede PROFIAP, depois Externa) e, em cada uma, por
+        // universidade: o que é comum ao grupo vai no título, não em cada linha.
+        const porNome = (a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' });
+        caixa.innerHTML = Object.keys(BANCAS).map((g) => {
+            const daBanca = lista.filter((d) => d.grupo === g);
+            if (!daBanca.length) return '';
+            const comCv = daBanca.filter((d) => d.temCurriculo).length;
+            const univs = [...new Set(daBanca.map((d) => d.universidade || ''))].sort((a, b) => (!a) - (!b) || porNome(a, b));
+            return `<section class="doc-banca" aria-label="${esc(BANCAS[g])}">
+                <h4 class="doc-banca-titulo">${esc(BANCAS[g])} <span class="doc-contagem">${daBanca.length} docente(s), ${comCv} com currículo</span></h4>
+                ${univs.map((u) => {
+                    const pessoas = daBanca.filter((d) => (d.universidade || '') === u).sort((a, b) => porNome(a.nome, b.nome));
+                    return `<div class="doc-univ">
+                        <h5 class="doc-univ-titulo">${esc(u || 'Universidade não informada')} <span class="doc-contagem">${pessoas.length}</span></h5>
+                        <ul class="doc-lista">${pessoas.map((d) => linhaDocente(d, g)).join('')}</ul>
+                    </div>`;
+                }).join('')}
+            </section>`;
+        }).join('');
+    }
+    function linhaDocente(d, grupo) {
+        // Na Rede PROFIAP o PPG é sempre PROFIAP: só aparece na Externa.
+        const ppg = grupo === 'outro' && d.ppg ? `<span class="doc-ppg">${esc(d.ppg)}</span>` : '';
+        const situacao = d.situacao ? `<span class="doc-situacao">${esc(d.situacao)}</span>` : '';
+        return `<li class="doc-linha">
+            <span class="doc-nome">${esc(d.nome)} ${situacao}${ppg}</span>
+            <a class="doc-lattes text-brand-600 dark:text-accent-400 hover:underline" href="https://lattes.cnpq.br/${esc(d.id)}" target="_blank" rel="noopener" title="ID Lattes ${esc(d.id)}" aria-label="Currículo Lattes de ${esc(d.nome)} (abre em nova aba)"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i> Lattes</a>
+            <span class="doc-email">${d.email ? `<a href="mailto:${esc(d.email)}" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(d.email)}</a>` : ''}</span>
+            <span class="doc-cv">${d.temCurriculo
                 ? '<i aria-hidden="true" class="fa-solid fa-circle-check text-green-700 dark:text-green-400"></i> enviado'
-                : '<i aria-hidden="true" class="fa-regular fa-clock text-gray-500"></i> pendente'}</td>
-        </tr>`).join('');
+                : '<i aria-hidden="true" class="fa-regular fa-clock"></i> pendente'}</span>
+        </li>`;
     }
 
     function renderTabela() {

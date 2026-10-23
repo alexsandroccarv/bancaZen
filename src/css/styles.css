@@ -217,6 +217,31 @@ html.tz-theme .passo { background: var(--tz-accent); color: var(--tz-bg); }
 .vinculo-confirmado { background: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
 .vinculo-provavel { background: #fef3c7; color: #78350f; border: 1px solid #fcd34d; }
 
+/* Lista de docentes (Administração): grupos por banca e universidade, sem
+   linhas divisórias; fundo alternado leve. Vale também sem o Tailwind. */
+.doc-banca + .doc-banca { margin-top: 1.5rem; }
+.doc-banca-titulo { font-size: 1rem; font-weight: 700; margin: 0 0 .25rem; }
+.doc-univ { margin-top: .75rem; }
+.doc-univ-titulo { font-size: .875rem; font-weight: 600; margin: 0 0 .25rem; opacity: .9; }
+.doc-contagem { font-weight: 400; font-size: .8125rem; opacity: .75; margin-left: .25rem; }
+.doc-lista { list-style: none; margin: 0; padding: 0; }
+.doc-linha { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .125rem 1rem; align-items: center;
+             padding: .375rem .5rem; border-radius: .375rem; }
+.doc-linha:nth-child(odd) { background: rgba(127, 127, 127, .07); }
+.doc-linha:hover { background: rgba(127, 127, 127, .14); }
+.doc-nome { min-width: 0; }
+.doc-situacao, .doc-ppg { display: inline-block; font-size: .75rem; opacity: .8; margin-left: .375rem; }
+.doc-ppg::before { content: "· "; }
+.doc-email { grid-column: 1 / -1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8125rem; }
+.doc-email:empty { display: none; }
+.doc-lattes, .doc-cv { white-space: nowrap; font-size: .8125rem; }
+.doc-cv { opacity: .85; }
+@media (min-width: 768px) {
+  .doc-linha { grid-template-columns: minmax(0, 2fr) 5rem minmax(0, 1.6fr) 6.5rem; }
+  .doc-email { grid-column: auto; }
+  .doc-email:empty { display: block; }
+}
+
 /* Zona de risco da Administração: o alerta vale também sem o Tailwind. */
 .zona-risco { border: 2px solid #b91c1c; border-radius: .5rem; }
 .zona-risco h3 { color: #b91c1c; }
