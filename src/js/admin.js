@@ -3,7 +3,9 @@
    --------------------------------------------------------------------------
    Entrada por senha; cadastro unificado de docentes e currículos (CSV da
    lista de docentes e XML/ZIP do Lattes, arquivos ou pasta) com PPG,
-   instituição e situação; tabelas da lista e da base; correção e remoção.
+   instituição e situação; inclusão na busca dos XMLs copiados direto para
+   o servidor (rsync/FTP), em lotes; tabelas da lista e da base; correção
+   e remoção.
    A lista da banca vem do PPG (PROFIAP -> Rede PROFIAP; outro -> Externa).
    Toda a regra (mesmo ID, guarda fora da área pública) fica no servidor:
    api/admin.php.
@@ -166,6 +168,66 @@
         }
     }
 
+    /* --------------- currículos copiados direto para o servidor ------------- */
+    // O servidor processa em lotes (cursor pelo nome do arquivo); aqui os
+    // lotes são repetidos até o fim e os relatórios somados.
+    async function reindexar(simular) {
+        const organizar = !simular && $('#reOrganizarInput').checked;
+        if (!simular && !confirm(`Incluir na busca os currículos guardados no servidor?${organizar ? ' As cópias com outro nome serão apagadas depois de incluídas.' : ''}`)) return;
+        const rel = $('#reRelatorio');
+        const botoes = [$('#reSimularBtn'), $('#reIncluirBtn')];
+        botoes.forEach((b) => { b.disabled = true; });
+        const soma = { lidos: 0, novo: 0, substituido: 0, mantido: 0, organizados: 0, copias: 0, erros: [], semPpg: new Map(), pessoas: new Map() };
+        let r = null;
+        let indiceAtual = null;
+        let depois = '';
+        try {
+            do {
+                rel.innerHTML = `<p>${simular ? 'Simulando' : 'Incluindo'}: ${soma.lidos} de ${r ? r.totalArquivos : '…'} arquivo(s) lido(s)…</p>`;
+                r = (await api('reindexar', form({
+                    ppg: $('#rePpgInput').value.trim(), instituicao: $('#reInstInput').value.trim(), situacao: $('#reSituacaoInput').value,
+                    simular: simular ? '1' : '0', organizar: organizar ? '1' : '0', depois,
+                }))).relatorio;
+                soma.lidos += r.arquivos;
+                for (const k of ['novo', 'substituido', 'mantido', 'organizados']) soma[k] += r[k] || 0;
+                soma.copias += r.comOutroNome.length;
+                soma.erros.push(...r.erros);
+                for (const p of r.semPpg) soma.semPpg.set(p.id, p);
+                for (const p of r.pessoas) if (!soma.pessoas.has(p.id)) soma.pessoas.set(p.id, p.situacao);
+                if (indiceAtual === null && r.indiceAtual != null) indiceAtual = r.indiceAtual;
+                depois = r.ultimo;
+            } while (r.restantes > 0 && r.arquivos > 0);
+            rel.innerHTML = simular ? relatorioSimulacao(soma, indiceAtual) : relatorioInclusao(soma, r.total);
+            if (!simular) { listar(); listarDocentes(); }
+        } catch (e) {
+            if (e.message !== 'sessão') rel.innerHTML = `<p class="text-red-700 dark:text-red-400">${esc(e.message)}${soma.lidos ? ` (depois de ${soma.lidos} arquivo(s) lido(s); pode repetir)` : ''}</p>`;
+        } finally {
+            botoes.forEach((b) => { b.disabled = false; });
+        }
+    }
+    function listaSemPpg(soma, verbo) {
+        if (!soma.semPpg.size) return '';
+        const nomes = [...soma.semPpg.values()].slice(0, 50).map((p) => `<li>${esc(p.nome || '(sem nome)')} <span class="font-mono text-xs">${esc(p.id)}</span> ${esc(p.arquivo)}</li>`).join('');
+        return `<p>${soma.semPpg.size} pessoa(s) sem PPG ${verbo} de fora (não estão cadastradas nem na lista de docentes). Para incluí-las, informe o PPG acima ou importe a lista de docentes do programa.</p>
+            <ul class="list-disc list-inside">${nomes}${soma.semPpg.size > 50 ? `<li>… e mais ${soma.semPpg.size - 50}</li>` : ''}</ul>`;
+    }
+    function listaErros(soma) {
+        return soma.erros.length ? `<p class="text-red-700 dark:text-red-400">${soma.erros.length} arquivo(s) com erro:</p><ul class="list-disc list-inside">${soma.erros.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : '';
+    }
+    function relatorioSimulacao(soma, indiceAtual) {
+        const novos = [...soma.pessoas.values()].filter((s) => s === 'novo').length;
+        return `<p class="font-medium">Simulação (nada foi gravado): ${soma.lidos} arquivo(s) lido(s); ${soma.pessoas.size} pessoa(s) entrariam na busca
+            (${novos} nova(s), ${soma.pessoas.size - novos} já cadastrada(s)). Currículos na busca: ${indiceAtual ?? 0} → ${(indiceAtual ?? 0) + novos}.</p>
+            ${soma.copias ? `<p>${soma.copias} arquivo(s) com outro nome seriam guardados como &lt;ID Lattes&gt;.xml.</p>` : ''}
+            ${listaSemPpg(soma, 'ficariam')}${listaErros(soma)}`;
+    }
+    function relatorioInclusao(soma, total) {
+        return `<p class="font-medium">${soma.lidos} arquivo(s) lido(s): ${soma.novo} incluído(s), ${soma.substituido} já cadastrado(s) ou repetido(s), ${soma.mantido} mantido(s) (havia versão mais recente).
+            Currículos na busca: ${total}.</p>
+            ${soma.organizados ? `<p>${soma.organizados} cópia(s) com outro nome apagada(s).</p>` : soma.copias ? `<p>${soma.copias} arquivo(s) com outro nome continuam na pasta como cópia; para apagá-los, marque a opção acima e inclua de novo.</p>` : ''}
+            ${listaSemPpg(soma, 'ficaram')}${listaErros(soma)}`;
+    }
+
     /* ------------------------------- base --------------------------------- */
     async function listar() {
         try {
@@ -301,6 +363,9 @@
         $('#ppgInput').addEventListener('input', mostrarBancaDoPpg);
         mostrarBancaDoPpg();
         $('#envioForm').addEventListener('submit', enviar);
+        $('#reSimularBtn').addEventListener('click', () => reindexar(true));
+        $('#reIncluirBtn').addEventListener('click', () => reindexar(false));
+        $('#reForm').addEventListener('submit', (ev) => ev.preventDefault());
         $('#docFiltroInput').addEventListener('input', renderDocentes);
         $('#docPendentesInput').addEventListener('change', renderDocentes);
         $('#filtroInput').addEventListener('input', renderTabela);

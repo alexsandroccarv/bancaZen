@@ -418,6 +418,49 @@
                     <div id="relatorio" class="text-sm space-y-2" aria-live="polite"></div>
                 </section>
 
+                <section class="border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="servidorTitulo">
+                    <h3 id="servidorTitulo" class="text-lg font-bold">Currículos guardados no servidor</h3>
+                    <p class="text-sm">
+                        Para XMLs ou ZIPs do Lattes copiados direto para a pasta de dados do servidor
+                        (<code>xml/</code>), por rsync ou FTP, sem passar pelo envio acima: eles só entram na busca
+                        depois de incluídos aqui. Mesmo ID Lattes: fica o de atualização mais recente. Pode ser
+                        repetido sempre que novos arquivos forem copiados.
+                    </p>
+                    <form id="reForm" class="space-y-4">
+                        <div class="grid gap-4 sm:grid-cols-3">
+                            <div>
+                                <label for="rePpgInput" class="block text-sm font-medium mb-1">PPG <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
+                                <input id="rePpgInput" type="text" list="ppgLista" placeholder="PROFIAP" aria-describedby="reAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            </div>
+                            <div>
+                                <label for="reInstInput" class="block text-sm font-medium mb-1">Instituição <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
+                                <input id="reInstInput" type="text" list="instLista" aria-describedby="reAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            </div>
+                            <div>
+                                <label for="reSituacaoInput" class="block text-sm font-medium mb-1">Situação no programa <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></label>
+                                <select id="reSituacaoInput" aria-describedby="reAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                    <option value="">Não informada</option>
+                                    <option>Permanente</option>
+                                    <option>Colaborador</option>
+                                    <option>Visitante</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p id="reAjuda" class="text-xs text-gray-600 dark:text-gray-400">
+                            O programa de cada pessoa vem do que já está cadastrado ou da lista de docentes. Os campos
+                            acima valem só para as demais; sem PPG, elas ficam de fora e são listadas.
+                        </p>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input id="reOrganizarInput" type="checkbox"> Depois de incluir, apagar as cópias com outro nome (cada currículo fica guardado como <code>&lt;ID Lattes&gt;.xml</code>)
+                        </label>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" id="reSimularBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 font-medium disabled:opacity-50"><i aria-hidden="true" class="fa-solid fa-magnifying-glass"></i> Simular</button>
+                            <button type="button" id="reIncluirBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50"><i aria-hidden="true" class="fa-solid fa-database"></i> Incluir na busca</button>
+                        </div>
+                    </form>
+                    <div id="reRelatorio" class="text-sm space-y-2" aria-live="polite"></div>
+                </section>
+
                 <section class="space-y-3" aria-labelledby="docentesTitulo">
                     <h3 id="docentesTitulo" class="text-lg font-bold">Lista de docentes</h3>
                     <div class="space-y-2">
