@@ -59,7 +59,11 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   "Confirmado" = ID Lattes ou nome completo; "provável" = sobrenome + ao
   menos duas iniciais. "Minha orientação" é opcional (discente, orientador e
   coorientador): o resultado mostra quem foi considerado (`conformidade` em
-  `buscar.php`) ou avisa que a verificação não foi feita.
+  `buscar.php`) ou avisa que a verificação não foi feita. Sem currículo, o
+  nome (`<papel>Nome`) vira registro mínimo e a verificação é parcial
+  (`soNome`): só os currículos indicados são conferidos.
+- `api/universidades.php` (público): nomes das universidades da planilha e
+  dos currículos, para a caixa de seleção "Minha universidade" (com "Outra").
 - Ao mudar o backend, rodar `php tools/testar.php` (currículos fictícios em
   `tools/fixtures/`; discente e orientadora em `tools/fixtures/envolvidos/`).
   Currículos reais não entram em `tools/fixtures/`.

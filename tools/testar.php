@@ -101,6 +101,10 @@ $tipos = function (array $v) { $t = array_map(fn($x) => "{$x['papel']}:{$x['tipo
 confere($tipos(vinc_verificar($porId['0000000000000001'], $env)) === ['Orientadora:coautoria:confirmado'], 'coautoria pelo ID Lattes');
 confere($tipos(vinc_verificar($porId['0000000000000005'], $env)) === [], 'ID diferente: sem vínculo');
 confere($tipos(vinc_verificar($porId['0000000000000003'], $env)) === ['Orientadora:coautoria:provável'], 'coautoria pelo nome em citação');
+// Só o nome (sem currículo): procura o nome nas produções e orientações da pessoa indicada.
+$soNome = [['papel' => 'Orientadora', 'pessoa' => ['id' => '', 'nome' => 'Olga Orientadora Prado', 'citacoes' => []]]];
+confere($tipos(vinc_verificar($porId['0000000000000003'], $soNome)) === ['Orientadora:coautoria:provável'], 'só o nome da orientação: coautoria encontrada no currículo indicado');
+confere($tipos(vinc_verificar($porId['0000000000000004'], [['papel' => 'Orientadora', 'pessoa' => ['id' => '', 'nome' => 'Diego Suposto Alves']]])) === ['Orientadora:mesma pessoa:confirmado'], 'só o nome: mesma pessoa pelo nome completo');
 confere($tipos(vinc_verificar($porId['0000000000000004'], $env)) === ['Aluna:orientação:confirmado'], 'orientação na graduação');
 confere($tipos(vinc_verificar($porId['0000000000000002'], $env)) === ['Orientadora:coautoria:confirmado'], 'coautoria pelo nome completo');
 confere($tipos(vinc_verificar($porId['0000000000000002'], $env, 2021)) === [], 'coautoria antiga fora do período');
