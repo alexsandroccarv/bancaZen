@@ -45,6 +45,15 @@ confere(!str_contains(json_encode($ana), 'nao@extrair.br'), 'e-mail não é extr
 confere($porId['0000000000000005']['nome'] === 'Elisa Zipada Teste', 'leitura de ZIP');
 confere(count($ana['bancas']) === 3 && $ana['bancas'][0]['t'] === 'Banca sobre tema qualquer de outra pessoa 0', 'títulos das bancas de mestrado');
 confere(($ana['producoes'][0]['tp'] ?? '') === 'a' && $ana['versao'] === LATTES_VERSAO, 'artigos marcados; versão do extrator');
+confere($ana['sexo'] === 'F' && $porId['0000000000000004']['sexo'] === 'M' && $porId['0000000000000005']['sexo'] === '', 'sexo do Lattes (F, M ou não informado)');
+
+/* ---------------- ordem: empate na proximidade exibida ------------------- */
+$r = fn($nome, $score, $sexo) => ['pessoa' => ['nome' => $nome, 'sexo' => $sexo], 'score' => $score];
+$ordem = sim_ordenar([$r('Marcos', 0.124, 'M'), $r('Bia', 0.118, 'F'), $r('Rui', 0.13, 'M'), $r('Lia', 0.121, 'F'), $r('Sem', 0.122, '')],
+    fn($p) => $p['sexo'] === 'F');
+confere(array_map(fn($x) => $x['pessoa']['nome'], $ordem) === ['Rui', 'Lia', 'Bia', 'Marcos', 'Sem'],
+    'empate em 0,12: sexo feminino primeiro (por proximidade entre elas); 0,13 continua antes');
+confere(!isset(bb_publico($ana + ['programa' => ['ppg' => 'PROFIAP']])['sexo']), 'sexo nunca sai na resposta pública');
 
 /* ---------------------------------- BM25 --------------------------------- */
 // Pessoas fictícias mínimas para conferir as propriedades do BM25.
@@ -251,6 +260,12 @@ $memoria = sim_buscar(sim_criar_indice(array_map('bb_carregar_pessoa', array_val
 $resumoR = fn($r) => array_map(fn($x) => $x['pessoa']['id'] . ':' . round($x['score'], 4) . ':' . implode(',', $x['termos']), $r['resultados']);
 confere($resumoR($disco) === $resumoR($memoria) && count($disco['resultados']) > 0, 'busca no índice em partes = busca em memória (ordem, proximidade e termos)');
 confere(bb_indice_garantir()['criadoEm'] === $meta['criadoEm'], 'índice não é refeito sem mudança no corpus');
+$sexoIdx = array_combine($meta['ids'], $meta['sexos']);
+confere($sexoIdx['0000000000000001'] === 'F' && $sexoIdx['0000000000000002'] === 'M', 'índice guarda o sexo de cada currículo, na ordem dos ids');
+// Ana (F) e Elisa (não informado) empatam em 0,75: Ana primeiro.
+$emp = sim_ordenar($disco['resultados'], fn($p) => ($sexoIdx[$p['id']] ?? '') === 'F');
+$ids2 = array_map(fn($x) => $x['pessoa']['id'], array_slice($emp, 0, 2));
+confere($ids2[0] === '0000000000000001', 'empate Ana x Elisa: a de sexo feminino primeiro');
 
 // Zona de risco: limpar a base (a senha fica).
 file_put_contents("$tmpR/admin.json", '{"hash":"x"}');

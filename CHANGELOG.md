@@ -8,6 +8,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- Ordem das sugestões: quando a proximidade exibida (2 casas) é a mesma, as
+  pessoas de sexo feminino (atributo `SEXO` do Lattes) aparecem primeiro,
+  inclusive no limite das 10 vagas de cada lista. O sexo fica só no
+  servidor (registro completo e índice) e não é exibido. Os currículos
+  guardados são relidos do XML e o índice é refeito sozinho.
+  [issue #63](../../issues/63)
+
+## [0.0.31] - 2026-10-23
+
+### Alterado
 - Minha Dissertação: o Lattes da pessoa discente fica logo abaixo de "Meu
   nome"; "Minha universidade" vira caixa de seleção com as universidades da
   base (planilha de docentes e currículos, pelo endpoint público

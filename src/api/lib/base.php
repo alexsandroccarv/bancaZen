@@ -292,9 +292,12 @@ function bb_indice_construir(): array
         @set_time_limit(600);
         $corpus = bb_carregar_json('corpus.json');
         $ano = (int) date('Y');
-        $tfDe = function (array $leve) use ($ano): ?array {
+        $sexos = [];
+        $tfDe = function (array $leve) use ($ano, &$sexos): ?array {
             $p = bb_carregar_pessoa($leve);
-            return $p ? sim_tf_curriculo($p, $ano) : null;
+            if (!$p) return null;
+            $sexos[] = $p['sexo'] ?? '';
+            return sim_tf_curriculo($p, $ano);
         };
         // 1º passe: em quantos currículos cada termo aparece. Os termos de
         // cada currículo vão para um arquivo temporário (uma linha por
@@ -353,7 +356,8 @@ function bb_indice_construir(): array
             unlink($tsv);
         }
         $meta = ['modelo' => SIM_MODELO, 'assinatura' => $assinatura, 'ano' => $ano, 'N' => $N, 'ids' => $ids,
-            'comprimentos' => $comprimentos, 'media' => $N ? array_sum($comprimentos) / $N : 0.0, 'criadoEm' => date('c')];
+            'comprimentos' => $comprimentos, 'media' => $N ? array_sum($comprimentos) / $N : 0.0,
+            'sexos' => $sexos, 'criadoEm' => date('c')];
         file_put_contents("$novo/meta.json", json_encode($meta));
         // Troca atômica da pasta do índice.
         $velho = "$dir/indice.velho-" . bin2hex(random_bytes(4));

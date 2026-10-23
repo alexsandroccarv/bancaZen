@@ -57,7 +57,9 @@ vira a consulta (palavras-chave e título pesam mais que o resumo). Os
 termos passam por remoção de acentos e de palavras vazias, radical leve e
 bigramas; a pontuação é BM25 (IDF, saturação da frequência e ajuste ao
 tamanho do currículo), e a proximidade (0 a 1) é a pontuação dividida pelo
-máximo que a consulta poderia alcançar. Filtros opcionais: desconsiderar a instituição do programa
+máximo que a consulta poderia alcançar. No empate da proximidade exibida
+(2 casas), as pessoas de sexo feminino (campo `SEXO` do Lattes) aparecem
+primeiro; o sexo não é exibido nem sai do servidor. Filtros opcionais: desconsiderar a instituição do programa
 e manter só doutores.
 
 **Código.** Backend em PHP 8 sem dependências, em `src/api/`:
