@@ -7,6 +7,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- Administração: "Lista de docentes" e "Currículos cadastrados" começam
+  recolhidas e abrem pelo título, que mostra a contagem.
+  [issue #45](../../issues/45)
+
+## [0.0.22] - 2026-10-23
+
 ### Corrigido
 - Planilha de docentes: o ID Lattes é lido como número
   (`1533188485721174`) ou link (`http://lattes.cnpq.br/1533188485721174`,

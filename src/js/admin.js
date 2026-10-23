@@ -302,6 +302,7 @@
 
     function renderDocentes() {
         const com = docentes.filter((d) => d.temCurriculo).length;
+        $('#docTotal').textContent = `(${docentes.length})`;
         $('#docTotais').textContent = docentes.length
             ? `${docentes.length} docente(s) na lista: ${com} com currículo enviado, ${docentes.length - com} sem currículo.`
             : 'Nenhuma lista de docentes importada.';
