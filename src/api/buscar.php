@@ -5,21 +5,23 @@
    Recebe (multipart/form-data):
      titulo, resumo, palavrasChave (texto separado por ; , ou quebra de linha)
      excluirInstituicao, somenteDoutores (1/0), periodo (0, 5 ou 10 anos)
-     para cada envolvida (discente, orientador, coorientador):
+     para cada envolvida (discente, orientador, coorientador), todas opcionais
+     (sem nenhuma, a conformidade ética não é verificada e o resultado avisa):
        <papel>Arquivo  XML/ZIP do Lattes  -> lido em memória, NÃO é gravado
        <papel>Id       link ou ID Lattes de currículo que já está na base
    Devolve duas listas (Rede PROFIAP e Externa, pelo PPG), cada uma com as 10
    pessoas mais próximas SEM vínculo e as retiradas por vínculo, só com os
-   campos de exibição (bb_publico). O índice completo e os XML nunca saem do
-   servidor.
+   campos de exibição (bb_publico), e 'conformidade' (verificada ou não, e
+   quem foi considerado: papel, nome e ID Lattes). O índice completo e os XML
+   nunca saem do servidor.
    ========================================================================== */
 require_once __DIR__ . '/lib/base.php';
 
 const LIMITE = 10;
 const ENVOLVIDOS = [
-    ['chave' => 'discente', 'papel' => 'Discente', 'obrigatorio' => true],
-    ['chave' => 'orientador', 'papel' => 'Orientador(a)', 'obrigatorio' => true],
-    ['chave' => 'coorientador', 'papel' => 'Coorientador(a)', 'obrigatorio' => false],
+    ['chave' => 'discente', 'papel' => 'Discente'],
+    ['chave' => 'orientador', 'papel' => 'Orientador(a)'],
+    ['chave' => 'coorientador', 'papel' => 'Coorientador(a)'],
 ];
 
 bb_exigir_metodo('POST');
@@ -39,11 +41,11 @@ if ($consulta['titulo'] === '' && $consulta['resumo'] === '' && !$consulta['pala
     bb_erro('Preencha ao menos o título, o resumo ou as palavras-chave.');
 }
 
-// Currículos da discente e da orientação: arquivo enviado tem prioridade;
-// senão, procura o link/ID na base.
+// Currículos da discente e da orientação (opcionais): arquivo enviado tem
+// prioridade; senão, procura o link/ID na base.
 $envolvidos = [];
 $avisos = [];
-$faltando = [];
+$considerados = [];
 foreach (ENVOLVIDOS as $env) {
     $pessoa = null;
     $arq = $_FILES[$env['chave'] . 'Arquivo'] ?? null;
@@ -62,11 +64,9 @@ foreach (ENVOLVIDOS as $env) {
     if ($pessoa) {
         $envolvidos[] = ['papel' => $env['papel'], 'pessoa' => $pessoa];
         $avisos[$env['chave']] = $pessoa['nome'];
-    } elseif ($env['obrigatorio']) {
-        $faltando[] = $env['papel'];
+        $considerados[] = ['papel' => $env['papel'], 'nome' => $pessoa['nome'], 'id' => vinc_id_lattes($pessoa['id'] ?? '')];
     }
 }
-if ($faltando) bb_erro('Informe o currículo Lattes de: ' . implode(', ', $faltando) . '.');
 
 // Um só índice para toda a base (o IDF considera todos os currículos), e o
 // ranking é separado por grupo depois.
@@ -101,4 +101,8 @@ foreach ($busca['resultados'] as $r) {
     unset($l);
 }
 
-bb_json(['listas' => array_values($listas), 'envolvidos' => $avisos]);
+bb_json([
+    'listas' => array_values($listas),
+    'envolvidos' => $avisos,
+    'conformidade' => ['verificada' => (bool) $envolvidos, 'considerados' => $considerados],
+]);

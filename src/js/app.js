@@ -15,8 +15,8 @@
     const $ = (s) => document.querySelector(s);
     const ENVOLVIDOS = ['discente', 'orientador', 'coorientador'];
     const PAPEIS = {
-        discente: { rotulo: 'Discente', obrigatorio: true },
-        orientador: { rotulo: 'Orientador(a)', obrigatorio: true },
+        discente: { rotulo: 'Discente', obrigatorio: false },
+        orientador: { rotulo: 'Orientador(a)', obrigatorio: false },
         coorientador: { rotulo: 'Coorientador(a)', obrigatorio: false },
     };
 
@@ -128,11 +128,6 @@
             mostrarErro('Preencha ao menos o título, o resumo ou as palavras-chave.', 'dissertacao', 'Minha Dissertação');
             return;
         }
-        const faltando = ENVOLVIDOS.filter((k) => PAPEIS[k].obrigatorio && !situacaoEnvolvido(k).ok);
-        if (faltando.length) {
-            mostrarErro(`Informe o currículo Lattes de: ${faltando.map((k) => PAPEIS[k].rotulo).join(', ')}.`, 'orientacao', 'Minha orientação');
-            return;
-        }
         const fd = new FormData();
         fd.append('titulo', $('#tituloInput').value);
         fd.append('resumo', $('#resumoInput').value);
@@ -163,6 +158,7 @@
                 $(`#${k}Status`).textContent = dados.envolvidos && dados.envolvidos[k] ? `Currículo considerado: ${dados.envolvidos[k]}.` : '';
             }
             renderListas(dados.listas || []);
+            renderConformidade(dados.conformidade, dados.listas || []);
         } catch (_) {
             mostrarErro('Não foi possível falar com o servidor. Verifique a conexão e tente de novo.');
         } finally {
@@ -231,6 +227,34 @@
                 homônimo: confira no Lattes antes de descartar.
             </p>
             <ul class="space-y-3">${itens}</ul>
+        </div>`;
+    }
+
+    // Quadro "Conformidade ética" do resultado: quem foi considerado (Minha
+    // orientação é opcional) ou o aviso de que os vínculos não foram verificados.
+    function renderConformidade(c, listas) {
+        const caixa = $('#conformidadeResultado');
+        const considerados = (c && c.considerados) || [];
+        if (!considerados.length) {
+            caixa.innerHTML = `<div class="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-gray-800 p-4 space-y-2">
+                <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Conformidade ética não verificada</h4>
+                <p class="text-sm">"Minha orientação" não foi preenchida: as listas podem incluir pessoas com coautoria ou relação de
+                orientação com você ou com a sua orientação. Para retirá-las, informe os currículos e busque de novo.</p>
+                <button type="button" data-ir="orientacao" class="text-sm text-brand-600 dark:text-accent-400 hover:underline font-medium">Preencher Minha orientação</button>
+            </div>`;
+            return;
+        }
+        const retirados = listas.reduce((n, l) => n + (l.retirados || []).length, 0);
+        const pessoas = considerados.map((p) => `<li><span class="font-medium">${esc(p.papel)}:</span> ${p.id
+            ? `<a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(p.nome)}</a>`
+            : esc(p.nome)}</li>`).join('');
+        caixa.innerHTML = `<div class="rounded-lg border border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800 p-4 space-y-2">
+            <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Conformidade ética verificada</h4>
+            <p class="text-sm">Vínculos (coautoria, orientação ou mesma pessoa) conferidos com os currículos de:</p>
+            <ul class="text-sm list-disc list-inside">${pessoas}</ul>
+            <p class="text-sm">${retirados
+                ? `${retirados} pessoa(s) com vínculo retirada(s) das listas; aparecem à parte, com o motivo, ao fim de cada lista.`
+                : 'Nenhuma pessoa com vínculo entre as mais próximas do tema.'}</p>
         </div>`;
     }
 

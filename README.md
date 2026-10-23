@@ -20,7 +20,7 @@ mestrado** a partir de currículos Lattes.
    orientação**, **Bancas sugeridas** e **Administração**. A pessoa discente
    informa **nome**, **universidade** (pessoas da mesma instituição são
    desconsideradas como membro externo), **título**, **resumo** e
-   **palavras-chave** do trabalho, o próprio
+   **palavras-chave** do trabalho e, opcionalmente, o próprio
    currículo Lattes e o da orientação, e recebe **duas listas de até 10 pessoas** com maior
    proximidade temática, numa escala de **0 a 1**, em ordem decrescente:
    - **Rede PROFIAP** (docentes do PPG PROFIAP);
@@ -42,7 +42,9 @@ orientador(a) ou o(a) coorientador(a), ou é uma dessas pessoas, sai da lista
 e aparece à parte, com o motivo. O vínculo é "confirmado" quando a pessoa é
 identificada pelo ID Lattes ou pelo nome completo, e "provável" quando só o
 sobrenome e as iniciais coincidem (pode ser homônimo). O período das
-coautorias é configurável (todo o período, 10 ou 5 anos).
+coautorias é configurável (todo o período, 10 ou 5 anos). A etapa "Minha
+orientação" é opcional: o resultado mostra quem foi considerado na
+verificação ou avisa que ela não foi feita.
 
 **Como a proximidade é calculada.** Cada currículo vira um vetor de termos
 (resumo, linhas de pesquisa, áreas do conhecimento, palavras-chave, títulos

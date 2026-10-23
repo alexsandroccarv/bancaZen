@@ -123,7 +123,7 @@
                     <h2 id="comoTitulo" class="text-lg font-bold">Como funciona</h2>
                     <ol class="space-y-3 list-none p-0">
                         <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Minha Dissertação</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe o título, o resumo e as palavras-chave do seu trabalho.</p></div></li>
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></span><div><p class="font-semibold">Minha orientação</p><p class="text-sm text-gray-600 dark:text-gray-400">Envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base.</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></span><div><p class="font-semibold">Minha orientação <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></p><p class="text-sm text-gray-600 dark:text-gray-400">Para a conformidade ética, envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base.</p></div></li>
                         <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Bancas sugeridas</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 pessoas, da maior para a menor proximidade: Rede PROFIAP (docentes do PPG PROFIAP) e Externa (docentes de outros PPGs, para o segundo membro externo).</p></div></li>
                     </ol>
                 </section>
@@ -206,13 +206,15 @@
             <div class="max-w-3xl mx-auto space-y-4">
                 <h2 class="text-lg font-bold">Minha orientação</h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Informe o currículo Lattes da pessoa discente e da orientação. Eles são usados para retirar das
-                    sugestões quem tem coautoria em publicações ou relação de orientação com alguma dessas pessoas.
+                    Etapa opcional, recomendada. Informe o currículo Lattes da pessoa discente e da orientação: eles
+                    são usados para retirar das sugestões quem tem coautoria em publicações ou relação de orientação
+                    com alguma dessas pessoas (conformidade ética). Sem eles, a busca funciona, mas o resultado avisa
+                    que os vínculos não foram verificados.
                     Os arquivos enviados aqui são usados só na consulta e não são guardados.
                 </p>
                 <div class="space-y-4">
                         <div class="envolvido space-y-1" data-papel="discente">
-                            <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-red-700 dark:text-red-400" aria-hidden="true">*</span></p>
+                            <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
                             <div class="grid gap-2 sm:grid-cols-2">
                                 <div>
                                     <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
@@ -226,7 +228,7 @@
                             <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                         </div>
                         <div class="envolvido space-y-1" data-papel="orientador">
-                            <p class="text-sm font-medium" id="orientadorRotulo">Orientador(a) <span class="text-red-700 dark:text-red-400" aria-hidden="true">*</span></p>
+                            <p class="text-sm font-medium" id="orientadorRotulo">Orientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
                             <div class="grid gap-2 sm:grid-cols-2">
                                 <div>
                                     <label for="orientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
@@ -300,6 +302,7 @@
                         Duas listas, cada uma com até 10 pessoas sem vínculo identificado, da maior para a menor
                         proximidade (0 a 1): Rede PROFIAP (PPG PROFIAP) e Externa (outros PPGs, para o segundo membro externo).
                     </p>
+                    <div id="conformidadeResultado" aria-live="polite"></div>
                     <div id="listas" class="space-y-8"></div>
                 </section>
             </div>
