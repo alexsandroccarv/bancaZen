@@ -184,7 +184,6 @@
             do {
                 rel.innerHTML = `<p>${simular ? 'Simulando' : 'Incluindo'}: ${soma.lidos} de ${r ? r.totalArquivos : '…'} arquivo(s) lido(s)…</p>`;
                 r = (await api('reindexar', form({
-                    ppg: $('#rePpgInput').value.trim(), instituicao: $('#reInstInput').value.trim(), situacao: $('#reSituacaoInput').value,
                     simular: simular ? '1' : '0', organizar: organizar ? '1' : '0', depois,
                 }))).relatorio;
                 soma.lidos += r.arquivos;
@@ -207,7 +206,7 @@
     function listaSemPpg(soma, verbo) {
         if (!soma.semPpg.size) return '';
         const nomes = [...soma.semPpg.values()].slice(0, 50).map((p) => `<li>${esc(p.nome || '(sem nome)')} <span class="font-mono text-xs">${esc(p.id)}</span> ${esc(p.arquivo)}</li>`).join('');
-        return `<p>${soma.semPpg.size} pessoa(s) sem dados ${verbo} guardada(s) fora da busca (não estão na planilha de docentes nem cadastradas com PPG). Para incluí-las na busca, envie a planilha com elas ou informe o PPG acima.</p>
+        return `<p>${soma.semPpg.size} pessoa(s) sem dados ${verbo} guardada(s) fora da busca (não estão na planilha de docentes). Para incluí-las na busca, envie a planilha com elas.</p>
             <ul class="list-disc list-inside">${nomes}${soma.semPpg.size > 50 ? `<li>… e mais ${soma.semPpg.size - 50}</li>` : ''}</ul>`;
     }
     function listaErros(soma) {

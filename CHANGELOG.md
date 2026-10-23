@@ -7,6 +7,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Removido
+- "Currículos guardados no servidor": saem os campos PPG, instituição e
+  situação. Os dados de cada pessoa vêm só das cargas (planilha de
+  docentes); quem não está nela fica guardado sem dados, fora da busca.
+  O comando `reindexar.php` mantém `--ppg`. [issue #47](../../issues/47)
+
+## [0.0.23] - 2026-10-23
+
 ### Alterado
 - Administração: "Lista de docentes" e "Currículos cadastrados" começam
   recolhidas e abrem pelo título, que mostra a contagem.
