@@ -46,7 +46,9 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
 - Conformidade ética: pessoa com vínculo (coautoria, orientação, mesma
   pessoa) nunca entra nas listas; aparece à parte com o motivo.
   "Confirmado" = ID Lattes ou nome completo; "provável" = sobrenome + ao
-  menos duas iniciais.
+  menos duas iniciais. "Minha orientação" é opcional (discente, orientador e
+  coorientador): o resultado mostra quem foi considerado (`conformidade` em
+  `buscar.php`) ou avisa que a verificação não foi feita.
 - Ao mudar o backend, rodar `php tools/testar.php` (currículos fictícios em
   `tools/fixtures/`; discente e orientadora em `tools/fixtures/envolvidos/`).
   Currículos reais não entram em `tools/fixtures/`.

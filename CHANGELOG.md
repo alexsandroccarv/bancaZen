@@ -8,6 +8,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- "Minha orientação" (conformidade ética) passa a ser opcional: discente e
+  orientador(a) não são mais exigidos, no navegador nem em `buscar.php`. O
+  resultado ganha o quadro "Conformidade ética": com dados, mostra quem foi
+  considerado (papel, nome e link do Lattes) e quantas pessoas foram
+  retiradas por vínculo; sem dados, avisa que a verificação não foi feita,
+  com botão para "Minha orientação". [issue #53](../../issues/53)
+
+## [0.0.26] - 2026-10-23
+
+### Alterado
 - Lista de docentes: a situação do currículo (enviado ou pendente) aparece
   só como ícone, no início da linha; o texto fica na dica do mouse e para
   leitores de tela. [issue #51](../../issues/51)
