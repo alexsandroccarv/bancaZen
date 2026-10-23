@@ -202,8 +202,9 @@ const LATTES_TITULACOES = [
 ];
 
 // Versão do extrator: registros de versões anteriores são relidos do XML
-// guardado (bb_carregar_pessoa). 2 = títulos das bancas e artigos marcados.
-const LATTES_VERSAO = 2;
+// guardado (bb_carregar_pessoa). 2 = títulos das bancas e artigos marcados;
+// 3 = sexo (desempate da ordem das sugestões).
+const LATTES_VERSAO = 3;
 // Bancas cujos títulos entram na busca (trabalho avaliado pela pessoa).
 const LATTES_BANCAS = ['PARTICIPACAO-EM-BANCA-DE-MESTRADO', 'PARTICIPACAO-EM-BANCA-DE-DOUTORADO', 'PARTICIPACAO-EM-BANCA-DE-EXAME-QUALIFICACAO'];
 
@@ -229,7 +230,7 @@ function lattes_secao(array $pilha): ?string
 function lattes_parse(string $xml, string $origem = ''): array
 {
     $p = [
-        'id' => '', 'nome' => '', 'citacoes' => [], 'origem' => $origem, 'atualizacao' => '',
+        'id' => '', 'nome' => '', 'sexo' => '', 'citacoes' => [], 'origem' => $origem, 'atualizacao' => '',
         'instituicao' => '', 'unidade' => '', 'cidade' => '', 'uf' => '',
         'titulacao' => '', 'nivel' => 0, 'bancasMestrado' => 0, 'bancasDoutorado' => 0,
         'resumo' => '', 'linhas' => [], 'projetos' => [], 'areas' => [], 'palavrasChave' => [],
@@ -268,6 +269,10 @@ function lattes_parse(string $xml, string $origem = ''): array
             if (strlen($d) === 8) $p['atualizacao'] = substr($d, 4, 4) . '-' . substr($d, 2, 2) . '-' . substr($d, 0, 2);
         } elseif ($tag === 'DADOS-GERAIS') {
             $p['nome'] = $a['NOME-COMPLETO'] ?? '';
+            // SEXO do Lattes (FEMININO/MASCULINO): só para o desempate da ordem
+            // das sugestões; nunca é exibido nem sai do servidor.
+            $sexo = strtoupper(substr(trim($a['SEXO'] ?? ''), 0, 1));
+            $p['sexo'] = in_array($sexo, ['F', 'M'], true) ? $sexo : '';
             $p['citacoes'] = array_values(array_filter(array_map('trim', explode(';', $a['NOME-EM-CITACOES-BIBLIOGRAFICAS'] ?? ''))));
         } elseif ($tag === 'RESUMO-CV') {
             $p['resumo'] = lattes_sem_html($a['TEXTO-RESUMO-CV-RICO'] ?? '');

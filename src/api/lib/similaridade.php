@@ -154,7 +154,8 @@ function sim_tf_curriculo(array $p, int $anoAtual): array
 
 const SIM_BM25_K1 = 1.2;  // saturação da frequência
 const SIM_BM25_B = 0.75;  // ajuste ao tamanho do currículo
-const SIM_MODELO = 'bm25-1'; // muda quando o índice gravado precisa ser refeito
+const SIM_MODELO = 'bm25-2'; // muda quando o índice gravado precisa ser refeito
+const SIM_CASAS_EXIBIDAS = 2; // proximidade exibida com 2 casas (0,12)
 
 // IDF do BM25 (sempre positivo): termo raro vale mais.
 function sim_idf(int $N, int $n): float
@@ -210,6 +211,20 @@ function sim_buscar_partes(array $consulta, array $opcoes, callable $termo, arra
 {
     [$tf, $formas] = sim_consulta($consulta);
     return sim_pontuar($tf, $formas, $termo, $docs, $media, $opcoes);
+}
+
+// Ordem das sugestões: proximidade como exibida (2 casas), decrescente; no
+// empate (ex.: três pessoas com 0,12), as de sexo feminino primeiro; depois a
+// proximidade sem arredondar e o nome. $feminina($pessoa) diz se é do sexo
+// feminino (o dado vem do índice, não do registro exibido).
+function sim_ordenar(array $resultados, callable $feminina): array
+{
+    $chave = fn($r) => round($r['score'], SIM_CASAS_EXIBIDAS);
+    usort($resultados, fn($a, $b) => ($chave($b) <=> $chave($a))
+        ?: ((int) $feminina($b['pessoa']) <=> (int) $feminina($a['pessoa']))
+        ?: ($b['score'] <=> $a['score'])
+        ?: strcmp(sim_sem_acento($a['pessoa']['nome']), sim_sem_acento($b['pessoa']['nome'])));
+    return $resultados;
 }
 
 // Termos da consulta (com pesos por campo) e a forma original de cada um.

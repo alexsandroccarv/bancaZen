@@ -94,6 +94,11 @@ $busca = sim_buscar_partes($consulta, [
     'excluirInstituicao' => $texto('excluirInstituicao'),
     'somenteDoutores' => $texto('somenteDoutores') === '1',
 ], bb_indice_leitor(), $docs, (float) ($meta['media'] ?? 0));
+// Empate na proximidade exibida: pessoas de sexo feminino primeiro (o sexo
+// fica só no índice; não vai para a resposta).
+$sexoDe = [];
+foreach ($meta['ids'] as $k => $id) $sexoDe[$id] = $meta['sexos'][$k] ?? '';
+$busca['resultados'] = sim_ordenar($busca['resultados'], fn($p) => ($sexoDe[$p['id']] ?? '') === 'F');
 // O filtro de instituição também vale para a instituição do programa.
 $excluir = trim(sim_sem_acento($texto('excluirInstituicao')));
 

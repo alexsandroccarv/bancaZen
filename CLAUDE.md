@@ -62,6 +62,10 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   `buscar.php`) ou avisa que a verificação não foi feita. Sem currículo, o
   nome (`<papel>Nome`) vira registro mínimo e a verificação é parcial
   (`soNome`): só os currículos indicados são conferidos.
+- Ordem das sugestões (`sim_ordenar`): proximidade exibida (2 casas)
+  decrescente; no empate, sexo feminino primeiro (`SEXO` do Lattes, em
+  `pessoas/` e em `indice/meta.json` `sexos`); nunca exibir nem enviar o
+  sexo ao navegador (`bb_publico` não o inclui).
 - `api/universidades.php` (público): nomes das universidades da planilha e
   dos currículos, para a caixa de seleção "Minha universidade" (com "Outra").
 - Ao mudar o backend, rodar `php tools/testar.php` (currículos fictícios em
