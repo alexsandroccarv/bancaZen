@@ -131,15 +131,24 @@ function bb_gravar_pessoa(array $p): void
 }
 // Registro completo de quem está no corpus ($leve). O programa vale o do
 // corpus (correções na administração alteram só o registro leve). Sem o
-// arquivo, relê o XML guardado.
+// arquivo, ou se ele foi gravado por uma versão anterior do extrator
+// (LATTES_VERSAO), relê o XML guardado e regrava o arquivo.
 function bb_carregar_pessoa(array $leve): ?array
 {
     $id = vinc_id_lattes((string) ($leve['id'] ?? ''));
     if ($id === '') return null;
     $dir = bb_dir_dados();
     $p = is_file("$dir/pessoas/$id.json") ? json_decode((string) file_get_contents("$dir/pessoas/$id.json"), true) : null;
-    if (!is_array($p) && is_file("$dir/xml/$id.xml")) {
-        try { $p = lattes_ler_arquivo("$id.xml", (string) file_get_contents("$dir/xml/$id.xml"))[0]['pessoa']; } catch (Throwable $e) { $p = null; }
+    if ((!is_array($p) || ($p['versao'] ?? 1) < LATTES_VERSAO) && is_file("$dir/xml/$id.xml")) {
+        try {
+            $novo = lattes_ler_arquivo("$id.xml", (string) file_get_contents("$dir/xml/$id.xml"))[0]['pessoa'];
+            if (vinc_id_lattes((string) $novo['id']) === $id) {
+                $p = array_merge($novo, bb_leve($leve));
+                bb_gravar_pessoa($p);
+            }
+        } catch (Throwable $e) {
+            // XML ilegível: fica o registro que havia.
+        }
     }
     return is_array($p) ? array_merge($p, bb_leve($leve)) : null;
 }
@@ -238,9 +247,10 @@ function bb_json_registros(string $arq, callable $fn): int
 
 /* --------------------------- índice de busca ----------------------------- */
 // Pré-calculado a partir dos registros completos (dois passes, um currículo
-// por vez) e gravado em indice/: meta.json (ids, normas, assinatura) e
-// termos/<2 hex>.json ({ termo: [idf, { doc: peso }] }). A busca lê só as
-// partes dos termos da consulta.
+// por vez) e gravado em indice/: meta.json (modelo, ids, comprimento de cada
+// currículo, comprimento médio, assinatura) e termos/<2 hex>.json ({ termo:
+// [idf, { doc: frequência }] }), o que o BM25 usa (sim_pontuar). A busca lê
+// só as partes dos termos da consulta.
 function bb_indice_assinatura(): string
 {
     $a = bb_dir_dados() . '/corpus.json';
@@ -261,8 +271,14 @@ function bb_indice_garantir(): array
 {
     bb_migrar_corpus();
     $m = bb_indice_meta();
-    if ($m && ($m['assinatura'] ?? '') === bb_indice_assinatura() && ($m['ano'] ?? 0) === (int) date('Y')) return $m;
+    if (bb_indice_valido($m, bb_indice_assinatura())) return $m;
     return bb_indice_construir();
+}
+// Índice do mesmo corpus, do mesmo ano (peso da recência) e do mesmo modelo.
+function bb_indice_valido(?array $m, string $assinatura): bool
+{
+    return $m && ($m['assinatura'] ?? '') === $assinatura && ($m['ano'] ?? 0) === (int) date('Y')
+        && ($m['modelo'] ?? '') === SIM_MODELO;
 }
 function bb_indice_construir(): array
 {
@@ -272,7 +288,7 @@ function bb_indice_construir(): array
     try {
         $assinatura = bb_indice_assinatura();
         $m = bb_indice_meta();
-        if ($m && ($m['assinatura'] ?? '') === $assinatura && ($m['ano'] ?? 0) === (int) date('Y')) return $m; // outro processo já fez
+        if (bb_indice_valido($m, $assinatura)) return $m; // outro processo já fez
         @set_time_limit(600);
         $corpus = bb_carregar_json('corpus.json');
         $ano = (int) date('Y');
@@ -297,13 +313,14 @@ function bb_indice_construir(): array
         fclose($htf);
         $N = count($ids);
         $idf = [];
-        foreach ($df as $t => $n) $idf[$t] = log(($N + 1) / ($n + 1)) + 1;
+        foreach ($df as $t => $n) $idf[$t] = sim_idf($N, $n);
         unset($df);
-        // 2º passe: pesos e normas; as postagens vão para arquivos por parte.
+        // 2º passe: frequências e comprimentos; as postagens vão para arquivos
+        // por parte.
         $novo = "$dir/indice.novo-" . bin2hex(random_bytes(4));
         @mkdir("$novo/termos", 0750, true);
         $buffers = [];
-        $normas = [];
+        $comprimentos = [];
         $descarregar = function (string $parte) use (&$buffers, $novo) {
             file_put_contents("$novo/termos/$parte.tsv", $buffers[$parte], FILE_APPEND);
             $buffers[$parte] = '';
@@ -311,17 +328,14 @@ function bb_indice_construir(): array
         $htf = fopen($tmpTf, 'rb');
         foreach ($ids as $k => $id) {
             $tf = json_decode((string) fgets($htf), true) ?: [];
-            $norma = 0.0;
             foreach ($tf as $t => $f) {
-                $peso = round((1 + log($f)) * ($idf[$t] ?? 0), 6);
-                if ($peso <= 0) continue;
-                $norma += $peso * $peso;
+                $f = round($f, 4);
+                if ($f <= 0) continue;
                 $parte = bb_indice_parte((string) $t);
-                $buffers[$parte] = ($buffers[$parte] ?? '') . "$t	$k	$peso
-";
+                $buffers[$parte] = ($buffers[$parte] ?? '') . "$t\t$k\t$f\n";
                 if (strlen($buffers[$parte]) > 65536) $descarregar($parte);
             }
-            $normas[$k] = sqrt($norma);
+            $comprimentos[$k] = round(array_sum($tf), 4);
         }
         fclose($htf);
         @unlink($tmpTf);
@@ -330,16 +344,16 @@ function bb_indice_construir(): array
             $termos = [];
             $h = fopen($tsv, 'rb');
             while (($linha = fgets($h)) !== false) {
-                [$t, $k, $peso] = explode("	", rtrim($linha, "
-"));
+                [$t, $k, $f] = explode("\t", rtrim($linha, "\n"));
                 $termos[$t] ??= [round($idf[$t], 6), []];
-                $termos[$t][1][(int) $k] = (float) $peso;
+                $termos[$t][1][(int) $k] = (float) $f;
             }
             fclose($h);
             file_put_contents(substr($tsv, 0, -4) . '.json', json_encode($termos, JSON_UNESCAPED_UNICODE));
             unlink($tsv);
         }
-        $meta = ['assinatura' => $assinatura, 'ano' => $ano, 'N' => $N, 'ids' => $ids, 'normas' => $normas, 'criadoEm' => date('c')];
+        $meta = ['modelo' => SIM_MODELO, 'assinatura' => $assinatura, 'ano' => $ano, 'N' => $N, 'ids' => $ids,
+            'comprimentos' => $comprimentos, 'media' => $N ? array_sum($comprimentos) / $N : 0.0, 'criadoEm' => date('c')];
         file_put_contents("$novo/meta.json", json_encode($meta));
         // Troca atômica da pasta do índice.
         $velho = "$dir/indice.velho-" . bin2hex(random_bytes(4));

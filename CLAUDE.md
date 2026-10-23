@@ -30,7 +30,9 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
 - Backend PHP 8 sem dependências em `src/api/`: extrator
   `lib/lattes.php` (tags do schema `CurriculoLattes`, o mesmo do lattesZen;
   não extrair dados de contato), proximidade `lib/similaridade.php`
-  (TF-IDF + cosseno), vínculos `lib/vinculos.php`, base/sessão
+  (BM25, `SIM_MODELO`; artigos e títulos das bancas com peso próprio;
+  `LATTES_VERSAO` faz reler do XML os registros de versões anteriores),
+  vínculos `lib/vinculos.php`, base/sessão
   `lib/base.php`; endpoints `buscar.php` (público), `status.php` (público,
   só a contagem) e `admin.php` (sessão + token CSRF).
 - Mesmo ID Lattes no upload: fica o de `DATA-ATUALIZACAO` mais recente.

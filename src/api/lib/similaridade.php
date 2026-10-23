@@ -1,11 +1,14 @@
 <?php
 /* ==========================================================================
-   bancaZen — Proximidade temática (TF-IDF + cosseno)
+   bancaZen — Proximidade temática (BM25)
    --------------------------------------------------------------------------
-   Cada currículo vira um vetor de termos ponderados; o trabalho informado
-   (título, resumo, palavras-chave) vira outro. A proximidade é o cosseno
-   entre os dois vetores: como todos os pesos são positivos, o valor fica
-   sempre entre 0 (nenhum termo em comum) e 1 (mesmo perfil de termos).
+   Cada currículo vira um conjunto de termos com frequência ponderada; o
+   trabalho informado (título, resumo, palavras-chave) vira a consulta. A
+   pontuação é a do BM25: cada termo em comum soma IDF x frequência saturada
+   (repetir o termo rende cada vez menos, k1) e ajustada ao tamanho do
+   currículo (currículos muito extensos não levam vantagem só pelo volume,
+   b). A proximidade exibida (0 a 1) é a pontuação dividida pelo máximo que a
+   consulta poderia alcançar (todos os termos com frequência sem limite).
 
    Etapas do texto: minúsculas, remoção de acentos, palavras vazias
    (português e inglês), radical leve (plural e vogal temática) e bigramas
@@ -17,8 +20,11 @@
    pesam mais que o resumo (SIM_PESOS_CONSULTA).
    ========================================================================== */
 
+// Artigos (em periódicos, com avaliação por pares) pesam mais que as demais
+// produções; títulos das bancas de que a pessoa participou (mestrado,
+// doutorado, qualificação) mostram os temas que ela já avaliou.
 const SIM_PESOS_CURRICULO = [
-    'palavrasChave' => 3, 'linhas' => 2.5, 'areas' => 2, 'formacao' => 2,
+    'palavrasChave' => 3, 'linhas' => 2.5, 'areas' => 2, 'formacao' => 2, 'artigos' => 2, 'bancas' => 2,
     'producoes' => 1.5, 'projetos' => 1.5, 'orientacoes' => 1, 'resumo' => 1,
 ];
 const SIM_PESOS_CONSULTA = ['palavrasChave' => 3, 'titulo' => 2, 'resumo' => 1];
@@ -137,39 +143,44 @@ function sim_tf_curriculo(array $p, int $anoAtual): array
     foreach ($p['palavrasChave'] ?? [] as $t) sim_acumular($tf, $t, $w['palavrasChave']);
     foreach ($p['areas'] ?? [] as $t) sim_acumular($tf, $t, $w['areas']);
     foreach ($p['linhas'] ?? [] as $t) sim_acumular($tf, $t, $w['linhas']);
-    foreach (['formacao', 'producoes', 'projetos', 'orientacoes'] as $campo) {
-        foreach ($p[$campo] ?? [] as $it) sim_acumular($tf, $it['t'], $w[$campo] * sim_peso_recencia($it['a'] ?? '', $anoAtual));
+    foreach (['formacao', 'producoes', 'projetos', 'orientacoes', 'bancas'] as $campo) {
+        foreach ($p[$campo] ?? [] as $it) {
+            $peso = $campo === 'producoes' && ($it['tp'] ?? '') === 'a' ? $w['artigos'] : $w[$campo];
+            sim_acumular($tf, $it['t'], $peso * sim_peso_recencia($it['a'] ?? '', $anoAtual));
+        }
     }
     return $tf;
 }
 
-// Frequência sublinear: evita que um currículo muito extenso domine só por
-// repetir o mesmo termo centenas de vezes.
-function sim_vetor(array $tf, array $idf): array
+const SIM_BM25_K1 = 1.2;  // saturação da frequência
+const SIM_BM25_B = 0.75;  // ajuste ao tamanho do currículo
+const SIM_MODELO = 'bm25-1'; // muda quando o índice gravado precisa ser refeito
+
+// IDF do BM25 (sempre positivo): termo raro vale mais.
+function sim_idf(int $N, int $n): float
 {
-    $v = [];
-    $norma = 0.0;
-    foreach ($tf as $t => $f) {
-        $peso = (1 + log($f)) * ($idf[$t] ?? 0);
-        if ($peso > 0) { $v[$t] = $peso; $norma += $peso * $peso; }
-    }
-    return ['v' => $v, 'norma' => sqrt($norma)];
+    return log(1 + ($N - $n + 0.5) / ($n + 0.5));
 }
 
 /* --------------------------------- índice -------------------------------- */
+// Índice em memória: docs[k] = ['pessoa', 'tf' => [termo => frequência],
+// 'comprimento' => soma das frequências]; 'media' = comprimento médio.
 function sim_criar_indice(array $pessoas, ?int $anoAtual = null): array
 {
     $anoAtual = $anoAtual ?: (int) date('Y');
-    $tfs = array_map(fn($p) => sim_tf_curriculo($p, $anoAtual), $pessoas);
-    $df = [];
-    foreach ($tfs as $tf) foreach ($tf as $t => $_) $df[$t] = ($df[$t] ?? 0) + 1;
-    $N = count($pessoas);
-    // IDF suavizado: termo presente em todos os currículos ainda vale um pouco.
-    $idf = [];
-    foreach ($df as $t => $n) $idf[$t] = log(($N + 1) / ($n + 1)) + 1;
     $docs = [];
-    foreach ($tfs as $i => $tf) $docs[] = ['pessoa' => $pessoas[$i]] + sim_vetor($tf, $idf);
-    return ['docs' => $docs, 'idf' => $idf, 'N' => $N];
+    $df = [];
+    $soma = 0.0;
+    foreach (array_values($pessoas) as $k => $p) {
+        $tf = sim_tf_curriculo($p, $anoAtual);
+        foreach ($tf as $t => $_) $df[$t] = ($df[$t] ?? 0) + 1;
+        $docs[$k] = ['pessoa' => $p, 'tf' => $tf, 'comprimento' => array_sum($tf)];
+        $soma += $docs[$k]['comprimento'];
+    }
+    $N = count($docs);
+    $idf = [];
+    foreach ($df as $t => $n) $idf[$t] = sim_idf($N, $n);
+    return ['docs' => $docs, 'idf' => $idf, 'N' => $N, 'media' => $N ? $soma / $N : 0.0];
 }
 
 /* --------------------------------- busca --------------------------------- */
@@ -180,24 +191,25 @@ function sim_criar_indice(array $pessoas, ?int $anoAtual = null): array
 function sim_buscar(array $indice, array $consulta, array $opcoes = []): array
 {
     [$tf, $formas] = sim_consulta($consulta);
-    $termo = fn($t) => isset($indice['idf'][$t]) ? $indice['idf'][$t] : null;
     $docs = [];
     $postagens = [];
     foreach ($indice['docs'] as $k => $d) {
-        $docs[$k] = ['pessoa' => $d['pessoa'], 'norma' => $d['norma']];
-        foreach ($tf as $t => $_) if (isset($d['v'][$t])) $postagens[$t][$k] = $d['v'][$t];
+        $docs[$k] = ['pessoa' => $d['pessoa'], 'comprimento' => $d['comprimento']];
+        foreach ($tf as $t => $_) if (isset($d['tf'][$t])) $postagens[$t][$k] = $d['tf'][$t];
     }
-    return sim_pontuar($tf, $formas, fn($t) => $termo($t) === null ? null : [$termo($t), $postagens[$t] ?? []], $docs, $opcoes);
+    $termo = fn($t) => isset($indice['idf'][$t]) ? [$indice['idf'][$t], $postagens[$t] ?? []] : null;
+    return sim_pontuar($tf, $formas, $termo, $docs, $indice['media'], $opcoes);
 }
 
-// Busca no índice gravado em partes: $termo($t) devolve [idf, [doc => peso]]
-// (ou null, se o termo não aparece em nenhum currículo) e $docs[doc] =
-// ['pessoa' => registro (leve basta), 'norma' => norma do vetor].
-// Só os termos da consulta são lidos: a memória não cresce com a base.
-function sim_buscar_partes(array $consulta, array $opcoes, callable $termo, array $docs): array
+// Busca no índice gravado em partes: $termo($t) devolve [idf, [doc =>
+// frequência]] (ou null, se o termo não aparece em nenhum currículo),
+// $docs[doc] = ['pessoa' => registro (leve basta), 'comprimento'] e $media é
+// o comprimento médio. Só os termos da consulta são lidos: a memória não
+// cresce com a base.
+function sim_buscar_partes(array $consulta, array $opcoes, callable $termo, array $docs, float $media): array
 {
     [$tf, $formas] = sim_consulta($consulta);
-    return sim_pontuar($tf, $formas, $termo, $docs, $opcoes);
+    return sim_pontuar($tf, $formas, $termo, $docs, $media, $opcoes);
 }
 
 // Termos da consulta (com pesos por campo) e a forma original de cada um.
@@ -211,31 +223,33 @@ function sim_consulta(array $consulta): array
     return [$tf, $formas];
 }
 
-// Cosseno entre a consulta e cada currículo que tem algum termo em comum.
-function sim_pontuar(array $tf, array $formas, callable $termo, array $docs, array $opcoes): array
+// BM25 entre a consulta e cada currículo que tem algum termo em comum. O
+// peso de cada termo da consulta é sublinear (1 + log), como antes.
+function sim_pontuar(array $tf, array $formas, callable $termo, array $docs, float $media, array $opcoes): array
 {
     $limite = $opcoes['limite'] ?? 10;
+    $k1 = SIM_BM25_K1;
+    $b = SIM_BM25_B;
     $q = [];
-    $qNorma = 0.0;
+    $maximo = 0.0;
     $postagens = [];
     foreach ($tf as $t => $f) {
         $info = $termo((string) $t);
         if (!$info || $info[0] <= 0) continue;
-        $peso = (1 + log($f)) * $info[0];
-        if ($peso <= 0) continue;
-        $q[$t] = $peso;
-        $qNorma += $peso * $peso;
+        $q[$t] = (1 + log($f)) * $info[0];
+        $maximo += $q[$t] * ($k1 + 1); // frequência sem limite: fator k1 + 1
         $postagens[$t] = $info[1];
     }
-    $qNorma = sqrt($qNorma);
-    if (!$qNorma) return ['resultados' => [], 'termosConsulta' => 0, 'avaliados' => 0];
+    if (!$maximo) return ['resultados' => [], 'termosConsulta' => 0, 'avaliados' => 0];
 
     $excluir = trim(sim_sem_acento($opcoes['excluirInstituicao'] ?? ''));
     $produto = [];
     $contrib = [];
     foreach ($q as $t => $qw) {
-        foreach ($postagens[$t] as $k => $dw) {
-            $c = $qw * $dw;
+        foreach ($postagens[$t] as $k => $f) {
+            if (!isset($docs[$k])) continue;
+            $ajuste = $media > 0 ? 1 - $b + $b * ($docs[$k]['comprimento'] / $media) : 1.0;
+            $c = $qw * ($f * ($k1 + 1)) / ($f + $k1 * $ajuste);
             $produto[$k] = ($produto[$k] ?? 0.0) + $c;
             $contrib[$k][$t] = $c;
         }
@@ -250,7 +264,7 @@ function sim_pontuar(array $tf, array $formas, callable $termo, array $docs, arr
         $avaliados++;
         $prod = $produto[$k] ?? 0.0;
         if ($prod <= 0) continue;
-        $score = $d['norma'] ? min(1.0, $prod / ($qNorma * $d['norma'])) : 0.0;
+        $score = min(1.0, $prod / $maximo);
         $c = $contrib[$k];
         arsort($c);
         // Termos em comum que mais pesaram (sem repetir a palavra de um bigrama já listado).

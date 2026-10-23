@@ -201,11 +201,18 @@ const LATTES_TITULACOES = [
     'MESTRADO' => [3, 'Mestrado'], 'ESPECIALIZACAO' => [2, 'Especialização'], 'GRADUACAO' => [1, 'Graduação'],
 ];
 
+// Versão do extrator: registros de versões anteriores são relidos do XML
+// guardado (bb_carregar_pessoa). 2 = títulos das bancas e artigos marcados.
+const LATTES_VERSAO = 2;
+// Bancas cujos títulos entram na busca (trabalho avaliado pela pessoa).
+const LATTES_BANCAS = ['PARTICIPACAO-EM-BANCA-DE-MESTRADO', 'PARTICIPACAO-EM-BANCA-DE-DOUTORADO', 'PARTICIPACAO-EM-BANCA-DE-EXAME-QUALIFICACAO'];
+
 // Seções cujos títulos descrevem a atuação da pessoa (e não de terceiros).
 function lattes_secao(array $pilha): ?string
 {
     for ($i = count($pilha) - 1; $i >= 0; $i--) {
         $t = $pilha[$i];
+        if (in_array($t, LATTES_BANCAS, true)) return 'bancas';
         if ($t === 'PRODUCAO-BIBLIOGRAFICA' || $t === 'PRODUCAO-TECNICA' || $t === 'OUTRA-PRODUCAO') {
             // Orientações ficam dentro de OUTRA-PRODUCAO, mas têm peso próprio.
             return in_array('ORIENTACOES-CONCLUIDAS', $pilha, true) ? 'orientacoes' : 'producoes';
@@ -226,7 +233,8 @@ function lattes_parse(string $xml, string $origem = ''): array
         'instituicao' => '', 'unidade' => '', 'cidade' => '', 'uf' => '',
         'titulacao' => '', 'nivel' => 0, 'bancasMestrado' => 0, 'bancasDoutorado' => 0,
         'resumo' => '', 'linhas' => [], 'projetos' => [], 'areas' => [], 'palavrasChave' => [],
-        'formacao' => [], 'producoes' => [], 'orientacoes' => [], 'orientadores' => [],
+        'formacao' => [], 'producoes' => [], 'orientacoes' => [], 'orientadores' => [], 'bancas' => [],
+        'versao' => LATTES_VERSAO,
     ];
     $pilha = [];
     $areas = [];
@@ -307,7 +315,8 @@ function lattes_parse(string $xml, string $origem = ''): array
             $titulo = lattes_pick($a, LATTES_TITULOS);
             $ultimo = null;
             if ($secao && $titulo !== '') {
-                $p[$secao][] = ['t' => $titulo, 'a' => lattes_pick($a, LATTES_ANOS)];
+                // Artigo em periódico (publicado ou aceito): peso próprio na busca.
+                $p[$secao][] = lattes_compacto(['t' => $titulo, 'a' => lattes_pick($a, LATTES_ANOS), 'tp' => $tag === 'DADOS-BASICOS-DO-ARTIGO' ? 'a' : '']);
                 $ultimo = [$secao, count($p[$secao]) - 1];
             }
         } elseif ($tag === 'AUTORES' && $ultimo) {
