@@ -225,19 +225,20 @@ html.tz-theme .passo { background: var(--tz-accent); color: var(--tz-bg); }
 .doc-univ-titulo { font-size: .875rem; font-weight: 600; margin: 0 0 .25rem; opacity: .9; }
 .doc-contagem { font-weight: 400; font-size: .8125rem; opacity: .75; margin-left: .25rem; }
 .doc-lista { list-style: none; margin: 0; padding: 0; }
-.doc-linha { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .125rem 1rem; align-items: center;
+.doc-linha { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr) auto; gap: .125rem .75rem; align-items: center;
              padding: .375rem .5rem; border-radius: .375rem; }
 .doc-linha:nth-child(odd) { background: rgba(127, 127, 127, .07); }
 .doc-linha:hover { background: rgba(127, 127, 127, .14); }
 .doc-nome { min-width: 0; }
 .doc-situacao, .doc-ppg { display: inline-block; font-size: .75rem; opacity: .8; margin-left: .375rem; }
 .doc-ppg::before { content: "· "; }
-.doc-email { grid-column: 1 / -1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8125rem; }
+.doc-email { grid-column: 2 / -1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8125rem; }
 .doc-email:empty { display: none; }
-.doc-lattes, .doc-cv { white-space: nowrap; font-size: .8125rem; }
-.doc-cv { opacity: .85; }
+.doc-lattes { white-space: nowrap; font-size: .8125rem; }
+.doc-cv { text-align: center; line-height: 1; }
+.doc-cv-pendente { opacity: .6; }
 @media (min-width: 768px) {
-  .doc-linha { grid-template-columns: minmax(0, 2fr) 5rem minmax(0, 1.6fr) 6.5rem; }
+  .doc-linha { grid-template-columns: 1.25rem minmax(0, 2fr) 5rem minmax(0, 1.6fr); }
   .doc-email { grid-column: auto; }
   .doc-email:empty { display: block; }
 }

@@ -8,6 +8,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- Lista de docentes: a situação do currículo (enviado ou pendente) aparece
+  só como ícone, no início da linha; o texto fica na dica do mouse e para
+  leitores de tela. [issue #51](../../issues/51)
+
+## [0.0.25] - 2026-10-23
+
+### Alterado
 - Lista de docentes (Administração): agrupada por banca (Rede PROFIAP e
   Externa) e, em cada uma, por universidade, com as contagens nos títulos;
   sem linhas divisórias, com fundo alternado leve. Cada pessoa mostra nome,
