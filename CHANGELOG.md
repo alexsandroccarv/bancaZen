@@ -8,6 +8,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Adicionado
+- Administração: seção "Currículos guardados no servidor", com os botões
+  **Simular** e **Incluir na busca** para os XML/ZIP copiados direto para a
+  pasta de dados, PPG, instituição e situação para quem não está cadastrado
+  nem na lista de docentes, e a opção de apagar as cópias com outro nome.
+  Processa em lotes de 25 arquivos (ação `reindexar` de `api/admin.php`),
+  com o progresso na tela. [issue #31](../../issues/31)
+
+## [0.0.15] - 2026-10-23
+
+### Adicionado
 - Comando `php api/cli/reindexar.php`, no servidor: monta ou completa o índice
   da busca a partir dos XML/ZIP copiados direto para a pasta de dados (rsync,
   FTP), com a regra do mesmo ID. O programa vem do índice, da lista de

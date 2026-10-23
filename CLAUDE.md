@@ -46,8 +46,10 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   Currículos reais não entram em `tools/fixtures/`.
 - Senha da administração: `php api/cli/definir-senha.php` no servidor.
 - XMLs copiados direto para `<dados>/xml/` (rsync/FTP) só entram na busca
-  com `php api/cli/reindexar.php` (`bb_reindexar`; `--simular`, `--ppg`,
-  `--organizar`; programa: índice > lista de docentes > `--ppg`).
+  depois de incluídos: Administração, "Currículos guardados no servidor"
+  (ação `reindexar` de `admin.php`, em lotes com cursor pelo nome do
+  arquivo), ou `php api/cli/reindexar.php` (`bb_reindexar`; `--simular`,
+  `--ppg`, `--organizar`; programa: índice > lista de docentes > `--ppg`).
 
 ## Padrões de UI
 - Página principal em seções (abas com ícone na barra superior, nome visível

@@ -236,7 +236,9 @@ Só o hash (`password_hash`) é gravado em `bancazen-dados/admin.json`.
 
 O índice da busca (`corpus.json`) é montado quando os currículos são enviados
 pela Administração. XMLs ou ZIPs copiados direto para `<dados>/xml/` só
-entram na busca depois deste comando, no servidor, na pasta do site:
+entram na busca depois de incluídos: na **Administração**, seção "Currículos
+guardados no servidor" (botões **Simular** e **Incluir na busca**, em lotes
+de 25 arquivos), ou por este comando, no servidor, na pasta do site:
 
 ```bash
 cd ~/public_html/labs/bancaZen

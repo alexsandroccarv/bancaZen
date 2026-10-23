@@ -185,6 +185,12 @@ $resta = array_map('basename', glob("$tmpR/xml/*"));
 sort($resta);
 confere($r['organizados'] === 4 && $resta === ['0000000000000001.xml', '0000000000000002.xml', '0000000000000003.xml', '0000000000000005.xml', 'leia-me.txt', 'quebrado.xml'], 'reindexar --organizar apaga só as cópias já gravadas');
 confere(bb_reindexar(null)['total'] === 4, 'índice intacto depois de organizar');
+// Em lotes (Administração): cursor pelo nome do arquivo.
+$l1 = bb_reindexar(null, true, false, '', 2);
+$l2 = bb_reindexar(null, true, false, $l1['ultimo'], 2);
+$l3 = bb_reindexar(null, true, false, $l2['ultimo'], 2);
+confere($l1['arquivos'] === 2 && $l1['restantes'] === 3 && $l2['arquivos'] === 2 && $l3['arquivos'] === 1 && $l3['restantes'] === 0 && $l1['totalArquivos'] === 5 && $l3['ultimo'] === 'quebrado.xml', 'reindexar em lotes percorre todos os arquivos');
+confere($l1['indiceAtual'] === 4 && count($l1['pessoas']) === 2 && $l1['pessoas'][0]['situacao'] === 'substituido', 'reindexar simulado em lotes informa índice atual e pessoas');
 array_map('unlink', glob("$tmpR/xml/*"));
 rmdir("$tmpR/xml");
 array_map('unlink', array_filter(glob("$tmpR/{,.}*", GLOB_BRACE) ?: [], 'is_file'));

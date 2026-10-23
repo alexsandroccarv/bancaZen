@@ -156,13 +156,23 @@ function bb_guardar_curriculo(array &$corpus, array $pessoa, string $xmlBytes, a
 // fora e vai para 'semPpg'. Com $simular, nada é gravado. 'comOutroNome'
 // lista os arquivos já gravados como <ID>.xml com outro nome (cópias); com
 // $organizar, são apagados depois de o índice ser gravado.
-function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = false): array
+// Em lotes (Administração, limite de tempo do PHP): $limite arquivos por vez,
+// em ordem de nome, a partir do primeiro depois de $depois; o relatório traz
+// 'ultimo' (o $depois do próximo lote) e 'restantes'. Na simulação, 'pessoas'
+// lista [id, situacao] de cada currículo, para somar os lotes sem repetir.
+function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = false, string $depois = '', int $limite = 0): array
 {
     $dir = bb_preparar_dados();
     $docentes = bb_carregar_docentes();
-    $arquivos = array_values(array_filter(glob("$dir/xml/*") ?: [], fn($a) => is_file($a) && preg_match('/\.(xml|zip)$/i', $a)));
-    sort($arquivos);
-    $rel = ['arquivos' => count($arquivos), 'novo' => 0, 'substituido' => 0, 'mantido' => 0, 'semPpg' => [], 'comOutroNome' => [], 'erros' => []];
+    $todos = array_values(array_filter(glob("$dir/xml/*") ?: [], fn($a) => is_file($a) && preg_match('/\.(xml|zip)$/i', $a)));
+    sort($todos, SORT_STRING);
+    $pendentes = $depois === '' ? $todos : array_values(array_filter($todos, fn($a) => strcmp(basename($a), $depois) > 0));
+    $arquivos = $limite > 0 ? array_slice($pendentes, 0, $limite) : $pendentes;
+    $rel = [
+        'arquivos' => count($arquivos), 'totalArquivos' => count($todos), 'restantes' => count($pendentes) - count($arquivos),
+        'ultimo' => $arquivos ? basename(end($arquivos)) : $depois,
+        'novo' => 0, 'substituido' => 0, 'mantido' => 0, 'semPpg' => [], 'comOutroNome' => [], 'erros' => [], 'pessoas' => [],
+    ];
     $processar = function (array $corpus) use ($arquivos, $docentes, $padrao, $simular, &$rel) {
         foreach ($arquivos as $arq) {
             $nome = basename($arq);
@@ -185,6 +195,7 @@ function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = f
                         $atual = $corpus[$id] ?? null;
                         $sit = $atual && ($atual['atualizacao'] ?? '') > ($p['atualizacao'] ?? '') ? 'mantido' : ($atual ? 'substituido' : 'novo');
                         if ($sit !== 'mantido') $corpus[$id] = ['id' => $id, 'programa' => $programa] + $p;
+                        $rel['pessoas'][] = ['id' => $id, 'situacao' => $sit];
                     } else {
                         $sit = bb_guardar_curriculo($corpus, $p, $it['xml'], $programa)['situacao'];
                     }
@@ -198,7 +209,13 @@ function bb_reindexar(?array $padrao, bool $simular = false, bool $organizar = f
         }
         return [$corpus, count($corpus)];
     };
-    $rel['total'] = $simular ? $processar(bb_carregar_corpus())[1] : bb_alterar_corpus($processar);
+    if ($simular) {
+        $corpus = bb_carregar_corpus();
+        $rel['indiceAtual'] = count($corpus);
+        $rel['total'] = $processar($corpus)[1];
+    } else {
+        $rel['total'] = bb_alterar_corpus($processar);
+    }
     $rel['organizados'] = 0;
     if ($organizar && !$simular) {
         foreach ($rel['comOutroNome'] as $arq) $rel['organizados'] += (int) @unlink($arq);

@@ -14,6 +14,10 @@
      GET  modelo-docentes     -> modelo do CSV da lista de docentes (download;
                                  sem dados da base, não exige sessão)
      POST remover    id
+     POST reindexar  ppg, instituicao, situacao, simular (1/0), organizar (1/0),
+                     depois  -> um lote dos XML/ZIP de <dados>/xml/ (copiados
+                     por rsync/FTP) no índice; repetir com depois = ultimo
+                     enquanto restantes > 0 (bb_reindexar)
    Todas as ações, exceto sessao e entrar, exigem sessão; as que alteram
    dados exigem também o token anti-CSRF no cabeçalho X-CSRF.
    A senha é definida no servidor: php api/cli/definir-senha.php
@@ -21,6 +25,8 @@
 require_once __DIR__ . '/lib/base.php';
 
 $acao = $_GET['acao'] ?? '';
+// Arquivos por requisição em "reindexar" (limite de tempo do PHP).
+const BB_LOTE_REINDEXAR = 25;
 $post = fn($k) => trim((string) ($_POST[$k] ?? ''));
 
 try {
@@ -136,6 +142,15 @@ try {
                 : 'Nenhum docente com Lattes encontrado no arquivo.');
             $rel += bb_alterar_docentes(fn($atuais) => doc_aplicar($atuais, $novos, $ppg, $post('substituir') === '1'));
             bb_json(['relatorio' => $rel]);
+
+        case 'reindexar':
+            bb_exigir_metodo('POST');
+            bb_exigir_admin();
+            @set_time_limit(300);
+            @ini_set('memory_limit', '1024M');
+            $padrao = $post('ppg') !== '' ? bb_programa($post('ppg'), $post('instituicao'), $post('situacao')) : null;
+            $simular = $post('simular') === '1';
+            bb_json(['relatorio' => bb_reindexar($padrao, $simular, !$simular && $post('organizar') === '1', $post('depois'), BB_LOTE_REINDEXAR)]);
 
         case 'remover':
             bb_exigir_metodo('POST');
