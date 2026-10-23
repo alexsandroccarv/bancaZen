@@ -7,6 +7,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- Lista de docentes (Administração): agrupada por banca (Rede PROFIAP e
+  Externa) e, em cada uma, por universidade, com as contagens nos títulos;
+  sem linhas divisórias, com fundo alternado leve. Cada pessoa mostra nome,
+  situação, Lattes, e-mail e currículo (enviado/pendente); o PPG aparece só
+  na Externa. Funciona sem o Tailwind e em tela estreita.
+  [issue #49](../../issues/49)
+
+## [0.0.24] - 2026-10-23
+
 ### Removido
 - "Currículos guardados no servidor": saem os campos PPG, instituição e
   situação. Os dados de cada pessoa vêm só das cargas (planilha de

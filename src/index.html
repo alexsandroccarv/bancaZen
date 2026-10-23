@@ -456,24 +456,7 @@
                             <input id="docFiltroInput" type="search" placeholder="Filtrar por nome, universidade, PPG, situação ou e-mail" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 sm:flex-1">
                             <label class="flex items-center gap-2 text-sm whitespace-nowrap"><input id="docPendentesInput" type="checkbox"> Só sem currículo</label>
                         </div>
-                        <div class="overflow-x-auto max-h-[32rem] overflow-y-auto scroll-area">
-                            <table class="w-full text-sm text-left">
-                                <caption class="sr-only">Docentes dos programas</caption>
-                                <thead class="border-b border-gray-300 dark:border-gray-600">
-                                    <tr>
-                                        <th scope="col" class="py-2 pr-3">Nome</th>
-                                        <th scope="col" class="py-2 pr-3">Universidade</th>
-                                        <th scope="col" class="py-2 pr-3">PPG</th>
-                                        <th scope="col" class="py-2 pr-3">Banca</th>
-                                        <th scope="col" class="py-2 pr-3">Situação</th>
-                                        <th scope="col" class="py-2 pr-3">Lattes</th>
-                                        <th scope="col" class="py-2 pr-3">E-mail</th>
-                                        <th scope="col" class="py-2">Currículo</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="docTabela"></tbody>
-                            </table>
-                        </div>
+                        <div id="docGrupos" class="doc-grupos max-h-[40rem] overflow-y-auto scroll-area text-sm" aria-live="polite"></div>
                     </div>
                     </details>
                 </section>
