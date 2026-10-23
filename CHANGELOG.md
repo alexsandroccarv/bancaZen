@@ -7,6 +7,20 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Seção **Relatório**: a pessoa discente marca as pessoas escolhidas
+  (titular ou suplente) entre as indicações e gera a declaração da indicação
+  da banca, em tom formal, para o pedido de defesa ou de exame de
+  qualificação: processo objetivo (BM25, índice de 0 a 1, critérios da
+  busca), critérios éticos conforme o que a busca verificou (currículos, só
+  nome ou sem verificação, caso em que a ausência de vínculo é declarada por
+  quem assina), indicações das duas listas com o índice, pessoas
+  escolhidas, local, data, assinaturas, data de geração e referência ABNT
+  para citar o bancaZen. Impressão ou PDF pelo navegador; nada vai ao
+  servidor. [issue #65](../../issues/65)
+
+## [0.0.32] - 2026-10-23
+
 ### Alterado
 - Ordem das sugestões: quando a proximidade exibida (2 casas) é a mesma, as
   pessoas de sexo feminino (atributo `SEXO` do Lattes) aparecem primeiro,

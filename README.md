@@ -18,7 +18,11 @@ mestrado** a partir de currículos Lattes.
 3. A página principal é dividida em seções, com ícones na barra superior:
    **Início** (apresentação e funcionamento), **Minha Dissertação** (com
    **Minha orientação**, opcional, e botões para exportar e importar os dados
-   num arquivo JSON), **Bancas sugeridas** e **Administração**. A pessoa discente
+   num arquivo JSON), **Bancas sugeridas**, **Relatório** (declaração da
+   indicação da banca para o pedido de defesa ou de qualificação, com as
+   indicações, o índice, os critérios éticos aplicados, as pessoas
+   escolhidas, a data de geração e a referência para citar o bancaZen;
+   impressa ou salva em PDF pelo navegador) e **Administração**. A pessoa discente
    informa **nome**, **universidade** (pessoas da mesma instituição são
    desconsideradas como membro externo), **título**, **resumo** e
    **palavras-chave** do trabalho e, opcionalmente, o próprio

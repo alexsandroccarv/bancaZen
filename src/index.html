@@ -92,6 +92,9 @@
                 <button id="tab-bancas-btn" aria-controls="tab-bancas" aria-label="Bancas sugeridas" title="Bancas sugeridas" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="bancas">
                     <i aria-hidden="true" class="fa-solid fa-users-viewfinder"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Bancas sugeridas</span>
                 </button>
+                <button id="tab-relatorio-btn" aria-controls="tab-relatorio" aria-label="Relatório" title="Relatório" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="relatorio">
+                    <i aria-hidden="true" class="fa-solid fa-file-signature"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Relatório</span>
+                </button>
                 <button id="tab-administracao-btn" aria-controls="tab-administracao" aria-label="Administração" title="Administração" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="administracao">
                     <i aria-hidden="true" class="fa-solid fa-user-shield"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Administração</span>
                 </button>
@@ -121,6 +124,7 @@
                     <ol class="space-y-3 list-none p-0">
                         <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Minha Dissertação</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe o título, o resumo e as palavras-chave do seu trabalho. Na mesma seção, em "Minha orientação" (opcional, para a conformidade ética), envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></div></li>
                         <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Bancas sugeridas</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 pessoas, da maior para a menor proximidade: Rede PROFIAP (docentes do PPG PROFIAP) e Externa (docentes de outros PPGs, para o segundo membro externo).</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span><div><p class="font-semibold">Relatório</p><p class="text-sm text-gray-600 dark:text-gray-400">Marque as pessoas escolhidas e gere a declaração da indicação da banca, com as indicações, o índice de proximidade e os critérios éticos aplicados, para anexar ao pedido de defesa ou de exame de qualificação.</p></div></li>
                     </ol>
                 </section>
 
@@ -324,7 +328,54 @@
             </div>
         </div>
 
-        <!-- 4. Administração (js/admin.js; só consulta o servidor quando a seção é aberta) -->
+        <!-- 4. Relatório (js/relatorio.js; gerado no navegador, nada vai ao servidor) -->
+        <div id="tab-relatorio" class="tab-panel" role="tabpanel" aria-labelledby="tab-relatorio-btn" tabindex="0" hidden>
+            <div class="max-w-3xl mx-auto space-y-4">
+                <h2 class="text-lg font-bold">Relatório</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Gere a declaração da indicação da banca, para anexar ao pedido de defesa ou de exame de
+                    qualificação. Ela registra o processo de indicação, os critérios éticos aplicados, as
+                    indicações do bancaZen com o índice de proximidade e as pessoas escolhidas. O documento é
+                    montado no seu navegador e não é guardado no servidor.
+                </p>
+                <div id="relSemBusca" class="rounded-lg border border-gray-300 dark:border-gray-600 p-4 text-sm space-y-2">
+                    <p>Faça antes a busca em "Bancas sugeridas": o relatório usa o resultado dela.</p>
+                    <button type="button" data-ir="bancas" class="text-brand-600 dark:text-accent-400 hover:underline font-medium">Ir para Bancas sugeridas</button>
+                </div>
+                <form id="relForm" class="space-y-4" hidden>
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <div>
+                            <label for="relTipoInput" class="block text-sm font-medium mb-1">Pedido</label>
+                            <select id="relTipoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                <option value="defesa">Defesa</option>
+                                <option value="qualificacao">Exame de qualificação</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="relProgramaInput" class="block text-sm font-medium mb-1">Programa</label>
+                            <input id="relProgramaInput" type="text" value="Mestrado Profissional em Administração Pública em Rede Nacional (PROFIAP)" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                        <div>
+                            <label for="relLocalInput" class="block text-sm font-medium mb-1">Local <span class="font-normal text-gray-600 dark:text-gray-400">(cidade)</span></label>
+                            <input id="relLocalInput" type="text" placeholder="Ex.: São Paulo" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                    </div>
+                    <fieldset class="space-y-2">
+                        <legend class="text-sm font-medium mb-1">Pessoas escolhidas para a banca</legend>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Marque, entre as indicações, quem foi escolhido e o papel na banca.</p>
+                        <div id="relEscolhas" class="space-y-4 text-sm"></div>
+                    </fieldset>
+                    <div id="relAviso" class="text-sm" aria-live="polite"></div>
+                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium"><i aria-hidden="true" class="fa-solid fa-file-signature"></i> Gerar relatório</button>
+                </form>
+                <div id="relAcoes" class="flex flex-wrap gap-2" hidden>
+                    <button type="button" id="relImprimirBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 font-medium"><i aria-hidden="true" class="fa-solid fa-print"></i> Imprimir ou salvar em PDF</button>
+                </div>
+                <article id="relDocumento" class="documento" aria-label="Relatório gerado" hidden></article>
+            </div>
+        </div>
+
+        <!-- 5. Administração (js/admin.js; só consulta o servidor quando a seção é aberta) -->
         <div id="tab-administracao" class="tab-panel" role="tabpanel" aria-labelledby="tab-administracao-btn" tabindex="0" hidden>
             <div class="max-w-5xl mx-auto space-y-6">
                 <h2 class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-user-shield text-brand-600 dark:text-accent-400"></i> Administração</h2>
@@ -584,6 +635,7 @@
     <script src="js/chrome.js"></script>
     <script src="js/layout.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/relatorio.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>
