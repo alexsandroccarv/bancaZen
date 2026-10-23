@@ -78,10 +78,14 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   a partir de 640px): `#inicio` (apresentação e funcionamento),
   `#dissertacao` (nome e universidade da discente, que preenche o critério
   de instituição a desconsiderar sem sobrescrever o digitado; título, resumo,
-  palavras-chave; nada disso é gravado no servidor), `#orientacao`, `#bancas` (conferência, critérios, busca e
+  palavras-chave e, no trecho `#orientacao`, Minha orientação (opcional);
+  nada disso é gravado no servidor; botões só com ícone exportam/importam
+  esses dados num JSON local, `CAMPOS_JSON` em `app.js`, sem os arquivos
+  XML/ZIP), `#bancas` (conferência, critérios, busca e
   listas) e `#administracao` (`js/admin.js`, só consulta o servidor ao abrir).
-  O endereço da seção fica na URL; botões `data-ir="<seção>"` trocam de
-  seção (`layout.js`). `admin.html` só redireciona para `#administracao`.
+  O endereço da seção fica na URL; botões `data-ir="<seção ou trecho>"`
+  trocam de seção (`irPara` em `layout.js`; um trecho abre a aba que o
+  contém). `admin.html` só redireciona para `#administracao`.
 - Cabeçalho/rodapé (site estático HTML+JS): fonte única em `src/js/chrome.js`
   (injeta em `#app-header`/`#app-footer`). Não recriar por página. O `index.html`
   tem seu próprio cabeçalho (com abas); as páginas de apoio usam o `chrome.js`.

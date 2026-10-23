@@ -23,6 +23,9 @@
     function esc(s) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
+    function semAcento(s) {
+        return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    }
     function dataBR(iso) {
         return /^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.split('-').reverse().join('/') : '';
     }
@@ -293,6 +296,63 @@
         sec.focus();
     }
 
+    /* ------------------- exportar/importar (arquivo JSON) ------------------ */
+    // Os dados de Minha Dissertação (com Minha orientação e os critérios da
+    // busca) num arquivo JSON, só no computador da pessoa: nada vai ao
+    // servidor. Os arquivos XML/ZIP do Lattes não entram (só links/IDs).
+    const CAMPOS_JSON = {
+        dissertacao: { nome: '#nomeInput', universidade: '#universidadeInput', titulo: '#tituloInput', resumo: '#resumoInput', palavrasChave: '#palavrasInput' },
+        orientacao: { discente: '#discenteId', orientador: '#orientadorId', coorientador: '#coorientadorId', periodo: '#periodoInput' },
+        criterios: { excluirInstituicao: '#excluirInput', somenteDoutores: '#doutoresInput' },
+    };
+    function exportarJson() {
+        const dados = { app: 'bancaZen', formato: 1, exportadoEm: new Date().toISOString() };
+        for (const [grupo, campos] of Object.entries(CAMPOS_JSON)) {
+            dados[grupo] = {};
+            for (const [chave, sel] of Object.entries(campos)) {
+                const el = $(sel);
+                dados[grupo][chave] = el.type === 'checkbox' ? el.checked : el.value;
+            }
+        }
+        const nome = semAcento(dados.dissertacao.nome).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'dissertacao';
+        const url = URL.createObjectURL(new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bancazen-${nome}-${dados.exportadoEm.slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const arquivos = ENVOLVIDOS.filter((k) => $(`#${k}Arquivo`).files[0]).length;
+        $('#jsonStatus').textContent = `Dados exportados para ${a.download}.` +
+            (arquivos ? ' Os arquivos XML/ZIP do Lattes não vão no JSON: ao importar, envie-os de novo ou informe o link do Lattes.' : '');
+    }
+    async function importarJson(arquivo) {
+        const status = $('#jsonStatus');
+        try {
+            const dados = JSON.parse(await arquivo.text());
+            if (!dados || typeof dados !== 'object' || (dados.app && dados.app !== 'bancaZen') || !dados.dissertacao) {
+                throw new Error('o arquivo não é uma exportação do bancaZen');
+            }
+            for (const [grupo, campos] of Object.entries(CAMPOS_JSON)) {
+                for (const [chave, sel] of Object.entries(campos)) {
+                    const v = dados[grupo] && dados[grupo][chave];
+                    if (v === undefined || v === null) continue;
+                    const el = $(sel);
+                    if (el.type === 'checkbox') el.checked = Boolean(v);
+                    else el.value = String(v);
+                    // Avisa os ouvintes (ex.: universidade -> critério de instituição).
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+            renderConferencia();
+            status.textContent = `Dados importados de ${arquivo.name}.`;
+        } catch (e) {
+            status.textContent = `Não foi possível importar ${arquivo.name}: ${e.message}.`;
+        }
+    }
+
     /* -------------------------------- início ------------------------------ */
     function init() {
         $('#buscaForm').addEventListener('submit', buscar);
@@ -309,6 +369,12 @@
             if (tab === 'bancas' || tab === 'inicio') carregarStatus();
         });
         $('#universidadeInput').addEventListener('input', sincronizarExcluir);
+        $('#exportarJsonBtn').addEventListener('click', exportarJson);
+        $('#importarJsonBtn').addEventListener('click', () => $('#importarJsonInput').click());
+        $('#importarJsonInput').addEventListener('change', (e) => {
+            if (e.target.files[0]) importarJson(e.target.files[0]);
+            e.target.value = '';
+        });
         renderConferencia();
         carregarStatus();
     }

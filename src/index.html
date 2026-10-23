@@ -89,9 +89,6 @@
                 <button id="tab-dissertacao-btn" aria-controls="tab-dissertacao" aria-label="Minha Dissertação" title="Minha Dissertação" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="dissertacao">
                     <i aria-hidden="true" class="fa-solid fa-book-open"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Minha Dissertação</span>
                 </button>
-                <button id="tab-orientacao-btn" aria-controls="tab-orientacao" aria-label="Minha orientação" title="Minha orientação" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="orientacao">
-                    <i aria-hidden="true" class="fa-solid fa-user-graduate"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Minha orientação</span>
-                </button>
                 <button id="tab-bancas-btn" aria-controls="tab-bancas" aria-label="Bancas sugeridas" title="Bancas sugeridas" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="bancas">
                     <i aria-hidden="true" class="fa-solid fa-users-viewfinder"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Bancas sugeridas</span>
                 </button>
@@ -122,8 +119,7 @@
                 <section class="space-y-3" aria-labelledby="comoTitulo">
                     <h2 id="comoTitulo" class="text-lg font-bold">Como funciona</h2>
                     <ol class="space-y-3 list-none p-0">
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Minha Dissertação</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe o título, o resumo e as palavras-chave do seu trabalho.</p></div></li>
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></span><div><p class="font-semibold">Minha orientação <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></p><p class="text-sm text-gray-600 dark:text-gray-400">Para a conformidade ética, envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base.</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Minha Dissertação</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe o título, o resumo e as palavras-chave do seu trabalho. Na mesma seção, em "Minha orientação" (opcional, para a conformidade ética), envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></div></li>
                         <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Bancas sugeridas</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 pessoas, da maior para a menor proximidade: Rede PROFIAP (docentes do PPG PROFIAP) e Externa (docentes de outros PPGs, para o segundo membro externo).</p></div></li>
                     </ol>
                 </section>
@@ -173,7 +169,16 @@
         <!-- 2. Minha Dissertação -->
         <div id="tab-dissertacao" class="tab-panel" role="tabpanel" aria-labelledby="tab-dissertacao-btn" tabindex="0" hidden>
             <div class="max-w-3xl mx-auto space-y-4">
-                <h2 class="text-lg font-bold">Minha Dissertação</h2>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold">Minha Dissertação</h2>
+                    <!-- Exportar/importar os dados desta seção (arquivo JSON, só no seu computador). -->
+                    <div class="ml-auto flex items-center gap-1">
+                        <button type="button" id="exportarJsonBtn" class="botao-discreto" aria-label="Exportar meus dados (arquivo JSON)" title="Exportar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-down"></i></button>
+                        <button type="button" id="importarJsonBtn" class="botao-discreto" aria-label="Importar meus dados (arquivo JSON)" title="Importar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i></button>
+                        <input id="importarJsonInput" type="file" accept=".json,application/json" class="sr-only" tabindex="-1" aria-hidden="true">
+                    </div>
+                </div>
+                <p id="jsonStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">Quanto mais completos o resumo e as palavras-chave, melhor a comparação com os currículos.</p>
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
@@ -199,83 +204,76 @@
                         <input id="palavrasInput" type="text" aria-describedby="palavrasAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <p id="palavrasAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separe por ponto e vírgula ou vírgula. Ex.: governança pública; transparência; controle social</p>
                     </div>
-                <div class="flex justify-end">
-                    <button type="button" data-ir="orientacao" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Próximo: Minha orientação <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. Minha orientação -->
-        <div id="tab-orientacao" class="tab-panel" role="tabpanel" aria-labelledby="tab-orientacao-btn" tabindex="0" hidden>
-            <div class="max-w-3xl mx-auto space-y-4">
-                <h2 class="text-lg font-bold">Minha orientação</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Etapa opcional, recomendada. Informe o currículo Lattes da pessoa discente e da orientação: eles
-                    são usados para retirar das sugestões quem tem coautoria em publicações ou relação de orientação
-                    com alguma dessas pessoas (conformidade ética). Sem eles, a busca funciona, mas o resultado avisa
-                    que os vínculos não foram verificados.
-                    Os arquivos enviados aqui são usados só na consulta e não são guardados.
-                </p>
+                <section id="orientacao" class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700" aria-labelledby="orientacaoTitulo">
+                    <h3 id="orientacaoTitulo" class="text-base font-bold">Minha orientação <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Recomendada. Informe o currículo Lattes da pessoa discente e da orientação: eles são usados
+                        para retirar das sugestões quem tem coautoria em publicações ou relação de orientação com
+                        alguma dessas pessoas (conformidade ética). Sem eles, a busca funciona, mas o resultado avisa
+                        que os vínculos não foram verificados. Os arquivos enviados aqui são usados só na consulta e
+                        não são guardados.
+                    </p>
                 <div class="space-y-4">
-                        <div class="envolvido space-y-1" data-papel="discente">
-                            <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
-                            <div class="grid gap-2 sm:grid-cols-2">
-                                <div>
-                                    <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
-                                    <input id="discenteArquivo" type="file" accept=".xml,.zip" aria-describedby="discenteRotulo discenteStatus" class="block w-full text-sm">
+                            <div class="envolvido space-y-1" data-papel="discente">
+                                <p class="text-sm font-medium" id="discenteRotulo">Discente <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                                <div class="grid gap-2 sm:grid-cols-2">
+                                    <div>
+                                        <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
+                                        <input id="discenteArquivo" type="file" accept=".xml,.zip" aria-describedby="discenteRotulo discenteStatus" class="block w-full text-sm">
+                                    </div>
+                                    <div>
+                                        <label for="discenteId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
+                                        <input id="discenteId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="discenteRotulo discenteStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="discenteId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
-                                    <input id="discenteId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="discenteRotulo discenteStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                </div>
+                                <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                             </div>
-                            <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                        </div>
-                        <div class="envolvido space-y-1" data-papel="orientador">
-                            <p class="text-sm font-medium" id="orientadorRotulo">Orientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
-                            <div class="grid gap-2 sm:grid-cols-2">
-                                <div>
-                                    <label for="orientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
-                                    <input id="orientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="orientadorRotulo orientadorStatus" class="block w-full text-sm">
+                            <div class="envolvido space-y-1" data-papel="orientador">
+                                <p class="text-sm font-medium" id="orientadorRotulo">Orientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                                <div class="grid gap-2 sm:grid-cols-2">
+                                    <div>
+                                        <label for="orientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
+                                        <input id="orientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="orientadorRotulo orientadorStatus" class="block w-full text-sm">
+                                    </div>
+                                    <div>
+                                        <label for="orientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
+                                        <input id="orientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="orientadorRotulo orientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="orientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
-                                    <input id="orientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="orientadorRotulo orientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                </div>
+                                <p id="orientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                             </div>
-                            <p id="orientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                        </div>
-                        <div class="envolvido space-y-1" data-papel="coorientador">
-                            <p class="text-sm font-medium" id="coorientadorRotulo">Coorientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
-                            <div class="grid gap-2 sm:grid-cols-2">
-                                <div>
-                                    <label for="coorientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
-                                    <input id="coorientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="coorientadorRotulo coorientadorStatus" class="block w-full text-sm">
+                            <div class="envolvido space-y-1" data-papel="coorientador">
+                                <p class="text-sm font-medium" id="coorientadorRotulo">Coorientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                                <div class="grid gap-2 sm:grid-cols-2">
+                                    <div>
+                                        <label for="coorientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
+                                        <input id="coorientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="coorientadorRotulo coorientadorStatus" class="block w-full text-sm">
+                                    </div>
+                                    <div>
+                                        <label for="coorientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
+                                        <input id="coorientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="coorientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
-                                    <input id="coorientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                </div>
+                                <p id="coorientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                             </div>
-                            <p id="coorientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                        </div>
-                        <div>
-                            <label for="periodoInput" class="block text-sm mb-1">Coautorias consideradas</label>
-                            <select id="periodoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                <option value="0">Todo o período</option>
-                                <option value="10">Últimos 10 anos</option>
-                                <option value="5">Últimos 5 anos</option>
-                            </select>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Relações de orientação valem em qualquer período.</p>
-                        </div>
-                </div>
+                            <div>
+                                <label for="periodoInput" class="block text-sm mb-1">Coautorias consideradas</label>
+                                <select id="periodoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                                    <option value="0">Todo o período</option>
+                                    <option value="10">Últimos 10 anos</option>
+                                    <option value="5">Últimos 5 anos</option>
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Relações de orientação valem em qualquer período.</p>
+                            </div>
+                    </div>
+                </section>
                 <div class="flex justify-end">
                     <button type="button" data-ir="bancas" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Próximo: Bancas sugeridas <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
                 </div>
             </div>
         </div>
 
-        <!-- 4. Bancas sugeridas -->
+        <!-- 3. Bancas sugeridas -->
         <div id="tab-bancas" class="tab-panel" role="tabpanel" aria-labelledby="tab-bancas-btn" tabindex="0" hidden>
             <div class="max-w-3xl mx-auto space-y-6">
                 <h2 class="text-lg font-bold">Bancas sugeridas</h2>
@@ -312,7 +310,7 @@
             </div>
         </div>
 
-        <!-- 5. Administração (js/admin.js; só consulta o servidor quando a seção é aberta) -->
+        <!-- 4. Administração (js/admin.js; só consulta o servidor quando a seção é aberta) -->
         <div id="tab-administracao" class="tab-panel" role="tabpanel" aria-labelledby="tab-administracao-btn" tabindex="0" hidden>
             <div class="max-w-5xl mx-auto space-y-6">
                 <h2 class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-user-shield text-brand-600 dark:text-accent-400"></i> Administração</h2>

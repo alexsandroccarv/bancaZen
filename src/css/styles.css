@@ -243,6 +243,11 @@ html.tz-theme .passo { background: var(--tz-accent); color: var(--tz-bg); }
   .doc-email:empty { display: block; }
 }
 
+/* Botão só com ícone, discreto (ex.: exportar/importar em Minha Dissertação). */
+.botao-discreto { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem;
+                  border-radius: .375rem; background: transparent; border: 0; color: inherit; opacity: .6; cursor: pointer; }
+.botao-discreto:hover, .botao-discreto:focus-visible { opacity: 1; background: rgba(127, 127, 127, .12); }
+
 /* Zona de risco da Administração: o alerta vale também sem o Tailwind. */
 .zona-risco { border: 2px solid #b91c1c; border-radius: .5rem; }
 .zona-risco h3 { color: #b91c1c; }
