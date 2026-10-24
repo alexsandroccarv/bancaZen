@@ -7,6 +7,19 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- Novo visual em todo o app, no estilo "etapas em cartões" (mockup A):
+  abas em pílula no cabeçalho, cartões com ícone, campos e botões
+  arredondados, sobretítulo de etapa em cada seção. Meu TCC ganha o
+  indicador de etapas, a área de arrastar e soltar o Lattes, as
+  palavras-chave em etiquetas e o contador de palavras do resumo.
+  Composição da banca mostra os critérios ao lado da conferência e as duas
+  listas em colunas, com cartões de indicação e retiradas por vínculo num
+  quadro recolhível. Cores das variáveis do tema (9 temas).
+  [issue #77](../../issues/77)
+
+## [0.0.38] - 2026-10-24
+
 ### Adicionado
 - Critério "Somente docentes permanentes" na Composição da banca, marcado
   por padrão (Normas Acadêmicas, 13.1). Sem a situação Permanente (da

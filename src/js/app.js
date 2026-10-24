@@ -38,17 +38,18 @@
         const url = urlLattes(p);
         return url ? `<a href="${url}" target="_blank" rel="noopener" class="hover:underline">${esc(p.nome)}</a>` : esc(p.nome);
     }
-    // Ficha da pessoa: Universidade, PPG, Situação no programa e Link do
-    // Lattes (o nome vem no título). Mesma ficha para as duas listas.
+    // Ficha da pessoa em etiquetas: Universidade, PPG, Situação no programa e
+    // Link do Lattes (o nome vem no título). Mesma ficha para as duas listas.
     function ficha(p) {
         const url = urlLattes(p);
-        const campo = (rotulo, valor) => `<div class="ficha-campo"><dt>${rotulo}</dt><dd>${valor}</dd></div>`;
-        return `<dl class="ficha text-sm">
-            ${campo('Universidade', esc(p.universidade) || '—')}
-            ${campo('PPG', esc(p.ppg) || '—')}
-            ${campo('Situação no programa', esc(p.situacao) || 'não informada')}
-            ${campo('Lattes', url ? `<a href="${url}" target="_blank" rel="noopener" title="${url}" class="text-brand-600 dark:text-accent-400 hover:underline whitespace-nowrap">Abrir currículo Lattes <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square text-xs"></i><span class="sr-only"> de ${esc(p.nome)} (abre em nova aba)</span></a>` : '—')}
-        </dl>`;
+        const etq = (rotulo, valor, classe = '') => `<li${classe ? ` class="${classe}"` : ''}><span class="sr-only">${rotulo}: </span>${valor}</li>`;
+        const permanente = /^permanente/i.test(p.situacao || '');
+        return `<ul class="etiquetas-pessoa">
+            ${etq('Universidade', esc(p.universidade) || 'não informada')}
+            ${etq('PPG', esc(p.ppg) || 'não informado')}
+            ${etq('Situação no programa', esc(p.situacao) || 'situação não informada', permanente ? 'ok' : '')}
+            ${url ? `<li><a href="${url}" target="_blank" rel="noopener" title="${url}" class="text-brand-600 dark:text-accent-400 hover:underline whitespace-nowrap">Lattes <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square text-xs"></i><span class="sr-only"> de ${esc(p.nome)} (abre em nova aba)</span></a></li>` : ''}
+        </ul>`;
     }
 
     /* ------------------------------- status ------------------------------- */
@@ -113,10 +114,10 @@
     function renderConferencia() {
         const n = dissertacaoPreenchida();
         const eu = discente();
-        const item = (ok, opcional, rotulo, texto, secao) => `<li class="flex items-center gap-2">
-            <i aria-hidden="true" class="fa-solid ${ok ? 'fa-circle-check text-green-700 dark:text-green-400' : (opcional ? 'fa-circle-minus text-gray-500' : 'fa-circle-xmark text-red-700 dark:text-red-400')}"></i>
-            <span><span class="font-medium">${esc(rotulo)}:</span> ${esc(texto)}</span>
-            <button type="button" data-ir="${secao}" class="ml-auto text-brand-600 dark:text-accent-400 hover:underline">${ok ? 'editar' : 'preencher'}</button>
+        const item = (ok, opcional, rotulo, texto, secao) => `<li class="conferencia-item">
+            <span class="marca ${ok ? 'marca-ok' : (opcional ? 'marca-opcional' : 'marca-falta')}" aria-hidden="true">${ok ? '<i class="fa-solid fa-check"></i>' : (opcional ? '' : '<i class="fa-solid fa-xmark"></i>')}</span>
+            <span class="flex-1 min-w-0"><span class="font-bold">${esc(rotulo)}:</span> ${esc(texto)}</span>
+            <button type="button" data-ir="${secao}" class="text-brand-600 dark:text-accent-400 hover:underline font-bold">${ok ? 'editar' : 'preencher'}</button>
         </li>`;
         $('#conferencia').innerHTML =
             item(Boolean(eu.nome && eu.universidade), true, 'Meus dados',
@@ -142,6 +143,7 @@
 
     async function buscar(ev) {
         ev.preventDefault();
+        incluirDigitado();
         mostrarErro('');
         if (!dissertacaoPreenchida()) {
             mostrarErro('Preencha ao menos o título, o resumo ou as palavras-chave.', 'dissertacao', 'Meu TCC');
@@ -224,21 +226,16 @@
             `${p.bancasMestrado} banca(s) de mestrado no Lattes`,
             p.atualizacao ? `currículo atualizado em ${dataBR(p.atualizacao)}` : '',
         ].filter(Boolean);
-        const termos = r.termos.map((t) => `<span class="badge bg-brand-50 dark:bg-gray-700 border border-brand-100 dark:border-gray-600">${esc(t)}</span>`).join(' ');
-        return `<li class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-            <div class="flex items-start gap-3">
-                <span class="font-mono text-sm font-bold text-gray-500 dark:text-gray-400 w-6 shrink-0">${i + 1}º</span>
-                <div class="flex-1 min-w-0 space-y-2">
-                    <div class="flex flex-wrap items-baseline justify-between gap-2">
-                        <h4 class="font-semibold text-brand-600 dark:text-accent-400">${nomeComLink(p)}</h4>
-                        <span class="font-mono font-bold" aria-label="Proximidade ${fmt.format(r.score)} numa escala de 0 a 1">${fmt.format(r.score)}</span>
-                    </div>
-                    <div class="score-bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
-                    ${ficha(p)}
-                    <p class="text-sm text-gray-600 dark:text-gray-400">${esc(detalhes.join(' · '))}</p>
-                    ${termos ? `<p class="text-sm flex flex-wrap items-center gap-1"><span class="text-gray-600 dark:text-gray-400">Termos em comum:</span> ${termos}</p>` : ''}
-                </div>
+        return `<li class="indicacao">
+            <div class="indicacao-topo">
+                <span class="posicao" aria-hidden="true">${i + 1}º</span>
+                <h4 class="indicacao-nome"><span class="sr-only">${i + 1}º: </span>${nomeComLink(p)}</h4>
+                <span class="indicacao-indice" aria-label="Proximidade ${fmt.format(r.score)} numa escala de 0 a 1">${fmt.format(r.score)}</span>
             </div>
+            <div class="score-bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
+            ${ficha(p)}
+            ${r.termos.length ? `<p class="indicacao-termos">Termos em comum: <strong>${esc(r.termos.join(', '))}</strong></p>` : ''}
+            <p class="indicacao-detalhes">${esc(detalhes.join(' · '))}</p>
         </li>`;
     }
 
@@ -248,21 +245,22 @@
             const vs = r.vinculos.map((v) => `<li>
                 <span class="badge ${v.certeza === 'confirmado' ? 'vinculo-confirmado' : 'vinculo-provavel'}">${v.certeza === 'confirmado' ? 'confirmado' : 'provável'}</span>
                 ${esc(descreverVinculo(v))}</li>`).join('');
-            return `<li>
-                <p class="font-semibold">${nomeComLink(r.pessoa)} <span class="font-mono font-normal text-sm">(${fmt.format(r.score)})</span></p>
+            return `<li class="space-y-2">
+                <p class="font-bold m-0">${nomeComLink(r.pessoa)} <span class="font-normal text-sm">(${fmt.format(r.score)})</span></p>
                 ${ficha(r.pessoa)}
-                <ul class="text-sm space-y-1 mt-1">${vs}</ul>
+                <ul class="text-sm space-y-1 m-0 p-0 list-none">${vs}</ul>
             </li>`;
         }).join('');
-        return `<div class="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-gray-800 p-4 space-y-2">
-            <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Retiradas por vínculo (conflito de interesses, item 13.3)</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+        const n = retirados.length;
+        return `<details class="retiradas">
+            <summary><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> ${n} ${n === 1 ? 'retirada' : 'retiradas'} por vínculo (conflito de interesses, item 13.3)</summary>
+            <p class="text-sm mt-3">
                 Estas indicações teriam proximidade suficiente para a lista, mas têm vínculo com você ou com a
                 orientação. Vínculo "provável" foi identificado só pelo nome em citação e pode ser homonímia:
                 confira no Lattes antes de descartar.
             </p>
-            <ul class="space-y-3">${itens}</ul>
-        </div>`;
+            <ul class="space-y-4 m-0 p-0 list-none">${itens}</ul>
+        </details>`;
     }
 
     // Quadro "Conformidade ética" do resultado: quem foi considerado (Minha
@@ -271,11 +269,14 @@
         const caixa = $('#conformidadeResultado');
         const considerados = (c && c.considerados) || [];
         if (!considerados.length) {
-            caixa.innerHTML = `<div class="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-gray-800 p-4 space-y-2">
-                <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Vínculos não verificados</h4>
+            caixa.innerHTML = `<div class="aviso aviso-alerta">
+                <i aria-hidden="true" class="fa-solid fa-triangle-exclamation"></i>
+                <div class="space-y-2">
+                <h4 class="font-bold m-0">Vínculos não verificados</h4>
                 <p class="text-sm">"Orientação" não foi preenchida: as listas podem incluir docentes com coautoria ou relação de
                 orientação com você ou com a orientação (item 13.3). Para fazer essa verificação, informe os currículos e busque de novo.</p>
-                <button type="button" data-ir="orientacao" class="text-sm text-brand-600 dark:text-accent-400 hover:underline font-medium">Preencher Orientação</button>
+                <button type="button" data-ir="orientacao" class="botao-secundario">Preencher Orientação</button>
+                </div>
             </div>`;
             return;
         }
@@ -283,13 +284,16 @@
         const pessoas = considerados.map((p) => `<li><span class="font-medium">${esc(p.papel)}:</span> ${p.id
             ? `<a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(p.nome)}</a>`
             : esc(p.nome)}${p.soNome ? ' <span class="text-gray-600 dark:text-gray-400">(só pelo nome: sem o currículo, as produções desta pessoa não foram conferidas)</span>' : ''}</li>`).join('');
-        caixa.innerHTML = `<div class="rounded-lg border border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800 p-4 space-y-2">
-            <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Vínculos verificados</h4>
+        caixa.innerHTML = `<div class="aviso aviso-ok">
+            <i aria-hidden="true" class="fa-solid fa-shield-halved"></i>
+            <div class="space-y-1">
+            <h4 class="font-bold m-0">Vínculos verificados</h4>
             <p class="text-sm">Vínculos (coautoria, orientação ou mesma pessoa) conferidos com os currículos de:</p>
             <ul class="text-sm list-disc list-inside">${pessoas}</ul>
             <p class="text-sm">${retirados
                 ? `${retirados} ${retirados === 1 ? 'indicação com vínculo retirada' : 'indicações com vínculo retiradas'} das listas; aparecem à parte, com o motivo, ao fim de cada lista.`
                 : 'Nenhum vínculo entre os currículos com maior proximidade temática.'}</p>
+            </div>
         </div>`;
     }
 
@@ -300,17 +304,21 @@
         $('#resultadoTitulo').textContent = eu.nome || eu.universidade
             ? `Docentes com maior proximidade temática: indicações para ${[eu.nome, eu.universidade].filter(Boolean).join(' · ')}`
             : 'Docentes com maior proximidade temática';
-        $('#listas').innerHTML = listas.map((l, n) => {
+        $('#listas').innerHTML = listas.map((l) => {
             const resumo = (l.resultados.length
                 ? `${l.resultados.length} ${l.resultados.length === 1 ? 'indicação' : 'indicações'} entre ${l.total} currículo(s) desta lista.`
                 : (l.total
                     ? `Nenhum dos ${l.total} currículo(s) desta lista tem termos em comum com o trabalho sem ter vínculo identificado.`
                     : 'Nenhum currículo cadastrado nesta lista.'))
                 + (l.foraSituacao ? ` ${l.foraSituacao} currículo(s) fora da busca por não constar como docente permanente.` : '');
+            const alinea = l.grupo === 'profiap' ? '13.1 b' : '13.1 c';
             return `<section class="space-y-3" aria-labelledby="lista-${l.grupo}">
-                <h3 id="lista-${l.grupo}" class="text-base font-bold">${n + 1}. ${esc(l.titulo)}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">${esc(resumo)}</p>
-                <ol class="lista-resultado list-none p-0 space-y-3">${l.resultados.map(itemResultado).join('')}</ol>
+                <div class="flex items-center gap-2">
+                    <h3 id="lista-${l.grupo}" class="cartao-titulo flex-1">${esc(l.titulo)}</h3>
+                    <span class="selo${l.grupo === 'profiap' ? '' : ' verde'}">${alinea}</span>
+                </div>
+                <p class="ajuda m-0">${esc(resumo)}</p>
+                <ol class="lista-resultado list-none p-0 m-0 space-y-3">${l.resultados.map(itemResultado).join('')}</ol>
                 ${blocoRetirados(l.retirados)}
             </section>`;
         }).join('');
@@ -432,10 +440,114 @@
             }
             if (typeof dados.dissertacao.universidade === 'string') definirUniversidade(dados.dissertacao.universidade);
             renderConferencia();
+            atualizarEtapas();
             status.textContent = `Dados importados de ${arquivo.name}.`;
         } catch (e) {
             status.textContent = `Não foi possível importar ${arquivo.name}: ${e.message}.`;
         }
+    }
+
+    /* ------------- Meu TCC: etiquetas, arquivos e etapas -------------- */
+    // Palavras-chave em etiquetas: o texto fica em #palavrasInput (oculto,
+    // separado por "; "), lido pela busca, pela conferência e pelo JSON.
+    const separarPalavras = (t) => String(t || '').split(/[;,\n]+/).map((x) => x.trim()).filter(Boolean);
+    const palavras = () => separarPalavras($('#palavrasInput').value);
+    function renderPalavras() {
+        $('#palavrasLista').innerHTML = palavras().map((x, i) => `<li class="etiqueta">${esc(x)}<button type="button" data-remover="${i}" aria-label="Remover ${esc(x)}"><i aria-hidden="true" class="fa-solid fa-xmark"></i></button></li>`).join('');
+    }
+    function gravarPalavras(lista, aviso) {
+        const vistas = new Set();
+        $('#palavrasInput').value = lista.filter((x) => !vistas.has(semAcento(x)) && vistas.add(semAcento(x))).join('; ');
+        renderPalavras();
+        $('#palavrasAviso').textContent = aviso;
+        atualizarEtapas();
+    }
+    function incluirDigitado() {
+        const campo = $('#palavraNovaInput');
+        const novas = separarPalavras(campo.value);
+        campo.value = '';
+        if (novas.length) gravarPalavras([...palavras(), ...novas], `Incluída: ${novas.join(', ')}.`);
+    }
+    function iniciarPalavras() {
+        const campo = $('#palavraNovaInput');
+        campo.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                incluirDigitado();
+            } else if (e.key === 'Backspace' && !campo.value && palavras().length) {
+                const lista = palavras();
+                const x = lista.pop();
+                gravarPalavras(lista, `Removida: ${x}.`);
+            }
+        });
+        campo.addEventListener('input', () => { if (/[;,]/.test(campo.value)) incluirDigitado(); });
+        campo.addEventListener('blur', incluirDigitado);
+        $('#palavrasLista').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-remover]');
+            if (!b) return;
+            const lista = palavras();
+            const [x] = lista.splice(Number(b.dataset.remover), 1);
+            gravarPalavras(lista, `Removida: ${x}.`);
+            campo.focus();
+        });
+        // A importação do JSON grava o texto direto no campo oculto.
+        $('#palavrasInput').addEventListener('input', renderPalavras);
+        renderPalavras();
+    }
+
+    // Áreas de arrastar e soltar o XML/ZIP do Lattes (o <input type="file">
+    // fica dentro do rótulo): mostram o nome do arquivo escolhido.
+    function iniciarSoltar() {
+        document.querySelectorAll('.soltar').forEach((zona) => {
+            const input = zona.querySelector('input[type="file"]');
+            const nome = zona.querySelector('.soltar-nome');
+            const padrao = nome.textContent;
+            input.addEventListener('change', () => {
+                const f = input.files[0];
+                nome.textContent = f ? f.name : padrao;
+                zona.classList.toggle('com-arquivo', Boolean(f));
+            });
+            zona.addEventListener('dragover', (e) => { e.preventDefault(); zona.classList.add('arrastando'); });
+            zona.addEventListener('dragleave', () => zona.classList.remove('arrastando'));
+            zona.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zona.classList.remove('arrastando');
+                if (e.dataTransfer && e.dataTransfer.files.length) {
+                    input.files = e.dataTransfer.files;
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
+    }
+
+    // Indicador de etapas de Meu TCC (Sobre você, O TCC, Orientação),
+    // contagem de campos do TCC e de palavras do resumo.
+    function atualizarEtapas() {
+        const eu = discente();
+        const n = dissertacaoPreenchida();
+        const feitas = [Boolean(eu.nome && eu.universidade), n === 3, ['orientador', 'coorientador'].some((k) => situacaoEnvolvido(k).ok)];
+        const atual = feitas.indexOf(false);
+        document.querySelectorAll('#etapasTcc .etapa').forEach((li, i) => {
+            const estado = feitas[i] ? 'feito' : (i === atual ? 'atual' : 'pendente');
+            li.dataset.estado = estado;
+            li.querySelector('button').setAttribute('aria-current', estado === 'atual' ? 'step' : 'false');
+            li.querySelector('.etapa-estado').textContent = estado === 'feito' ? ' (preenchida)' : '';
+        });
+        $('#tccContagem').textContent = `${n} de 3 campos`;
+        const np = $('#resumoInput').value.trim().split(/\s+/).filter(Boolean).length;
+        $('#resumoContagem').textContent = `${np} ${np === 1 ? 'palavra' : 'palavras'}`;
+    }
+    function iniciarEtapas() {
+        const painel = $('#tab-dissertacao');
+        painel.addEventListener('input', atualizarEtapas);
+        painel.addEventListener('change', atualizarEtapas);
+        document.querySelectorAll('#etapasTcc .etapa button').forEach((b) => b.addEventListener('click', () => {
+            const alvo = document.getElementById(b.parentElement.dataset.alvo);
+            const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            alvo.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+            alvo.focus({ preventScroll: true });
+        }));
+        atualizarEtapas();
     }
 
     /* -------------------------------- início ------------------------------ */
@@ -466,6 +578,9 @@
             if (e.target.files[0]) importarJson(e.target.files[0]);
             e.target.value = '';
         });
+        iniciarPalavras();
+        iniciarSoltar();
+        iniciarEtapas();
         renderConferencia();
         carregarStatus();
     }

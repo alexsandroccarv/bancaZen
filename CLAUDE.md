@@ -125,6 +125,13 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
   `--tz-*`) — Catppuccin Latte/Mocha, Drácula, GitHub Light/Dark, gov.br,
   Rosé Pine Dawn, Solarized Light/Dark; padrão **gov.br**. Novos/alterados
   temas devem passar no `tools/contrast-check.mjs` (WCAG AA).
+- Visual "etapas em cartões" (mockup A, issue #77): classes em `styles.css`
+  (`.cartao`, `.cartao-cab`, `.icone-bloco`, `.sobretitulo`, `.titulo-secao`,
+  `.botao-primario`/`.botao-secundario`/`.botao-redondo`, `.dica`, `.aviso`,
+  `.soltar`, `.etiquetas-campo`, `.etapas`, `.indicacao`), cores só das
+  variáveis `--tz-*` (tons claros por `color-mix`; `--bz-*`). Palavras-chave
+  em etiquetas gravam em `#palavrasInput` (oculto, "; "); `atualizarEtapas`
+  em `app.js` mantém o indicador de etapas de Meu TCC.
 - Acessibilidade: manter landmarks, foco visível, um `<h1>` por página,
   rótulos (`aria-label`) em botões só-ícone e `prefers-reduced-motion`.
 
