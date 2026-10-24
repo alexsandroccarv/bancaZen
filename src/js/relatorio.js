@@ -130,6 +130,7 @@
         const criterios = [
             cr.excluirInstituicao ? 'desconsiderados os currículos de docentes da Instituição Associada' : '',
             cr.somenteDoutores ? 'somente docentes com o grau de doutor' : '',
+            cr.somentePermanentes ? 'somente docentes permanentes' : '',
             cr.periodo ? `coautorias dos últimos ${cr.periodo} anos` : 'coautorias de todo o período',
         ].filter(Boolean);
         const faltando = [!d.nome && 'o seu nome', !d.titulo && 'o título do trabalho', !orientador && 'o nome de quem orienta'].filter(Boolean);

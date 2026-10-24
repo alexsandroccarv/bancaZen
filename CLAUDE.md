@@ -70,6 +70,10 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
   `buscar.php`) ou avisa que a verificação não foi feita. Sem currículo, o
   nome (`<papel>Nome`) vira registro mínimo e a verificação é parcial
   (`soNome`): só os currículos indicados são conferidos.
+- Critério "Somente docentes permanentes" (marcado por padrão; 13.1):
+  `somentePermanentes` em `buscar.php` (sem o campo, desligado) e
+  `bb_permanente` (situação Permanente da lista de docentes ou dos dados do
+  XML; sem situação, fica fora). Cada lista traz `foraSituacao`.
 - Ordem das sugestões (`sim_ordenar`): proximidade exibida (2 casas)
   decrescente; no empate, sexo feminino primeiro (`SEXO` do Lattes, em
   `pessoas/` e em `indice/meta.json` `sexos`); nunca exibir nem enviar o

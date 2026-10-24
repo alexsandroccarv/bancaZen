@@ -4,7 +4,8 @@
    --------------------------------------------------------------------------
    Recebe (multipart/form-data):
      titulo, resumo, palavrasChave (texto separado por ; , ou quebra de linha)
-     excluirInstituicao, somenteDoutores (1/0), periodo (0, 5 ou 10 anos)
+     excluirInstituicao, somenteDoutores (1/0), somentePermanentes (1/0; sem o
+     campo, 0), periodo (0, 5 ou 10 anos)
      para cada envolvida (discente, orientador, coorientador), todas opcionais
      (sem nenhuma, a conformidade ética não é verificada e o resultado avisa):
        <papel>Arquivo  XML/ZIP do Lattes  -> lido em memória, NÃO é gravado
@@ -102,18 +103,25 @@ $busca['resultados'] = sim_ordenar($busca['resultados'], fn($p) => ($sexoDe[$p['
 // O filtro de instituição também vale para a instituição do programa.
 $excluir = trim(sim_sem_acento($texto('excluirInstituicao')));
 
+// Só docentes permanentes (13.1): quem não tem a situação Permanente fica
+// fora; cada lista informa quantos currículos saíram por esse critério.
+$somentePermanentes = $texto('somentePermanentes') === '1';
+
 $periodo = (int) $texto('periodo');
 $desdeAno = in_array($periodo, [5, 10], true) ? (int) date('Y') - $periodo + 1 : 0;
 $listas = [];
 foreach (BB_GRUPOS as $grupo => $titulo) {
     $listas[$grupo] = ['grupo' => $grupo, 'titulo' => $titulo, 'resultados' => [], 'retirados' => [],
-        'total' => count(array_filter($corpus, fn($p) => bb_grupo($p, $docentes) === $grupo))];
+        'total' => count(array_filter($corpus, fn($p) => bb_grupo($p, $docentes) === $grupo)),
+        'foraSituacao' => $somentePermanentes
+            ? count(array_filter($corpus, fn($p) => bb_grupo($p, $docentes) === $grupo && !bb_permanente($p, $docentes))) : 0];
 }
 // Percorre o ranking completo: quem tem vínculo sai da lista do seu grupo (e
 // é exibido à parte) até cada lista ter 10 pessoas sem vínculo.
 foreach ($busca['resultados'] as $r) {
     $p = $r['pessoa'];
     if ($excluir !== '' && str_contains(sim_sem_acento(bb_programa_efetivo($p, $docentes)['instituicao']), $excluir)) continue;
+    if ($somentePermanentes && !bb_permanente($p, $docentes)) continue;
     $l = &$listas[bb_grupo($p, $docentes)];
     if (count($l['resultados']) < LIMITE) {
         $item = ['pessoa' => bb_publico($p, $docentes), 'score' => round($r['score'], 4), 'termos' => $r['termos']];

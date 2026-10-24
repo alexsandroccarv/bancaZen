@@ -449,6 +449,12 @@ function bb_tem_dados(array $p, array $docentes = []): bool
 {
     return trim(bb_programa_efetivo($p, $docentes)['ppg']) !== '';
 }
+// Docente permanente (Normas Acadêmicas do PROFIAP, 13.1)? Situação da
+// lista de docentes ou dos dados gravados com o XML; sem situação, não.
+function bb_permanente(array $p, array $docentes = []): bool
+{
+    return str_starts_with(sim_sem_acento(trim(bb_programa_efetivo($p, $docentes)['situacao'])), 'permanente');
+}
 function bb_grupo(array $p, array $docentes = []): string
 {
     return bb_programa_efetivo($p, $docentes)['grupo'];
