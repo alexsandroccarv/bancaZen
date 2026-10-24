@@ -8,6 +8,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- Ajuda: o conteúdo de exemplo do template dá lugar ao item 13 das Normas
+  Acadêmicas Nacionais do PROFIAP (composição das bancas, publicado em
+  19/02/2026), com a fonte, e a uma nota sobre como o bancaZen se relaciona
+  com essas regras. [issue #71](../../issues/71)
+
+## [0.0.35] - 2026-10-24
+
+### Alterado
 - A Administração, com a entrada por senha, passa para o ícone de
   engrenagem, depois das configurações de nome e tema; a aba
   "Administração" sai da barra superior. Links `#administracao` e
