@@ -339,3 +339,6 @@ html.high-contrast.high-contrast button {
     color: #ffeb3b !important;
     text-decoration: underline;
 }
+
+/* Ajuda: alíneas das normas já trazem a letra (a, b, c). */
+.normas ol { list-style: none; padding-left: 1rem; }
