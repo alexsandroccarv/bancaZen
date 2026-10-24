@@ -8,6 +8,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- Termo de uso, Política de privacidade e Sobre reescritos para o bancaZen
+  (antes, texto de exemplo do template): finalidade e limites da
+  ferramenta, dados da busca usados só no cálculo, base de currículos fora
+  da área pública, uso do sexo só no desempate, terceiros, bases legais da
+  LGPD, retenção, segurança, direitos de titulares (inclusive docentes da
+  base) e como citar. Títulos das páginas com "bancaZen" e frase do Doe um
+  café corrigida. [issue #81](../../issues/81)
+
+## [0.0.40] - 2026-10-24
+
+### Alterado
 - Páginas de apoio (Ajuda, Sobre, Histórico, Termo de uso, Política de
   privacidade, Doe um café e 404) no visual "etapas em cartões": título
   com ícone, seções em cartões, avisos em quadros arredondados e cada

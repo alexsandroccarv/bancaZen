@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre — templateZen</title>
+    <title>Sobre — bancaZen</title>
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <link rel="stylesheet" href="css/styles.css">
     <script>
@@ -24,17 +24,30 @@
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
         <div class="max-w-3xl mx-auto space-y-6">
             <div class="cartao-cab"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-circle-info"></i></span><h1 class="titulo-secao">Sobre</h1></div>
-            <div class="quadro quadro-info">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    <i aria-hidden="true" class="fa-solid fa-circle-info mr-1"></i>
-                    Conteúdo de exemplo do template. Substitua pela descrição real do seu projeto.
-                </p>
-            </div>
-            <section class="cartao">
-                <p>Este projeto foi criado a partir do <strong>templateZen</strong>, um modelo
-                   reutilizável de cabeçalho, rodapé, estrutura de arquivos e CI/CD.</p>
-                <p>Descreva aqui o objetivo do seu projeto, a equipe responsável e outras
-                   informações relevantes.</p>
+            <p class="texto-apoio">O bancaZen apoia a indicação de docentes para as bancas do PROFIAP a partir dos currículos Lattes.</p>
+            <section id="objetivo" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span><h2 class="cartao-titulo">Objetivo</h2></div>
+                <p class="m-0">Pelo item 13 das Normas Acadêmicas Nacionais do PROFIAP, as Bancas de Defesa de Projeto de TCC e de Defesa de TCC têm, além de quem orienta, um docente permanente da Rede PROFIAP externo à Instituição Associada e um docente permanente de programa externo à Rede, com publicações ou orientações na área temática do trabalho e sem vínculos que possam representar conflito de interesses.</p>
+                <p class="m-0">O bancaZen torna essa busca objetiva: compara o TCC com os currículos Lattes cadastrados, ordena as indicações pela proximidade temática e retira quem tem vínculo com a discente ou o discente e com a orientação. A seção Relatório registra o processo numa declaração para o pedido de aprovação da banca.</p>
+            </section>
+            <section id="funcionamento" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-gears"></i></span><h2 class="cartao-titulo">Como funciona</h2></div>
+                <ul class="list-disc list-inside space-y-1 m-0 p-0">
+                    <li>A Administração cadastra a planilha de docentes dos programas e os currículos Lattes (XML ou ZIP exportados da Plataforma Lattes).</li>
+                    <li>Em "Meu TCC", a pessoa informa título, resumo, palavras-chave e, se quiser, os currículos de quem orienta e coorienta.</li>
+                    <li>Em "Composição da banca", o modelo BM25 calcula um índice de 0 a 1 para cada currículo e o bancaZen apresenta duas listas: Rede PROFIAP e Programa externo à Rede PROFIAP.</li>
+                    <li>Em "Relatório", a pessoa marca a composição proposta e gera a declaração.</li>
+                </ul>
+                <p class="m-0">Detalhes do cálculo e das regras estão na página inicial e na <a href="ajuda.html" class="text-brand-600 dark:text-accent-400 hover:underline">Ajuda</a>.</p>
+            </section>
+            <section id="autoria" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-user-pen"></i></span><h2 class="cartao-titulo">Autoria e código-fonte</h2></div>
+                <p class="m-0">Desenvolvido por Alexsandro Cardoso Carvalho. O código-fonte está no <a href="https://github.com/alexsandroccarv/bancaZen" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">repositório do projeto</a>, sob a licença GNU GPL versão 3 (GPLv3). O extrator de currículos segue o mesmo formato de leitura do Lattes do <a href="https://github.com/alexsandroccarv/latteszen" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">lattesZen</a>, do mesmo autor. A interface parte do modelo templateZen.</p>
+                <p class="m-0">Sugestões e relatos de erro podem ser enviados como uma <a href="https://github.com/alexsandroccarv/bancaZen/issues" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline"><em>issue</em> no repositório do projeto</a>. As mudanças de cada versão estão no <a href="historico.html" class="text-brand-600 dark:text-accent-400 hover:underline">Histórico de versão</a>.</p>
+            </section>
+            <section id="citar" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-quote-left"></i></span><h2 class="cartao-titulo">Como citar</h2></div>
+                <p class="m-0">CARVALHO, Alexsandro Cardoso. <em>bancaZen</em>: indicação de docentes para as bancas de defesa do PROFIAP. Versão <span id="sobreVersao">atual</span>. 2026. Disponível em: <span id="sobreEndereco">endereço deste site</span>. Acesso em: data do acesso.</p>
             </section>
         </div>
     </main>
@@ -46,5 +59,13 @@
     <script src="js/config.js"></script>
     <script src="js/chrome.js"></script>
     <script src="js/layout.js"></script>
+    <script>
+        // Como citar: versão e endereço do site em uso.
+        (function () {
+            const v = (window.APP_CONFIG && window.APP_CONFIG.version) || '';
+            document.getElementById('sobreVersao').textContent = v.replace(/^v/, '') || 'atual';
+            document.getElementById('sobreEndereco').textContent = location.origin + location.pathname.replace(/sobre\.html$/, '');
+        })();
+    </script>
 </body>
 </html>
