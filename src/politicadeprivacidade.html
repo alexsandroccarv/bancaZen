@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Política de privacidade — templateZen</title>
+    <title>Política de privacidade — bancaZen</title>
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <link rel="stylesheet" href="css/styles.css">
     <script>
@@ -24,102 +24,119 @@
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
         <div class="max-w-3xl mx-auto space-y-6">
             <div class="cartao-cab"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h1 class="titulo-secao">Política de privacidade</h1></div>
-            <p class="texto-apoio">Como o TemplateZen trata (ou, principalmente, <em>não</em> trata) os seus dados pessoais — em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).</p>
-
+            <p class="texto-apoio">Como o bancaZen trata dados pessoais, em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD, Lei nº 13.709/2018).</p>
+            <p class="ajuda m-0">Última atualização: 24 de outubro de 2026.</p>
             <div class="quadro quadro-info">
-                <strong>Resumo em uma frase:</strong> o TemplateZen <strong>não tem servidor</strong>.
-                As preferências que você define ficam no seu navegador — nada é enviado para nós.
+                <strong>Resumo:</strong> os dados do seu TCC e os currículos que você envia são usados só para calcular as
+                indicações e não ficam gravados no servidor. O servidor guarda a base de currículos Lattes de docentes,
+                cadastrada pela Administração, fora da área pública do site.
             </div>
-            <div class="quadro">
-                <strong>Modelo a personalizar:</strong> "TemplateZen" é um placeholder e este texto
-                reflete o comportamento padrão do template — revise-o conforme o que o seu produto
-                realmente coletar (cadastro, analytics, backend etc.).
-            </div>
-
             <nav aria-label="Nesta página" class="cartao text-sm">
-                <h2 class="font-semibold mb-1">Nesta página</h2>
-                <ol class="list-decimal list-inside space-y-0.5 text-brand-600 dark:text-accent-400">
-                    <li><a href="#arquitetura" class="hover:underline">Como o TemplateZen funciona (sem servidor)</a></li>
+                <h2 class="font-semibold m-0">Nesta página</h2>
+                <ol class="list-decimal list-inside space-y-0.5 text-brand-600 dark:text-accent-400 m-0 p-0">
+                    <li><a href="#controlador" class="hover:underline">Quem trata os dados</a></li>
                     <li><a href="#dados" class="hover:underline">Quais dados existem e onde ficam</a></li>
-                    <li><a href="#naofaz" class="hover:underline">O que o TemplateZen não faz</a></li>
-                    <li><a href="#terceiros" class="hover:underline">Recursos de terceiros carregados pela página</a></li>
-                    <li><a href="#fora" class="hover:underline">Ações que saem do TemplateZen</a></li>
-                    <li><a href="#base" class="hover:underline">Base legal (LGPD)</a></li>
-                    <li><a href="#direitos" class="hover:underline">Seus direitos como titular</a></li>
+                    <li><a href="#busca" class="hover:underline">Dados da busca (Meu TCC)</a></li>
+                    <li><a href="#base-curriculos" class="hover:underline">Base de currículos de docentes</a></li>
+                    <li><a href="#naofaz" class="hover:underline">O que o bancaZen não faz</a></li>
+                    <li><a href="#terceiros" class="hover:underline">Recursos de terceiros</a></li>
+                    <li><a href="#base" class="hover:underline">Bases legais (LGPD)</a></li>
+                    <li><a href="#retencao" class="hover:underline">Por quanto tempo os dados ficam</a></li>
+                    <li><a href="#seguranca" class="hover:underline">Segurança</a></li>
+                    <li><a href="#direitos" class="hover:underline">Direitos de titulares</a></li>
                     <li><a href="#alteracoes" class="hover:underline">Alterações nesta política</a></li>
                     <li><a href="#contato" class="hover:underline">Contato</a></li>
                 </ol>
             </nav>
-
-            <section id="arquitetura" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-laptop-code"></i></span><h2 class="cartao-titulo">1. Como o TemplateZen funciona (sem servidor)</h2></div>
-                <p>O TemplateZen roda <strong>inteiramente no seu navegador</strong> (client-side). Não há servidor, backend, banco de dados remoto ou API própria para onde suas informações sejam enviadas — nem <strong>cadastro, login ou senha</strong>.</p>
-                <p>As <strong>preferências</strong> (tema, alto contraste, tamanho de fonte, nome exibido no cabeçalho e tema selecionado) ficam no <code>localStorage</code> do navegador, associadas a este site.</p>
+            <section id="controlador" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></span><h2 class="cartao-titulo">1. Quem trata os dados</h2></div>
+                <p class="m-0">O bancaZen é mantido por Alexsandro Cardoso Carvalho, que responde pelo tratamento dos dados da base de currículos e pelo funcionamento do serviço. A lista de docentes dos programas é fornecida pela coordenação do PROFIAP e cadastrada pela Administração.</p>
             </section>
-
             <section id="dados" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-database"></i></span><h2 class="cartao-titulo">2. Quais dados existem e onde ficam</h2></div>
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-table"></i></span><h2 class="cartao-titulo">2. Quais dados existem e onde ficam</h2></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm border border-gray-200 dark:border-gray-700">
-                        <thead class="bg-brand-50 dark:bg-gray-800">
-                            <tr><th class="text-left p-2 border-b border-gray-200 dark:border-gray-700">Onde fica</th><th class="text-left p-2 border-b border-gray-200 dark:border-gray-700">O quê</th><th class="text-left p-2 border-b border-gray-200 dark:border-gray-700">Sai do dispositivo?</th></tr>
-                        </thead>
+                        <thead><tr><th scope="col" class="text-left p-2 border-b border-gray-200 dark:border-gray-700">Onde fica</th><th scope="col" class="text-left p-2 border-b border-gray-200 dark:border-gray-700">O quê</th><th scope="col" class="text-left p-2 border-b border-gray-200 dark:border-gray-700">Vai ao servidor?</th></tr></thead>
                         <tbody>
-                            <tr><td class="p-2 border-b border-gray-200 dark:border-gray-700"><code>localStorage</code></td><td class="p-2 border-b border-gray-200 dark:border-gray-700">Preferências de interface (tema, alto contraste, fonte, nome)</td><td class="p-2 border-b border-gray-200 dark:border-gray-700">Não</td></tr>
-                            <tr><td class="p-2">Memória da aba</td><td class="p-2">Estado temporário da tela enquanto você usa o app</td><td class="p-2">Não</td></tr>
+                            <tr><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Navegador (<code>localStorage</code>)</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Preferências: tema, alto contraste, tamanho da fonte e nome exibido no cabeçalho</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Não</td></tr>
+                            <tr><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Seu computador</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Arquivo JSON exportado de "Meu TCC" e PDF do Relatório, se você os salvar</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Não</td></tr>
+                            <tr><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Servidor, só durante a busca</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Nome, Instituição Associada, título, resumo e palavras-chave do TCC; nomes, links Lattes e arquivos XML/ZIP de quem orienta, coorienta e da discente ou do discente</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Sim, para calcular as indicações; nada disso é gravado</td></tr>
+                            <tr><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Servidor, pasta fora da área pública</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Base de currículos Lattes de docentes e lista de docentes dos programas (nome, universidade, PPG, situação, ID Lattes e, quando a planilha traz, e-mail)</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Cadastrada pela Administração</td></tr>
+                            <tr><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Servidor, sessão</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top"><em>Cookie</em> de sessão <code>bb_admin</code>, só para quem entra na Administração</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Sim, enquanto a sessão durar</td></tr>
+                            <tr><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Hospedagem</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Registros de acesso do servidor web (endereço IP, data, página, navegador)</td><td class="p-2 border-b border-gray-200 dark:border-gray-700 align-top">Mantidos pela empresa de hospedagem</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Ao adicionar campos que coletem dados no seu projeto, atualize esta tabela.</p>
             </section>
-
+            <section id="busca" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><h2 class="cartao-titulo">3. Dados da busca (Meu TCC)</h2></div>
+                <p class="m-0">Para calcular as indicações, o navegador envia ao servidor os dados preenchidos em "Meu TCC" e os critérios da busca. Os arquivos XML ou ZIP do Lattes enviados ali são lidos em memória para verificar vínculos de coautoria e orientação. Ao fim da busca, nada disso é gravado: o servidor devolve só as listas e não guarda cópia do TCC, dos currículos enviados nem do resultado.</p>
+                <p class="m-0">A declaração do Relatório é montada no seu navegador e não vai ao servidor. O arquivo JSON de exportação também fica só no seu computador.</p>
+            </section>
+            <section id="base-curriculos" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-database"></i></span><h2 class="cartao-titulo">4. Base de currículos de docentes</h2></div>
+                <p class="m-0">A base reúne currículos Lattes de docentes, obtidos na Plataforma Lattes do CNPq, onde os próprios titulares os tornaram públicos. Deles são extraídos dados acadêmicos (formação, áreas, linhas de pesquisa, projetos, produções, orientações, participações em bancas e titulação). Dados de contato do Lattes não são extraídos.</p>
+                <p class="m-0">O campo sexo do currículo Lattes é usado só para ordenar indicações com o mesmo índice exibido, com as docentes de sexo feminino primeiro. Esse dado nunca é exibido nem enviado ao navegador.</p>
+                <p class="m-0">A lista de docentes dos programas guarda nome, universidade, PPG, situação no programa, ID Lattes e, quando a planilha traz, e-mail. O e-mail aparece só na Administração, protegida por senha, e nunca nas buscas. Os arquivos ficam numa pasta do servidor fora da área pública do site.</p>
+            </section>
             <section id="naofaz" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-ban"></i></span><h2 class="cartao-titulo">3. O que o TemplateZen não faz</h2></div>
-                <ul class="list-disc list-inside space-y-1">
-                    <li>Não tem servidor, backend ou banco de dados próprio para onde seus dados sejam enviados.</li>
-                    <li>Não pede conta, login, senha ou e-mail para uso.</li>
-                    <li>Não usa publicidade, analytics ou pixels de redes sociais (por padrão).</li>
-                    <li>Não vende, aluga, compartilha ou cede dados a terceiros.</li>
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-ban"></i></span><h2 class="cartao-titulo">5. O que o bancaZen não faz</h2></div>
+                <ul class="list-disc list-inside space-y-1 m-0 p-0">
+                    <li>Não pede conta, cadastro ou login para a busca.</li>
+                    <li>Não grava os dados do TCC nem os currículos enviados em "Meu TCC".</li>
+                    <li>Não usa publicidade, ferramentas de análise de audiência nem <em>pixels</em> de redes sociais.</li>
+                    <li>Não vende, aluga nem cede dados a terceiros.</li>
+                    <li>Não publica os currículos da base: o navegador recebe só o resultado da busca.</li>
                 </ul>
             </section>
-
             <section id="terceiros" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-cloud"></i></span><h2 class="cartao-titulo">4. Recursos de terceiros carregados pela página</h2></div>
-                <p>Para exibir a interface, o navegador busca bibliotecas públicas de seus provedores originais:</p>
-                <ul class="list-disc list-inside space-y-1">
-                    <li><strong>Tailwind CSS</strong> (<code>cdn.tailwindcss.com</code>) — estilo visual.</li>
-                    <li><strong>Font Awesome</strong> (<code>cdnjs.cloudflare.com</code>) — ícones.</li>
-                    <li><strong>Google Fonts</strong> (<code>fonts.googleapis.com</code>) — fontes dos temas.</li>
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-cloud"></i></span><h2 class="cartao-titulo">6. Recursos de terceiros</h2></div>
+                <p class="m-0">Para exibir a interface, o navegador busca bibliotecas públicas nos provedores de origem:</p>
+                <ul class="list-disc list-inside space-y-1 m-0 p-0">
+                    <li><strong>Tailwind CSS</strong> (<code>cdn.tailwindcss.com</code>): estilo visual;</li>
+                    <li><strong>Font Awesome</strong> (<code>cdnjs.cloudflare.com</code>): ícones;</li>
+                    <li><strong>Google Fonts</strong> (<code>fonts.googleapis.com</code>): fontes de alguns temas;</li>
+                    <li><strong>QR Server</strong> (<code>api.qrserver.com</code>): só na página Doe um café, gera a imagem do QR <em>code</em> Pix a partir do código do recebedor, sem dados seus.</li>
                 </ul>
-                <p>Essas requisições seguem o funcionamento normal da web: os provedores podem registrar metadados padrão de acesso (como endereço IP e navegador), segundo suas próprias políticas — o TemplateZen não envia dado adicional a eles. Se algum recurso não carregar, o app continua funcionando com um estilo mais simples.</p>
+                <p class="m-0">Esses provedores e a empresa de hospedagem podem registrar dados técnicos de acesso (como endereço IP e navegador), segundo as próprias políticas. O bancaZen não envia a eles dados do seu TCC. Links de parceiros na página Doe um café levam a sites com políticas próprias.</p>
             </section>
-
-            <section id="fora" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span><h2 class="cartao-titulo">5. Ações que saem do TemplateZen</h2></div>
-                <p>Algumas funções levam informações para fora do app, sempre por sua iniciativa:</p>
-                <ul class="list-disc list-inside space-y-1">
-                    <li><strong>Doe um café:</strong> o QR code Pix é gerado consultando o serviço externo <code>api.qrserver.com</code>, que recebe apenas o código Pix “copia e cola” (dados do recebedor, não seus). A página também traz links de parceiros/afiliados — ao clicar, você sai do TemplateZen e passa a estar sujeito à política de cada site de destino.</li>
-                </ul>
-            </section>
-
             <section id="base" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></span><h2 class="cartao-titulo">6. Base legal (LGPD)</h2></div>
-                <p>Como o processamento ocorre <strong>integralmente no seu dispositivo</strong>, sem coleta centralizada, esse uso se enquadra no tratamento realizado por pessoa natural para fins <strong>exclusivamente particulares</strong> (art. 4º, §1º, da LGPD). Ao usar serviços de terceiros (doar via Pix, links de parceiros), aplica-se a política de cada serviço.</p>
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></span><h2 class="cartao-titulo">7. Bases legais (LGPD)</h2></div>
+                <ul class="list-disc list-inside space-y-1 m-0 p-0">
+                    <li><strong>Dados da busca:</strong> tratados a pedido de quem usa a ferramenta, para a finalidade de indicar docentes para a banca (art. 7º, V e IX), sem armazenamento.</li>
+                    <li><strong>Base de currículos:</strong> dados tornados públicos pelos próprios titulares na Plataforma Lattes, tratados para finalidade compatível com a da divulgação, que é a avaliação de trabalhos acadêmicos (art. 7º, § 4º e § 7º), com base no legítimo interesse de apoiar a composição de bancas conforme as Normas Acadêmicas do PROFIAP (art. 7º, IX).</li>
+                    <li><strong>Lista de docentes:</strong> fornecida pela coordenação do PROFIAP, para a mesma finalidade (art. 7º, IX).</li>
+                    <li><strong>Sessão da Administração:</strong> necessária ao acesso restrito (art. 7º, IX).</li>
+                </ul>
             </section>
-
+            <section id="retencao" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-hourglass-half"></i></span><h2 class="cartao-titulo">8. Por quanto tempo os dados ficam</h2></div>
+                <ul class="list-disc list-inside space-y-1 m-0 p-0">
+                    <li>Dados da busca e currículos enviados em "Meu TCC": só durante o processamento da busca.</li>
+                    <li>Currículos e lista de docentes da base: enquanto forem úteis à finalidade; são substituídos a cada atualização e podem ser apagados pela Administração.</li>
+                    <li>Sessão da Administração: até a saída ou o fim da sessão.</li>
+                    <li>Preferências no navegador: até você apagar os dados deste site no navegador.</li>
+                </ul>
+            </section>
+            <section id="seguranca" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-key"></i></span><h2 class="cartao-titulo">9. Segurança</h2></div>
+                <p class="m-0">A base fica numa pasta do servidor sem acesso pela web. A Administração exige senha, guardada só como <em>hash</em>, e as ações que alteram dados exigem um código de proteção contra requisições forjadas. O <em>cookie</em> de sessão não é acessível a <em>scripts</em> da página. Nenhum sistema é imune a falhas: em caso de incidente com risco a titulares, ele será comunicado conforme a LGPD.</p>
+            </section>
             <section id="direitos" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-user-check"></i></span><h2 class="cartao-titulo">7. Seus direitos como titular</h2></div>
-                <p>O artigo 18 da LGPD garante acesso, correção, eliminação e portabilidade. Como tudo fica no seu navegador, você exerce esses direitos diretamente: para <strong>eliminar</strong>, apague os dados deste site no navegador; não há conta para cancelar nem servidor onde solicitar exclusão.</p>
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-user-check"></i></span><h2 class="cartao-titulo">10. Direitos de titulares</h2></div>
+                <p class="m-0">O artigo 18 da LGPD garante confirmação do tratamento, acesso, correção, anonimização, bloqueio ou eliminação, informação sobre compartilhamento e oposição.</p>
+                <ul class="list-disc list-inside space-y-1 m-0 p-0">
+                    <li><strong>Quem usa a busca:</strong> como os dados do TCC não são gravados, não há registro a acessar ou eliminar no bancaZen; as preferências se apagam nas configurações do navegador.</li>
+                    <li><strong>Docentes da base:</strong> podem pedir confirmação, acesso, correção ou retirada do próprio currículo e dos próprios dados da lista pelo canal em "Contato". A correção de dados do currículo também pode ser feita na Plataforma Lattes, e a base é atualizada na carga seguinte.</li>
+                </ul>
             </section>
-
             <section id="alteracoes" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h2 class="cartao-titulo">8. Alterações nesta política</h2></div>
-                <p>Qualquer alteração fica registrada no histórico do repositório. A versão e a data no rodapé indicam a última atualização.</p>
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h2 class="cartao-titulo">11. Alterações nesta política</h2></div>
+                <p class="m-0">Alterações nesta política ficam registradas no histórico do repositório e na página Histórico de versão. A versão e a data no rodapé indicam a última atualização.</p>
             </section>
-
             <section id="contato" class="cartao">
-                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span><h2 class="cartao-titulo">9. Contato</h2></div>
-                <p>Dúvidas sobre esta política podem ser enviadas como uma issue no repositório do projeto.</p>
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span><h2 class="cartao-titulo">12. Contato</h2></div>
+                <p class="m-0">Pedidos de titulares e dúvidas sobre esta política podem ser enviados como uma <a href="https://github.com/alexsandroccarv/bancaZen/issues" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline"><em>issue</em> no repositório do projeto</a>. Pedidos que envolvam dados pessoais não devem trazer esses dados no texto público da <em>issue</em>: informe só o necessário para o contato.</p>
             </section>
         </div>
     </main>
