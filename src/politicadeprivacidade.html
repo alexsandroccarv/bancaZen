@@ -23,20 +23,20 @@
 
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
         <div class="max-w-3xl mx-auto space-y-6">
-            <h1 class="text-xl font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-shield-halved text-brand-600 dark:text-accent-400"></i> Política de privacidade</h1>
-            <p class="text-gray-600 dark:text-gray-400">Como o TemplateZen trata (ou, principalmente, <em>não</em> trata) os seus dados pessoais — em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).</p>
+            <div class="cartao-cab"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><h1 class="titulo-secao">Política de privacidade</h1></div>
+            <p class="texto-apoio">Como o TemplateZen trata (ou, principalmente, <em>não</em> trata) os seus dados pessoais — em conformidade com a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).</p>
 
-            <div class="border-l-4 border-brand-400 dark:border-accent-600 bg-brand-50 dark:bg-gray-800 rounded p-3 text-sm">
+            <div class="quadro quadro-info">
                 <strong>Resumo em uma frase:</strong> o TemplateZen <strong>não tem servidor</strong>.
                 As preferências que você define ficam no seu navegador — nada é enviado para nós.
             </div>
-            <div class="border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-950/30 rounded p-3 text-sm">
+            <div class="quadro">
                 <strong>Modelo a personalizar:</strong> "TemplateZen" é um placeholder e este texto
                 reflete o comportamento padrão do template — revise-o conforme o que o seu produto
                 realmente coletar (cadastro, analytics, backend etc.).
             </div>
 
-            <nav aria-label="Nesta página" class="text-sm">
+            <nav aria-label="Nesta página" class="cartao text-sm">
                 <h2 class="font-semibold mb-1">Nesta página</h2>
                 <ol class="list-decimal list-inside space-y-0.5 text-brand-600 dark:text-accent-400">
                     <li><a href="#arquitetura" class="hover:underline">Como o TemplateZen funciona (sem servidor)</a></li>
@@ -51,14 +51,14 @@
                 </ol>
             </nav>
 
-            <section id="arquitetura" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-laptop-code text-brand-600 dark:text-accent-400"></i> 1. Como o TemplateZen funciona (sem servidor)</h2>
+            <section id="arquitetura" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-laptop-code"></i></span><h2 class="cartao-titulo">1. Como o TemplateZen funciona (sem servidor)</h2></div>
                 <p>O TemplateZen roda <strong>inteiramente no seu navegador</strong> (client-side). Não há servidor, backend, banco de dados remoto ou API própria para onde suas informações sejam enviadas — nem <strong>cadastro, login ou senha</strong>.</p>
                 <p>As <strong>preferências</strong> (tema, alto contraste, tamanho de fonte, nome exibido no cabeçalho e tema selecionado) ficam no <code>localStorage</code> do navegador, associadas a este site.</p>
             </section>
 
-            <section id="dados" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-database text-brand-600 dark:text-accent-400"></i> 2. Quais dados existem e onde ficam</h2>
+            <section id="dados" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-database"></i></span><h2 class="cartao-titulo">2. Quais dados existem e onde ficam</h2></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm border border-gray-200 dark:border-gray-700">
                         <thead class="bg-brand-50 dark:bg-gray-800">
@@ -73,8 +73,8 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">Ao adicionar campos que coletem dados no seu projeto, atualize esta tabela.</p>
             </section>
 
-            <section id="naofaz" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-ban text-brand-600 dark:text-accent-400"></i> 3. O que o TemplateZen não faz</h2>
+            <section id="naofaz" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-ban"></i></span><h2 class="cartao-titulo">3. O que o TemplateZen não faz</h2></div>
                 <ul class="list-disc list-inside space-y-1">
                     <li>Não tem servidor, backend ou banco de dados próprio para onde seus dados sejam enviados.</li>
                     <li>Não pede conta, login, senha ou e-mail para uso.</li>
@@ -83,8 +83,8 @@
                 </ul>
             </section>
 
-            <section id="terceiros" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-cloud text-brand-600 dark:text-accent-400"></i> 4. Recursos de terceiros carregados pela página</h2>
+            <section id="terceiros" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-cloud"></i></span><h2 class="cartao-titulo">4. Recursos de terceiros carregados pela página</h2></div>
                 <p>Para exibir a interface, o navegador busca bibliotecas públicas de seus provedores originais:</p>
                 <ul class="list-disc list-inside space-y-1">
                     <li><strong>Tailwind CSS</strong> (<code>cdn.tailwindcss.com</code>) — estilo visual.</li>
@@ -94,31 +94,31 @@
                 <p>Essas requisições seguem o funcionamento normal da web: os provedores podem registrar metadados padrão de acesso (como endereço IP e navegador), segundo suas próprias políticas — o TemplateZen não envia dado adicional a eles. Se algum recurso não carregar, o app continua funcionando com um estilo mais simples.</p>
             </section>
 
-            <section id="fora" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square text-brand-600 dark:text-accent-400"></i> 5. Ações que saem do TemplateZen</h2>
+            <section id="fora" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span><h2 class="cartao-titulo">5. Ações que saem do TemplateZen</h2></div>
                 <p>Algumas funções levam informações para fora do app, sempre por sua iniciativa:</p>
                 <ul class="list-disc list-inside space-y-1">
                     <li><strong>Doe um café:</strong> o QR code Pix é gerado consultando o serviço externo <code>api.qrserver.com</code>, que recebe apenas o código Pix “copia e cola” (dados do recebedor, não seus). A página também traz links de parceiros/afiliados — ao clicar, você sai do TemplateZen e passa a estar sujeito à política de cada site de destino.</li>
                 </ul>
             </section>
 
-            <section id="base" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced text-brand-600 dark:text-accent-400"></i> 6. Base legal (LGPD)</h2>
+            <section id="base" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></span><h2 class="cartao-titulo">6. Base legal (LGPD)</h2></div>
                 <p>Como o processamento ocorre <strong>integralmente no seu dispositivo</strong>, sem coleta centralizada, esse uso se enquadra no tratamento realizado por pessoa natural para fins <strong>exclusivamente particulares</strong> (art. 4º, §1º, da LGPD). Ao usar serviços de terceiros (doar via Pix, links de parceiros), aplica-se a política de cada serviço.</p>
             </section>
 
-            <section id="direitos" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-user-check text-brand-600 dark:text-accent-400"></i> 7. Seus direitos como titular</h2>
+            <section id="direitos" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-user-check"></i></span><h2 class="cartao-titulo">7. Seus direitos como titular</h2></div>
                 <p>O artigo 18 da LGPD garante acesso, correção, eliminação e portabilidade. Como tudo fica no seu navegador, você exerce esses direitos diretamente: para <strong>eliminar</strong>, apague os dados deste site no navegador; não há conta para cancelar nem servidor onde solicitar exclusão.</p>
             </section>
 
-            <section id="alteracoes" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-clock-rotate-left text-brand-600 dark:text-accent-400"></i> 8. Alterações nesta política</h2>
+            <section id="alteracoes" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h2 class="cartao-titulo">8. Alterações nesta política</h2></div>
                 <p>Qualquer alteração fica registrada no histórico do repositório. A versão e a data no rodapé indicam a última atualização.</p>
             </section>
 
-            <section id="contato" class="space-y-2">
-                <h2 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-envelope text-brand-600 dark:text-accent-400"></i> 9. Contato</h2>
+            <section id="contato" class="cartao">
+                <div class="cartao-cab"><span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-envelope"></i></span><h2 class="cartao-titulo">9. Contato</h2></div>
                 <p>Dúvidas sobre esta política podem ser enviadas como uma issue no repositório do projeto.</p>
             </section>
         </div>
