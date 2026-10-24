@@ -8,6 +8,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- A Administração, com a entrada por senha, passa para o ícone de
+  engrenagem, depois das configurações de nome e tema; a aba
+  "Administração" sai da barra superior. Links `#administracao` e
+  `admin.html` abrem a engrenagem no trecho da Administração.
+  [issue #69](../../issues/69)
+
+## [0.0.34] - 2026-10-23
+
+### Alterado
 - Relatório: novo texto (processo objetivo com a ferramenta bancaZen, com
   autoria e endereço; método e critérios da busca; critérios éticos com o
   número de pessoas retiradas e a declaração de ausência de vínculo);

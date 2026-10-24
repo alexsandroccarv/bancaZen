@@ -1,5 +1,6 @@
 /* ==========================================================================
-   bancaZen — área de administração (seção Administração do index.html)
+   bancaZen — área de administração (painel da engrenagem do index.html,
+   trecho #administracao)
    --------------------------------------------------------------------------
    Entrada por senha; cadastro unificado de docentes e currículos (CSV da
    planilha de docentes e XML/ZIP do Lattes, arquivos ou pasta; os dados vêm
@@ -487,8 +488,9 @@
         // Só consulta o servidor quando a seção é aberta (e uma vez só).
         let iniciada = false;
         const abrir = () => { if (!iniciada) { iniciada = true; iniciarSessao(); } };
-        document.addEventListener('tab:change', (e) => { if (e.detail && e.detail.tab === 'administracao') abrir(); });
-        if (!$('#tab-administracao').hidden) abrir(); // aberta direto por index.html#administracao
+        // A Administração fica no painel da engrenagem (tab-config).
+        document.addEventListener('tab:change', (e) => { if (e.detail && e.detail.tab === 'config') abrir(); });
+        if (!$('#tab-config').hidden) abrir(); // aberta direto (ex.: index.html#administracao)
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
