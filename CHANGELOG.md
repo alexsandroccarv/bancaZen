@@ -7,6 +7,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Logo do PROFIAP no Início, no cartão "A banca segundo as Normas
+  Acadêmicas", sobre fundo claro próprio (legível nos temas escuros).
+  [issue #85](../../issues/85)
+
+## [0.0.42] - 2026-10-24
+
 ### Corrigido
 - Acessibilidade (WCAG 2.2 AA) e celular, após auditoria com axe-core em
   todas as páginas, 8 combinações de tema e tela:
