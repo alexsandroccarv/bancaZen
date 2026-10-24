@@ -35,11 +35,13 @@
             if (active && focus) b.focus();
         });
         $$('.tab-panel').forEach(p => { p.hidden = (p.id !== 'tab-' + name); });
-        // Endereço da seção na URL (index.html#<nome>), para links diretos,
-        // sem criar uma entrada nova no histórico a cada troca.
+        // Endereço da seção na URL (index.html#<nome>), para links diretos.
+        // Troca feita pela pessoa (opts.push) cria uma entrada no histórico:
+        // o "voltar" do navegador ou do celular retorna à seção anterior.
         if (opts && opts.url === false) { /* mantém a URL */ }
         else if (window.history && history.replaceState && location.hash !== '#' + name) {
-            history.replaceState(null, '', '#' + name);
+            if (opts && opts.push) history.pushState(null, '', '#' + name);
+            else history.replaceState(null, '', '#' + name);
         }
         document.dispatchEvent(new CustomEvent('tab:change', { detail: { tab: name } }));
     }
@@ -52,7 +54,10 @@
         const aba = trecho && trecho.closest('.tab-panel');
         if (!aba) return false;
         switchTab(aba.id.slice(4), Object.assign({}, opts, { url: false }));
-        if (window.history && history.replaceState) history.replaceState(null, '', '#' + nome);
+        if (window.history && history.replaceState && location.hash !== '#' + nome) {
+            if (opts && opts.push) history.pushState(null, '', '#' + nome);
+            else history.replaceState(null, '', '#' + nome);
+        }
         trecho.scrollIntoView({ block: 'start' });
         return true;
     }
@@ -60,7 +65,7 @@
     function wireTabs() {
         const btns = $$('.tab-btn');
         btns.forEach((b, i) => {
-            b.addEventListener('click', () => switchTab(b.dataset.tab));
+            b.addEventListener('click', () => switchTab(b.dataset.tab, { push: true }));
             // Navegação por teclado (setas/Home/End), esperada em um tablist.
             b.addEventListener('keydown', (e) => {
                 let next = -1;
@@ -68,10 +73,16 @@
                 else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + btns.length) % btns.length;
                 else if (e.key === 'Home') next = 0;
                 else if (e.key === 'End') next = btns.length - 1;
-                if (next >= 0) { e.preventDefault(); switchTab(btns[next].dataset.tab, { focus: true }); }
+                if (next >= 0) { e.preventDefault(); switchTab(btns[next].dataset.tab, { focus: true, push: true }); }
             });
         });
         // Seção inicial: a do endereço (#nome), se existir; senão a marcada.
+        // "Voltar"/"avançar" e links para #seção dentro da página.
+        window.addEventListener('popstate', () => {
+            const h = location.hash.slice(1);
+            if (h) irPara(h);
+            else if (btns[0]) switchTab(btns[0].dataset.tab, { url: false });
+        });
         const doHash = location.hash.slice(1);
         if (doHash && irPara(doHash)) return;
         const initial = $('.tab-btn[aria-selected="true"]') || btns[0];
@@ -252,11 +263,11 @@
         wireTabs();
         // Engrenagem no cabeçalho abre o painel de Configurações.
         const cfgBtn = $('#headerConfigBtn');
-        if (cfgBtn) cfgBtn.addEventListener('click', () => switchTab('config'));
+        if (cfgBtn) cfgBtn.addEventListener('click', () => switchTab('config', { push: true }));
         // Botões "ir para" (data-ir="<seção>") em qualquer lugar da página.
         document.addEventListener('click', (e) => {
             const alvo = e.target.closest('[data-ir]');
-            if (alvo) irPara(alvo.dataset.ir, { focus: true });
+            if (alvo) irPara(alvo.dataset.ir, { focus: true, push: true });
         });
     }
 

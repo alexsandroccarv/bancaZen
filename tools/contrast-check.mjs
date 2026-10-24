@@ -53,6 +53,49 @@ const PAIRS = [
     ['muted/superfície', '--tz-muted', '--tz-surface', 4.0],
 ];
 
+// Tons derivados do visual "etapas em cartões" (--bz-*, issue #83): lidos
+// do bloco html.tz-theme e das sobreposições por tema; color-mix(in srgb, ...)
+// é calculado aqui com as cores de cada paleta.
+const derivados = {};
+// Junta todos os blocos "<seletor> {" (o mesmo seletor aparece mais de uma vez).
+const bloco = (sel) => {
+    let out = '', i = -1;
+    while ((i = css.indexOf(sel + ' {', i + 1)) >= 0) out += css.slice(i, css.indexOf('}', i));
+    return out;
+};
+const lerBz = (txt, alvo) => { for (const d of txt.matchAll(/(--bz-[a-z0-9-]+):\s*([^;]+);/g)) alvo[d[1]] = d[2].trim(); };
+lerBz(bloco('html.tz-theme'), derivados);
+const hexRgb = (h) => { h = h.replace('#', ''); return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); };
+const rgbHex = (c) => '#' + c.map((x) => Math.round(x).toString(16).padStart(2, '0')).join('');
+function avaliar(expr, v, bz) {
+    expr = expr.trim();
+    const mv = expr.match(/^var\((--[a-z0-9-]+)\)$/);
+    if (mv) return mv[1].startsWith('--bz-') ? avaliar(bz[mv[1]], v, bz) : v[mv[1]];
+    if (expr.startsWith('#')) return expr;
+    const mm = expr.match(/^color-mix\(in srgb,\s*(.+?)\s+(\d+)%,\s*(.+)\)$/);
+    if (mm) {
+        const a = hexRgb(avaliar(mm[1], v, bz)), b = hexRgb(avaliar(mm[3], v, bz)), p = Number(mm[2]) / 100;
+        return rgbHex(a.map((x, i) => x * p + b[i] * (1 - p)));
+    }
+    return null;
+}
+// [rótulo, primeiro plano, fundo, limiar]; "pagina" = fundo da página.
+const PARES_BZ = [
+    ['bz-muted/superfície', '--bz-muted', '--tz-surface', 4.5],
+    ['bz-muted/página', '--bz-muted', 'pagina', 4.5],
+    ['bz-muted/campo', '--bz-muted', '--bz-campo', 4.5],
+    ['bz-muted/quadro', '--bz-muted', '--bz-dica', 4.5],
+    ['acento-texto/superfície', '--bz-acento-texto', '--tz-surface', 4.5],
+    ['acento-texto/página', '--bz-acento-texto', 'pagina', 4.5],
+    ['acento-texto/área de arquivo', '--bz-acento-texto', '--bz-suave-leve', 4.5],
+    ['texto/tinta', '--bz-texto-tinta', '--bz-suave', 4.5],
+    ['texto/quadro', '--bz-texto-tinta', '--bz-dica', 4.5],
+    ['texto/quadro verde', '--bz-texto-tinta', '--bz-suave-2', 4.5],
+    ['botão (texto/destaque)', '--bz-sobre-acento', '--tz-accent', 4.5],
+    ['ícone/tinta', '--tz-accent', '--bz-suave', 3.0],
+    ['marca concluída', '--bz-sobre-acento', '--bz-verde', 3.0],
+];
+
 let failed = 0;
 const names = Object.keys(themes);
 for (const name of names) {
@@ -62,6 +105,17 @@ for (const name of names) {
         if (!v[fg] || !v[bg]) continue;
         const r = ratio(v[fg], v[bg]);
         if (r < th) problems.push(`${label}=${r.toFixed(2)}<${th} (${v[fg]}/${v[bg]})`);
+    }
+    if (v['--tz-accent'] && v['--tz-accent-2']) {
+        const bz = { ...derivados };
+        lerBz(bloco(`html[data-tz-theme="${name}"]`), bz);
+        const cor = (k) => (k === 'pagina' ? avaliar('color-mix(in srgb, var(--tz-accent) 4%, var(--tz-bg))', v, bz) : avaliar(`var(${k})`, v, bz));
+        for (const [label, fg, bg, th] of PARES_BZ) {
+            const a = cor(fg), b = cor(bg);
+            if (!a || !b) { problems.push(`${label}: não foi possível calcular`); continue; }
+            const r = ratio(a, b);
+            if (r < th) problems.push(`${label}=${r.toFixed(2)}<${th} (${a}/${b})`);
+        }
     }
     if (problems.length) {
         failed++;

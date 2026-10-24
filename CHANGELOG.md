@@ -7,6 +7,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Corrigido
+- Acessibilidade (WCAG 2.2 AA) e celular, após auditoria com axe-core em
+  todas as páginas, 8 combinações de tema e tela:
+  - contraste dos tons derivados nos 9 temas (cinza auxiliar, destaque
+    como texto, verde de "concluído", quadros e etiquetas); cinzas fixos,
+    vermelho e âmbar seguem o tema;
+  - alvos de toque de 24 px ou mais (rodapé com 44 px; conferência,
+    caixas de seleção, índice "Nesta página", botões da Administração);
+  - links do texto corrido sublinhados;
+  - tabelas com rolagem horizontal e documento do Relatório acessíveis
+    pelo teclado;
+  - Relatório, indicador de etapas e títulos sem rolagem lateral em
+    320 px e com a fonte em 200%;
+  - "voltar" do navegador e do celular retorna à seção anterior e links
+    para #seção trocam a seção.
+  `tools/contrast-check.mjs` passa a conferir também os tons `--bz-*`.
+  [issue #83](../../issues/83)
+
+## [0.0.41] - 2026-10-24
+
 ### Alterado
 - Termo de uso, Política de privacidade e Sobre reescritos para o bancaZen
   (antes, texto de exemplo do template): finalidade e limites da
