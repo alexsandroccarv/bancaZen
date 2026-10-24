@@ -8,6 +8,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- Páginas de apoio (Ajuda, Sobre, Histórico, Termo de uso, Política de
+  privacidade, Doe um café e 404) no visual "etapas em cartões": título
+  com ícone, seções em cartões, avisos em quadros arredondados e cada
+  versão do Histórico num cartão. [issue #79](../../issues/79)
+
+## [0.0.39] - 2026-10-24
+
+### Alterado
 - Novo visual em todo o app, no estilo "etapas em cartões" (mockup A):
   abas em pílula no cabeçalho, cartões com ícone, campos e botões
   arredondados, sobretítulo de etapa em cada seção. Meu TCC ganha o

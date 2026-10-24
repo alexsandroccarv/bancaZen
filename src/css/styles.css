@@ -543,3 +543,11 @@ html.tz-theme .zona-risco { background: var(--tz-surface); }
 .cartao.hidden { display: none !important; }
 /* Botões secundários com borda (Administração): também em pílula. */
 html.tz-theme .tab-panel :is(button, label).border-brand-600 { border-radius: 9999px; padding-inline: 1rem; }
+/* Quadros de aviso das páginas de apoio (texto corrido, sem flex). */
+.quadro { border-radius: 14px; padding: .875rem 1rem; font-size: .9375rem; line-height: 1.5; }
+html.tz-theme .quadro { background: var(--bz-dica); color: var(--tz-text); }
+html.tz-theme .quadro.quadro-info { background: var(--bz-suave); }
+.quadro p { margin: 0; }
+/* Histórico: cada versão num cartão mais compacto. */
+.cartao.versao { gap: .5rem; }
+.cartao.versao ul { margin-top: 0; }

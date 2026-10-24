@@ -23,8 +23,8 @@
 
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
         <div class="max-w-3xl mx-auto space-y-6">
-            <h1 class="text-xl font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-clock-rotate-left text-brand-600 dark:text-accent-400"></i> Histórico de versão</h1>
-            <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-2">
+            <div class="cartao-cab"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><h1 class="titulo-secao">Histórico de versão</h1></div>
+            <div class="cartao cartao-foco">
                 <p>Versão atual: <span class="font-mono font-semibold" id="currentVersion">—</span></p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     Numeração <code class="font-mono">MAIOR.MENOR.PATCH</code>: o
@@ -55,7 +55,16 @@
             <!-- Entradas reais das versões (mais recente no topo). Os MODELOS
                  para copiar (marco e patch) estão no comentário logo abaixo. -->
             <div id="releaseList" class="space-y-4">
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
+                    <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
+                        <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.40</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">24/10/2026</span>
+                    </h2>
+                    <ul class="list-disc list-inside space-y-1 mt-3">
+                        <li>Páginas de apoio no visual "etapas em cartões". <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="79" target="_blank" rel="noopener">issue #79</a>.</li>
+                    </ul>
+                </section>
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.39</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">24/10/2026</span>
@@ -64,7 +73,7 @@
                         <li>Novo visual "etapas em cartões" em todo o app: etapas em Meu TCC, arrastar e soltar o Lattes, palavras-chave em etiquetas e indicações em cartões. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="77" target="_blank" rel="noopener">issue #77</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.38</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">24/10/2026</span>
@@ -73,7 +82,7 @@
                         <li>Critério "Somente docentes permanentes", marcado por padrão. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="75" target="_blank" rel="noopener">issue #75</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.37</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">24/10/2026</span>
@@ -82,7 +91,7 @@
                         <li>Termos do app alinhados ao item 13 das Normas Acadêmicas do PROFIAP, em linguagem não discriminatória; Início descreve o processo da Norma. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="73" target="_blank" rel="noopener">issue #73</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.36</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">24/10/2026</span>
@@ -91,7 +100,7 @@
                         <li>Ajuda com o item 13 das Normas Acadêmicas do PROFIAP (composição das bancas) e a relação com o bancaZen. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="71" target="_blank" rel="noopener">issue #71</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.35</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">24/10/2026</span>
@@ -100,7 +109,7 @@
                         <li>Administração movida para o ícone de engrenagem, com a entrada por senha. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="69" target="_blank" rel="noopener">issue #69</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.34</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -109,7 +118,7 @@
                         <li>Relatório: novo texto, membros escolhidos em destaque e tabelas das indicações no final. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="67" target="_blank" rel="noopener">issue #67</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.33</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -118,7 +127,7 @@
                         <li>Nova seção Relatório: declaração da indicação da banca, com as indicações, o índice, os critérios éticos, as pessoas escolhidas e como citar o bancaZen. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="65" target="_blank" rel="noopener">issue #65</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.32</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -127,7 +136,7 @@
                         <li>Ordem das sugestões: no empate da proximidade, pessoas de sexo feminino primeiro. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="63" target="_blank" rel="noopener">issue #63</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.31</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -136,7 +145,7 @@
                         <li>Minha Dissertação: Lattes da discente abaixo do nome, universidade em lista e nome da orientação antes do Lattes, com verificação de vínculos só pelo nome quando não há currículo. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="61" target="_blank" rel="noopener">issue #61</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.30</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -145,7 +154,7 @@
                         <li>Minha orientação passa a ficar dentro de Minha Dissertação, que ganha botões para exportar e importar os dados em JSON. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="59" target="_blank" rel="noopener">issue #59</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.29</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -154,7 +163,7 @@
                         <li>Busca com o modelo BM25, incluindo os títulos dos trabalhos avaliados em bancas e com peso próprio para artigos. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="57" target="_blank" rel="noopener">issue #57</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.28</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -163,7 +172,7 @@
                         <li>Busca corrigida para bases grandes: índice de busca pré-calculado e menos memória no servidor; erros do servidor aparecem com a mensagem, não mais como "Erro 200". <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="55" target="_blank" rel="noopener">issue #55</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.27</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -172,7 +181,7 @@
                         <li>"Minha orientação" opcional; o resultado mostra quem foi considerado na conformidade ética ou avisa que ela não foi verificada. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="53" target="_blank" rel="noopener">issue #53</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.26</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -181,7 +190,7 @@
                         <li>Lista de docentes: currículo enviado ou pendente indicado só por ícone, no início da linha. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="51" target="_blank" rel="noopener">issue #51</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.25</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -190,7 +199,7 @@
                         <li>Lista de docentes agrupada por banca e universidade, sem linhas divisórias. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="49" target="_blank" rel="noopener">issue #49</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.24</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -199,7 +208,7 @@
                         <li>Currículos guardados no servidor: sem os campos de PPG, instituição e situação; os dados vêm só da planilha de docentes. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="47" target="_blank" rel="noopener">issue #47</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.23</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -208,7 +217,7 @@
                         <li>Administração: lista de docentes e currículos cadastrados começam recolhidos, com a contagem no título. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="45" target="_blank" rel="noopener">issue #45</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.22</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -217,7 +226,7 @@
                         <li>Planilha de docentes: ID Lattes aceito como número ou como link do Lattes, com aviso quando os dois divergem. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="43" target="_blank" rel="noopener">issue #43</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.21</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -226,7 +235,7 @@
                         <li>Administração: zona de risco para limpar a base de dados (currículos e/ou lista de docentes), com confirmação. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="41" target="_blank" rel="noopener">issue #41</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.20</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -235,7 +244,7 @@
                         <li>Arquivos recusados na leitura dos currículos passam a mostrar o que contêm, e mais variações de XML do CNPq são aceitas. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="39" target="_blank" rel="noopener">issue #39</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.19</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -244,7 +253,7 @@
                         <li>Conferência conta todos os currículos ainda não identificados na planilha de docentes. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="37" target="_blank" rel="noopener">issue #37</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.18</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -253,7 +262,7 @@
                         <li>Planilha de docentes aceita e-mail (opcional), visível só na Administração. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="35" target="_blank" rel="noopener">issue #35</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.17</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -262,7 +271,7 @@
                         <li>Cadastro de docentes e currículos só com a escolha dos arquivos, com os dados vindos da planilha, e conferência de currículos sem dados e de docentes sem currículo. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="33" target="_blank" rel="noopener">issue #33</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.16</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -271,7 +280,7 @@
                         <li>Administração: botões para simular e incluir na busca os currículos copiados direto para o servidor, sem usar o terminal. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="31" target="_blank" rel="noopener">issue #31</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.15</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -280,7 +289,7 @@
                         <li>Novo comando no servidor para incluir na busca os currículos copiados direto para a pasta de dados, sem passar pela Administração. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="29" target="_blank" rel="noopener">issue #29</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.14</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -289,7 +298,7 @@
                         <li>A verificação feita de dentro do servidor usa uma só conexão SSH, pois a hospedagem recusa conexões seguidas. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="27" target="_blank" rel="noopener">issue #27</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.13</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -298,7 +307,7 @@
                         <li>A verificação feita de dentro do servidor informa por que não obteve resposta e tenta o acesso local; sem resposta, a publicação recebe um aviso em vez de falhar. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="25" target="_blank" rel="noopener">issue #25</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.12</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -307,7 +316,7 @@
                         <li>A verificação do site depois de cada publicação passa a funcionar mesmo quando a hospedagem bloqueia os servidores do GitHub: ela é refeita de dentro do próprio servidor. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="23" target="_blank" rel="noopener">issue #23</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.11</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -316,7 +325,7 @@
                         <li>Minha Dissertação passa a pedir o seu nome e a sua universidade; a universidade preenche o critério de instituição a desconsiderar. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="21" target="_blank" rel="noopener">issue #21</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.10</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -325,7 +334,7 @@
                         <li>Cadastro de docentes e currículos num só formulário, sem o campo Grupo: a lista da banca vem do PPG (PROFIAP → Rede PROFIAP; outro PPG → Externa). <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="19" target="_blank" rel="noopener">issue #19</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.9</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">23/10/2026</span>
@@ -334,7 +343,7 @@
                         <li>Modelo do arquivo CSV da lista de docentes para baixar na Administração, com a explicação de cada coluna. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="17" target="_blank" rel="noopener">issue #17</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.8</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">21/10/2026</span>
@@ -343,7 +352,7 @@
                         <li>Lista de docentes dos programas, importada pela Administração; as sugestões mostram Nome, Universidade, PPG, Situação no programa e Link do Lattes. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="15" target="_blank" rel="noopener">issue #15</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.7</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">21/10/2026</span>
@@ -353,7 +362,7 @@
                         <li>A publicação aceita a chave SSH com quebras de linha do Windows e explica o formato quando ela é inválida. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="12" target="_blank" rel="noopener">issue #12</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.6</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">21/10/2026</span>
@@ -362,7 +371,7 @@
                         <li>A publicação confere que o servidor guarda os currículos exatamente na pasta verificada, fora da área pública. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="10" target="_blank" rel="noopener">issue #10</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.5</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">21/10/2026</span>
@@ -371,7 +380,7 @@
                         <li>Publicação em hospedagem compartilhada: a pasta dos currículos não pode ficar dentro da área pública do site, e as falhas de chave SSH passam a ser explicadas no log. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="8" target="_blank" rel="noopener">issue #8</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.4</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">20/10/2026</span>
@@ -385,7 +394,7 @@
                         <li>Projeto renomeado para bancaZen, acompanhando o novo nome do repositório. <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="6" target="_blank" rel="noopener">issue #6</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.2</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">11/09/2026</span>
@@ -394,7 +403,7 @@
                         <li>Seção de temas reorganizada para 9 paletas nomeadas (Catppuccin Latte/Mocha, Drácula, GitHub Light/Dark, gov.br como novo padrão, Rosé Pine Dawn, Solarized Light/Dark), removendo a lógica legada de tema claro/escuro que ficara órfã — <a class="issue-link text-brand-600 dark:text-accent-400 hover:underline" data-issue="12" target="_blank" rel="noopener">issue #12</a>.</li>
                     </ul>
                 </section>
-                <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                <section class="cartao versao">
                     <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                         <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.1</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">—</span>
@@ -423,7 +432,7 @@
                  </section>
 
                  CORREÇÃO/PATCH (3º numeral — incremento automático a cada issue):
-                 <section class="rounded-lg border p-5 border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800">
+                 <section class="cartao versao">
                      <h2 class="text-base font-bold flex items-center gap-2 flex-wrap m-0">
                          <span class="ver-pill font-mono text-xs font-bold text-white bg-brand-600 dark:bg-accent-700 rounded px-2 py-0.5">v0.0.2</span>
                          <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">DD/MM/AAAA</span>
