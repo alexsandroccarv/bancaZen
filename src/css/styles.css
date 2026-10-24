@@ -616,3 +616,10 @@ html.tz-theme :is(.doc-contagem, .doc-situacao, .doc-ppg) { color: var(--bz-mute
 .etapas { flex-wrap: wrap; row-gap: .75rem; }
 .etapa:not(:first-child) { flex: 1 1 auto; min-width: 0; }
 .titulo-linha > :first-child { flex: 1 1 16rem; min-width: 0; }
+
+/* Logo do PROFIAP (Início, cartão das regras da banca; issue #85): placa
+   clara, porque o logo tem texto escuro sobre fundo transparente. */
+.logo-profiap { flex: none; display: inline-flex; align-items: center; padding: .375rem .75rem; border-radius: 12px; background: #ffffff; }
+html.tz-theme .logo-profiap { border: 1px solid color-mix(in srgb, var(--tz-border) 60%, transparent); }
+.logo-profiap img { display: block; width: 8.5rem; height: auto; }
+@media (max-width: 559px) { .logo-profiap { order: 3; margin-left: 3.875rem; } }
