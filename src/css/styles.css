@@ -254,6 +254,7 @@ html.tz-theme .passo { background: var(--tz-accent); color: var(--tz-bg); }
 .documento p { margin: 0 0 .75rem; text-align: justify; }
 .doc-cabecalho { text-align: center; margin-bottom: 1.25rem; }
 .doc-cabecalho p { margin: 0; text-align: center; font-weight: 600; color: #111; }
+.doc-logo { display: block; width: 4cm; height: auto; margin: 0 auto .75rem; }
 .doc-titulo { text-align: center; font-size: 13pt; font-weight: 700; margin: 0 0 1.25rem; }
 .doc-subtitulo { font-size: 12pt; font-weight: 700; margin: 1.25rem 0 .5rem; }
 .doc-nota { font-size: 10pt; color: #444; }

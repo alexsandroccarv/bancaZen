@@ -147,6 +147,7 @@
         const doc = $('#relDocumento');
         doc.innerHTML = `
             <div class="doc-cabecalho">
+                <img class="doc-logo" src="images/profiap.png" alt="PROFIAP" width="307" height="118">
                 <p>${esc(d.universidade || branco)}</p>
                 <p>${esc(programa || branco)}</p>
             </div>
