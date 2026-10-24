@@ -342,3 +342,204 @@ html.high-contrast.high-contrast button {
 
 /* Ajuda: alíneas das normas já trazem a letra (a, b, c). */
 .normas ol, ol.alineas { list-style: none; padding-left: 1rem; }
+
+/* ==========================================================================
+   Visual "etapas em cartões" (issue #77)
+   --------------------------------------------------------------------------
+   Cartões arredondados, ícones em quadrados coloridos, campos altos, botões
+   em pílula e abas em pílula no cabeçalho. Tudo sai das variáveis --tz-* do
+   tema; os tons claros são misturas (color-mix) do destaque com a superfície,
+   para funcionar nos 9 temas, claros e escuros.
+   ========================================================================== */
+html.tz-theme {
+    --bz-suave: color-mix(in srgb, var(--tz-accent) 14%, var(--tz-surface));
+    --bz-suave-leve: color-mix(in srgb, var(--tz-accent) 6%, var(--tz-surface));
+    --bz-suave-2: color-mix(in srgb, var(--tz-accent-2) 16%, var(--tz-surface));
+    --bz-campo: var(--tz-bg);
+    --bz-dica: color-mix(in srgb, #ffcd07 24%, var(--tz-surface));
+    --bz-sobre-acento: var(--tz-bg);
+    --bz-sombra: 0 1px 2px color-mix(in srgb, var(--tz-text) 8%, transparent);
+}
+html.tz-theme body { background-color: color-mix(in srgb, var(--tz-accent) 4%, var(--tz-bg)) !important; }
+
+/* ---- Cabeçalho: abas em pílula na faixa do cabeçalho ---- */
+html.tz-theme header nav { background-color: var(--tz-header) !important; border-color: transparent !important; }
+html.tz-theme header nav > div { gap: .25rem; padding: .25rem 0 .625rem; }
+html.tz-theme header .tab-btn,
+html.tz-theme header nav a {
+    border-radius: 9999px; border-bottom: 0 !important; padding: .5rem 1rem !important; font-weight: 600;
+    color: color-mix(in srgb, var(--tz-header-text) 88%, var(--tz-header)) !important;
+}
+html.tz-theme header .tab-btn:hover,
+html.tz-theme header nav a:hover { background-color: color-mix(in srgb, var(--tz-header-text) 14%, var(--tz-header)); }
+html.tz-theme header .tab-btn[aria-selected="true"] {
+    background-color: var(--tz-header-text) !important; color: var(--tz-header) !important;
+}
+html.tz-theme header .tab-btn:focus-visible,
+html.tz-theme header nav a:focus-visible { outline: 2px solid var(--tz-header-text); outline-offset: 2px; }
+
+/* ---- Títulos das seções ---- */
+.sobretitulo { margin: 0 0 .375rem; font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+html.tz-theme .sobretitulo { color: var(--tz-accent); }
+.titulo-secao { margin: 0; font-size: 1.75rem; font-weight: 800; line-height: 1.15; }
+@media (min-width: 640px) { .titulo-secao { font-size: 2.25rem; } }
+.texto-apoio { margin: .5rem 0 0; font-size: 1rem; line-height: 1.5; }
+html.tz-theme .texto-apoio { color: var(--tz-muted); }
+
+/* ---- Cartões ---- */
+.cartao { border-radius: 20px; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+@media (min-width: 640px) { .cartao { padding: 1.75rem; } }
+html.tz-theme .cartao { background: var(--tz-surface); box-shadow: var(--bz-sombra); border: 1px solid color-mix(in srgb, var(--tz-border) 60%, transparent); }
+html.tz-theme .cartao-foco { border-color: transparent; box-shadow: 0 0 0 2px var(--tz-accent), 0 8px 24px color-mix(in srgb, var(--tz-accent) 14%, transparent); }
+.cartao-cab { display: flex; align-items: center; gap: .875rem; }
+.cartao-titulo { margin: 0; font-size: 1.25rem; font-weight: 800; line-height: 1.25; }
+@media (min-width: 640px) { .cartao-titulo { font-size: 1.375rem; } }
+.cartao-titulo .opcional { font-size: .9375rem; font-weight: 600; }
+html.tz-theme .cartao-titulo .opcional { color: var(--tz-muted); }
+.subcartao { border-radius: 16px; padding: 1.125rem; display: flex; flex-direction: column; gap: .75rem; }
+html.tz-theme .subcartao { background: var(--bz-campo); border: 1px solid var(--tz-border); }
+.grade-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 768px) { .grade-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Ícone do cartão num quadrado colorido. */
+.icone-bloco { flex: none; width: 3rem; height: 3rem; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+html.tz-theme .icone-bloco { background: var(--bz-suave); color: var(--tz-accent); }
+html.tz-theme .icone-bloco.cheio { background: var(--tz-accent); color: var(--bz-sobre-acento); }
+html.tz-theme .icone-bloco.verde { background: var(--bz-suave-2); color: var(--tz-accent-2); }
+
+/* Selo pequeno (ex.: "2 de 3 campos", "13.1 b"). */
+.selo { display: inline-flex; align-items: center; gap: .375rem; padding: .3125rem .75rem; border-radius: 9999px; font-size: .8125rem; font-weight: 700; white-space: nowrap; }
+html.tz-theme .selo { background: var(--bz-suave); color: var(--tz-text); }
+html.tz-theme .selo.verde { background: var(--bz-suave-2); }
+
+/* ---- Campos ---- */
+.rotulo { display: block; margin-bottom: .375rem; font-size: .875rem; font-weight: 700; }
+.ajuda { margin: .375rem 0 0; font-size: .8125rem; }
+html.tz-theme .ajuda { color: var(--tz-muted); }
+html.tz-theme .tab-panel :is(input[type="text"], input[type="search"], input[type="email"], input[type="url"], input[type="password"], input[type="number"], select, textarea):not(table *):not(.etiquetas-campo *) {
+    min-height: 3rem; padding: .625rem 1rem; border: 1px solid var(--tz-border) !important; border-radius: 12px;
+    background-color: var(--bz-campo) !important; font-size: 1rem;
+}
+html.tz-theme .tab-panel .subcartao :is(input[type="text"], select) { background-color: var(--tz-surface) !important; }
+html.tz-theme .tab-panel :is(input, select, textarea):focus-visible { outline: 2px solid var(--tz-accent); outline-offset: 1px; }
+html.tz-theme .tab-panel textarea { line-height: 1.5; }
+
+/* Área de arrastar e soltar o arquivo do Lattes (o <input type="file"> fica
+   dentro do rótulo, visualmente oculto; o foco aparece no contorno). */
+.soltar { display: flex; align-items: center; gap: .875rem; padding: 1rem 1.125rem; border-radius: 14px; cursor: pointer; min-height: 3rem; }
+html.tz-theme .soltar { border: 2px dashed color-mix(in srgb, var(--tz-accent) 45%, var(--tz-surface)); background: var(--bz-suave-leve); }
+html.tz-theme .soltar:hover, html.tz-theme .soltar.arrastando { background: var(--bz-suave); border-style: solid; }
+html.tz-theme .soltar:focus-within { outline: 2px solid var(--tz-accent); outline-offset: 2px; }
+.soltar-icone { flex: none; width: 2.5rem; height: 2.5rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; }
+html.tz-theme .soltar-icone { background: var(--tz-surface); color: var(--tz-accent); }
+.soltar-texto { display: flex; flex-direction: column; gap: .125rem; min-width: 0; }
+.soltar-titulo { font-size: .9375rem; font-weight: 700; }
+html.tz-theme .soltar-titulo { color: var(--tz-accent); }
+.soltar-nome { font-size: .8125rem; overflow-wrap: anywhere; }
+html.tz-theme .soltar-nome { color: var(--tz-muted); }
+html.tz-theme .soltar.com-arquivo .soltar-nome { color: var(--tz-text); font-weight: 600; }
+
+/* Palavras-chave como etiquetas removíveis. */
+.etiquetas-campo { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; min-height: 3rem; padding: .375rem .5rem; border-radius: 12px; }
+html.tz-theme .etiquetas-campo { background: var(--bz-campo); border: 1px solid var(--tz-border); }
+html.tz-theme .etiquetas-campo:focus-within { outline: 2px solid var(--tz-accent); outline-offset: 1px; }
+.etiquetas-lista { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.etiqueta { display: inline-flex; align-items: center; gap: .375rem; padding: .3125rem .375rem .3125rem .875rem; border-radius: 9999px; font-size: .875rem; font-weight: 600; }
+html.tz-theme .etiqueta { background: var(--tz-accent); color: var(--bz-sobre-acento); }
+.etiqueta button { width: 1.5rem; height: 1.5rem; border-radius: 9999px; border: 0; display: inline-flex; align-items: center; justify-content: center; font-size: .75rem; cursor: pointer; color: inherit; background: color-mix(in srgb, currentColor 22%, transparent); }
+html.tz-theme .etiquetas-campo input, .etiquetas-campo input { flex: 1 1 10rem; min-width: 8rem; min-height: 2.25rem; border: 0 !important; outline: none; background: transparent !important; font-size: 1rem; padding: 0 .5rem; }
+
+/* ---- Botões ---- */
+.botao-primario { display: inline-flex; align-items: center; justify-content: center; gap: .625rem; min-height: 3rem; padding: 0 1.5rem;
+                  border-radius: 9999px; border: 0; font-weight: 700; font-size: 1rem; cursor: pointer; text-decoration: none; }
+html.tz-theme .botao-primario,
+html.tz-theme .tab-panel button.bg-brand-600 {
+    background: var(--tz-accent) !important; color: var(--bz-sobre-acento) !important;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--tz-accent) 28%, transparent);
+}
+html.tz-theme .tab-panel button.bg-brand-600 { border-radius: 9999px; min-height: 2.75rem; padding-inline: 1.25rem; font-weight: 700; }
+html.tz-theme .botao-primario:hover,
+html.tz-theme .tab-panel button.bg-brand-600:hover { filter: brightness(.93); }
+.botao-primario:disabled, .tab-panel button.bg-brand-600:disabled { opacity: .5; cursor: not-allowed; box-shadow: none !important; }
+.botao-grande { min-height: 3.5rem; padding: 0 1.75rem; font-size: 1.0625rem; }
+.botao-secundario { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.25rem;
+                    border-radius: 9999px; font-weight: 700; cursor: pointer; text-decoration: none; }
+html.tz-theme .botao-secundario { background: var(--tz-surface); color: var(--tz-accent); border: 1px solid color-mix(in srgb, var(--tz-accent) 35%, var(--tz-border)); }
+html.tz-theme .botao-secundario:hover { background: var(--bz-suave); }
+.botao-redondo { flex: none; width: 2.75rem; height: 2.75rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.0625rem; }
+html.tz-theme .botao-redondo { background: var(--tz-surface); color: var(--tz-accent); border: 1px solid color-mix(in srgb, var(--tz-accent) 25%, var(--tz-border)); }
+html.tz-theme .botao-redondo:hover { background: var(--bz-suave); }
+
+/* Opção (checkbox) em pílula, nos critérios da busca. */
+.opcao-pilula { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: 0 1rem; border-radius: 9999px; font-size: .875rem; font-weight: 700; cursor: pointer; }
+html.tz-theme .opcao-pilula { background: var(--bz-suave); color: var(--tz-text); }
+.opcao-pilula input { width: 1.125rem; height: 1.125rem; }
+
+/* ---- Avisos ---- */
+.dica, .aviso { display: flex; align-items: flex-start; gap: .75rem; padding: .875rem 1rem; border-radius: 14px; font-size: .9375rem; line-height: 1.45; }
+.dica > i, .aviso > i { font-size: 1.25rem; margin-top: .0625rem; flex: none; }
+html.tz-theme .dica, html.tz-theme .aviso-alerta { background: var(--bz-dica); color: var(--tz-text); }
+html.tz-theme .aviso-ok { background: var(--bz-suave-2); color: var(--tz-text); }
+html.tz-theme .aviso-ok > i { color: var(--tz-accent-2); }
+.aviso p { margin: 0; }
+
+/* ---- Indicador de etapas (Meu TCC) ---- */
+.etapas { display: flex; align-items: center; gap: .75rem; margin: 0; padding: 1rem 1.25rem; list-style: none; border-radius: 20px; }
+html.tz-theme .etapas { background: var(--tz-surface); box-shadow: var(--bz-sombra); border: 1px solid color-mix(in srgb, var(--tz-border) 60%, transparent); }
+.etapa { display: flex; align-items: center; gap: .75rem; }
+.etapa:not(:first-child) { flex: 1 1 0; }
+.etapa:not(:first-child)::before { content: ""; flex: 1 1 auto; min-width: 1rem; height: 3px; border-radius: 3px; }
+html.tz-theme .etapa:not(:first-child)::before { background: var(--tz-border); }
+html.tz-theme .etapa[data-estado="feito"] + .etapa::before { background: var(--tz-accent-2); }
+.etapa button { display: inline-flex; align-items: center; gap: .625rem; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.etapa-num { flex: none; width: 2.25rem; height: 2.25rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; }
+html.tz-theme .etapa-num { background: var(--bz-campo); color: var(--tz-muted); border: 1px solid var(--tz-border); }
+html.tz-theme .etapa[data-estado="feito"] .etapa-num { background: var(--tz-accent-2); color: var(--bz-sobre-acento); border-color: transparent; }
+html.tz-theme .etapa[data-estado="atual"] .etapa-num { background: var(--tz-accent); color: var(--bz-sobre-acento); border-color: transparent; box-shadow: 0 0 0 5px var(--bz-suave); }
+.etapa-rotulo { font-weight: 700; font-size: .9375rem; white-space: nowrap; }
+html.tz-theme .etapa[data-estado="atual"] .etapa-rotulo { color: var(--tz-accent); }
+html.tz-theme .etapa[data-estado="pendente"] .etapa-rotulo { color: var(--tz-muted); font-weight: 600; }
+.etapa .etapa-feito { display: none; }
+.etapa[data-estado="feito"] .etapa-feito { display: inline; }
+.etapa[data-estado="feito"] .etapa-n { display: none; }
+@media (max-width: 559px) { .etapa:not([data-estado="atual"]) .etapa-rotulo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; } }
+
+/* ---- Composição da banca: conferência e indicações ---- */
+.conferencia-item { display: flex; align-items: center; gap: .625rem; font-size: .875rem; }
+.marca { flex: none; width: 1.5rem; height: 1.5rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; font-size: .6875rem; }
+html.tz-theme .marca-ok { background: var(--tz-accent-2); color: var(--bz-sobre-acento); }
+html.tz-theme .marca-opcional { border: 2px solid var(--tz-border); }
+.marca-falta { background: #b91c1c; color: #ffffff; }
+.listas-grade { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+@media (min-width: 900px) { .listas-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.indicacao { border-radius: 18px; padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+html.tz-theme .indicacao { background: var(--tz-surface); box-shadow: var(--bz-sombra); border: 1px solid color-mix(in srgb, var(--tz-border) 60%, transparent); }
+.indicacao-topo { display: flex; align-items: center; gap: .75rem; }
+.posicao { flex: none; width: 2.25rem; height: 2.25rem; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: .875rem; }
+html.tz-theme .posicao { background: var(--bz-suave); color: var(--tz-text); }
+html.tz-theme .indicacao:first-child .posicao { background: var(--tz-accent); color: var(--bz-sobre-acento); }
+.indicacao-nome { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 1.0625rem; font-weight: 800; }
+.indicacao-nome a { text-decoration: none; }
+.indicacao-nome a:hover { text-decoration: underline; }
+.indicacao-indice { font-size: 1.375rem; font-weight: 800; }
+.etiquetas-pessoa { display: flex; flex-wrap: wrap; gap: .375rem; margin: 0; padding: 0; list-style: none; font-size: .8125rem; }
+.etiquetas-pessoa li { padding: .25rem .625rem; border-radius: 9999px; }
+html.tz-theme .etiquetas-pessoa li { background: var(--bz-campo); }
+html.tz-theme .etiquetas-pessoa li.ok { background: var(--bz-suave-2); font-weight: 700; }
+.indicacao-detalhes, .indicacao-termos { margin: 0; font-size: .8125rem; }
+html.tz-theme .indicacao-detalhes, html.tz-theme .indicacao-termos { color: var(--tz-muted); }
+html.tz-theme .indicacao-termos strong { color: var(--tz-text); }
+.retiradas { border-radius: 16px; padding: 1rem 1.125rem; }
+html.tz-theme .retiradas { background: var(--bz-dica); color: var(--tz-text); }
+.retiradas > summary { font-weight: 800; font-size: .9375rem; cursor: pointer; }
+.score-bar { height: .5rem; }
+/* Os componentes acima usam display:flex/grid: o atributo hidden precisa vencer. */
+[hidden] { display: none !important; }
+/* Zona de risco no mesmo formato dos cartões, com a borda vermelha. */
+.zona-risco { border-radius: 20px; }
+html.tz-theme .zona-risco { background: var(--tz-surface); }
+/* Cartão com <details> dentro (listas recolhidas da Administração). */
+.cartao > details > summary { list-style-position: outside; }
+.cartao.hidden { display: none !important; }
+/* Botões secundários com borda (Administração): também em pílula. */
+html.tz-theme .tab-panel :is(button, label).border-brand-600 { border-radius: 9999px; padding-inline: 1rem; }

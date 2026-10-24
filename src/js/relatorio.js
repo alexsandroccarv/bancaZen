@@ -37,23 +37,23 @@
     function renderEscolhas() {
         const caixa = $('#relEscolhas');
         caixa.innerHTML = resultado.listas.map((l) => {
-            if (!l.resultados.length) return `<p class="text-gray-600 dark:text-gray-400">${esc(l.titulo)}: sem indicações.</p>`;
+            if (!l.resultados.length) return `<div class="subcartao"><p class="font-extrabold m-0">${esc(l.titulo)}</p><p class="ajuda m-0">Sem indicações.</p></div>`;
             const itens = l.resultados.map((r, i) => {
                 const p = r.pessoa;
                 const id = `rel-${l.grupo}-${i}`;
-                return `<li class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <label class="flex items-center gap-2 min-w-0 flex-1">
-                        <input type="checkbox" id="${id}" data-chave="${esc(chave(p))}">
-                        <span>${i + 1}. ${esc(p.nome)} <span class="text-gray-600 dark:text-gray-400">(${esc(p.universidade || p.instituicao || '')}; índice ${fmt.format(r.score)})</span></span>
+                return `<li class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <label class="flex items-center gap-3 min-w-0 flex-1 cursor-pointer">
+                        <input type="checkbox" id="${id}" data-chave="${esc(chave(p))}" class="w-5 h-5 shrink-0">
+                        <span class="min-w-0"><span class="font-bold">${i + 1}. ${esc(p.nome)}</span><br><span class="ajuda">${esc(p.universidade || p.instituicao || '')}; índice ${fmt.format(r.score)}</span></span>
                     </label>
                     <label class="sr-only" for="${id}-papel">Papel de ${esc(p.nome)} na banca</label>
-                    <select id="${id}-papel" data-papel-de="${esc(chave(p))}" class="text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                    <select id="${id}-papel" data-papel-de="${esc(chave(p))}">
                         <option value="titular">Titular</option>
                         <option value="suplente">Suplente</option>
                     </select>
                 </li>`;
             }).join('');
-            return `<div><p class="font-semibold">${esc(l.titulo)}</p><ul class="space-y-1 mt-1">${itens}</ul></div>`;
+            return `<div class="subcartao"><p class="font-extrabold m-0">${esc(l.titulo)}</p><ul class="space-y-3 m-0 p-0 list-none">${itens}</ul></div>`;
         }).join('');
     }
     function escolhidas() {

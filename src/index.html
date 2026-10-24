@@ -103,31 +103,39 @@
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
         <!-- 1. Início: apresentação e processo (Normas Acadêmicas do PROFIAP, item 13) -->
         <div id="tab-inicio" class="tab-panel" role="tabpanel" aria-labelledby="tab-inicio-btn" tabindex="0">
-            <div class="max-w-3xl mx-auto space-y-6">
-                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-3">
-                    <h2 class="text-xl font-bold text-brand-800 dark:text-accent-400">Indicação de docentes para a sua banca</h2>
-                    <p>
-                        O bancaZen apoia a composição das Bancas de Defesa de Projeto de TCC e de Defesa de TCC do
-                        PROFIAP. A partir do título, do resumo e das palavras-chave do seu TCC, compara o trabalho com
-                        os currículos Lattes cadastrados pela coordenação e indica docentes com proximidade temática,
-                        sem vínculos que possam representar conflito de interesses com você ou com a orientação.
-                    </p>
-                    <p id="corpusStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Consultando a base de currículos…</p>
-                    <div><button type="button" data-ir="dissertacao" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Começar <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button></div>
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="cartao cartao-foco">
+                    <div>
+                        <p class="sobretitulo">Etapa 1 de 4 no bancaZen</p>
+                        <h2 class="titulo-secao">Indicação de docentes para a sua banca</h2>
+                        <p class="texto-apoio">
+                            O bancaZen apoia a composição das Bancas de Defesa de Projeto de TCC e de Defesa de TCC do
+                            PROFIAP. A partir do título, do resumo e das palavras-chave do seu TCC, compara o trabalho com
+                            os currículos Lattes cadastrados pela coordenação e indica docentes com proximidade temática,
+                            sem vínculos que possam representar conflito de interesses com você ou com a orientação.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <button type="button" data-ir="dissertacao" class="botao-primario botao-grande">Começar <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
+                        <p id="corpusStatus" class="ajuda m-0" aria-live="polite">Consultando a base de currículos…</p>
+                    </div>
                 </div>
 
-                <section class="space-y-3" aria-labelledby="normaTitulo">
-                    <h2 id="normaTitulo" class="text-lg font-bold">A banca segundo as Normas Acadêmicas</h2>
-                    <p>
+                <section class="cartao" aria-labelledby="normaTitulo">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></span>
+                        <h2 id="normaTitulo" class="cartao-titulo">A banca segundo as Normas Acadêmicas</h2>
+                    </div>
+                    <p class="m-0">
                         Pelo item 13 das Normas Acadêmicas Nacionais do PROFIAP, as Bancas de Defesa de Projeto de TCC
                         e de Defesa de TCC têm, no mínimo, 3 docentes permanentes com o grau de doutor:
                     </p>
-                    <ol class="alineas list-none p-0 space-y-1 pl-4">
+                    <ol class="alineas list-none p-0 m-0 space-y-1 pl-4">
                         <li>a) quem orienta o trabalho;</li>
                         <li>b) docente permanente credenciado da Rede PROFIAP, externo à Instituição Associada;</li>
                         <li>c) docente permanente de um programa externo à Rede PROFIAP.</li>
                     </ol>
-                    <p>
+                    <p class="m-0">
                         Os membros da banca devem ter publicações ou orientações na área temática do trabalho (13.2).
                         É vedada a participação de quem tem parentesco de 1º grau entre si ou com você, de quem foi
                         orientanda ou orientando de quem orienta o trabalho e de quem tem outros vínculos que possam
@@ -135,7 +143,7 @@
                         diferentes no mesmo quadriênio (13.4), e a participação de docentes de universidades
                         estrangeiras é recomendável (13.5).
                     </p>
-                    <p>
+                    <p class="m-0">
                         A Instituição Associada submete os nomes ao Comitê Gestor Nacional, com o formulário, o TCC e a
                         comprovação da produção intelectual (13.6 e 13.7). A resposta vem em até 10 dias úteis; sem
                         manifestação nesse prazo, a banca está aprovada (13.8 a 13.10).
@@ -143,38 +151,44 @@
                     </p>
                 </section>
 
-                <section class="space-y-3" aria-labelledby="comoTitulo">
-                    <h2 id="comoTitulo" class="text-lg font-bold">Como funciona</h2>
-                    <ol class="space-y-3 list-none p-0">
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Meu TCC</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe a sua Instituição Associada e o título, o resumo e as palavras-chave do TCC (Dissertação ou Artigo Científico). Em "Orientação" (opcional, para a verificação de vínculos), informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta, em XML ou ZIP, ou o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></div></li>
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Composição da banca</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 docentes, da maior para a menor proximidade temática: Rede PROFIAP (13.1 b) e Programa externo à Rede PROFIAP (13.1 c).</p></div></li>
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span><div><p class="font-semibold">Relatório</p><p class="text-sm text-gray-600 dark:text-gray-400">Marque quem vai compor a banca e gere a declaração da indicação, com as indicações, o índice de proximidade e a verificação de vínculos, para anexar ao pedido de aprovação da banca ao Comitê Gestor Nacional.</p></div></li>
+                <section class="cartao" aria-labelledby="comoTitulo">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-route"></i></span>
+                        <h2 id="comoTitulo" class="cartao-titulo">Como funciona</h2>
+                    </div>
+                    <ol class="grade-2 list-none p-0 m-0">
+                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><p class="font-bold m-0">2. Meu TCC</p><p class="ajuda m-0">Informe a sua Instituição Associada e o título, o resumo e as palavras-chave do TCC (Dissertação ou Artigo Científico). Em "Orientação" (opcional, para a verificação de vínculos), informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta, em XML ou ZIP, ou o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></li>
+                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><p class="font-bold m-0">3. Composição da banca</p><p class="ajuda m-0">Receba duas listas, cada uma com até 10 docentes, da maior para a menor proximidade temática: Rede PROFIAP (13.1 b) e Programa externo à Rede PROFIAP (13.1 c).</p></li>
+                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span><p class="font-bold m-0">4. Relatório</p><p class="ajuda m-0">Marque quem vai compor a banca e gere a declaração da indicação, com as indicações, o índice de proximidade e a verificação de vínculos, para anexar ao pedido de aprovação da banca ao Comitê Gestor Nacional.</p></li>
                     </ol>
                 </section>
 
-                <section class="space-y-2" aria-labelledby="conferenciaNormaTitulo">
-                    <h2 id="conferenciaNormaTitulo" class="text-lg font-bold">O que o bancaZen confere</h2>
-                    <ul class="list-disc list-inside space-y-1">
+                <section class="cartao" aria-labelledby="conferenciaNormaTitulo">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco verde" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
+                        <h2 id="conferenciaNormaTitulo" class="cartao-titulo">O que o bancaZen confere</h2>
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 m-0 p-0">
                         <li>Proximidade temática com publicações, orientações e bancas avaliadas (apoio ao item 13.2).</li>
                         <li>Coautoria, relação de orientação e identidade de pessoa com você, com quem orienta e com quem coorienta (apoio ao item 13.3, alíneas b e c).</li>
                         <li>Docentes permanentes, externos à sua Instituição Associada e com o grau de doutor, pelos critérios da busca (13.1). A situação no programa vem da planilha de docentes; sem ela, o currículo fica fora da busca quando o critério de docentes permanentes está marcado.</li>
                     </ul>
-                    <p>
-                        Ficam com você e com a orientação: o parentesco, os vínculos sem registro no Lattes, a repetição de
-                        composição no quadriênio e o pedido ao Comitê Gestor Nacional.
-                    </p>
+                    <p class="dica m-0"><i aria-hidden="true" class="fa-regular fa-lightbulb"></i><span>Ficam com você e com a orientação: o parentesco, os vínculos sem registro no Lattes, a repetição de composição no quadriênio e o pedido ao Comitê Gestor Nacional.</span></p>
                 </section>
 
-                <section class="space-y-2" aria-labelledby="calculoTitulo">
-                    <h2 id="calculoTitulo" class="text-lg font-bold">Como a proximidade é calculada</h2>
-                    <p>
+                <section class="cartao" aria-labelledby="calculoTitulo">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-calculator"></i></span>
+                        <h2 id="calculoTitulo" class="cartao-titulo">Como a proximidade é calculada</h2>
+                    </div>
+                    <p class="m-0">
                         Cada currículo é descrito pelos termos do resumo, das linhas de pesquisa, das áreas do
                         conhecimento, das palavras-chave, dos títulos da formação, dos projetos (nome e descrição),
                         dos artigos e demais produções, das orientações e dos trabalhos avaliados em bancas de
                         mestrado, doutorado e qualificação. Artigos e bancas pesam mais que as demais produções. O seu
                         TCC é descrito da mesma forma, com peso maior para as palavras-chave e o título.
                     </p>
-                    <p>
+                    <p class="m-0">
                         A pontuação segue o modelo BM25: termos raros entre os currículos valem mais do que termos
                         comuns a todos, repetir o mesmo termo rende cada vez menos e currículos extensos não levam
                         vantagem só pelo volume. Produções com mais de 10 anos pesam menos. A proximidade, de 0 a 1, é
@@ -186,233 +200,306 @@
                     </p>
                 </section>
 
-                <section class="space-y-2" aria-labelledby="eticaTitulo">
-                    <h2 id="eticaTitulo" class="text-lg font-bold">Vínculos e conflito de interesses</h2>
-                    <p>
-                        Uma indicação sai das listas quando há coautoria em publicação (procurada nos currículos dos
-                        dois lados), relação de orientação com você, com quem orienta ou com quem coorienta, ou quando
-                        se trata de uma dessas pessoas (item 13.3). Ela aparece à parte, com o motivo. O vínculo é
-                        "confirmado" quando a identificação é pelo ID Lattes ou pelo nome completo, e "provável"
-                        quando só o sobrenome e as iniciais coincidem (pode haver homonímia).
-                    </p>
-                </section>
+                <div class="grade-2">
+                    <section class="cartao" aria-labelledby="eticaTitulo">
+                        <div class="cartao-cab">
+                            <span class="icone-bloco verde" aria-hidden="true"><i class="fa-solid fa-user-shield"></i></span>
+                            <h2 id="eticaTitulo" class="cartao-titulo">Vínculos e conflito de interesses</h2>
+                        </div>
+                        <p class="m-0">
+                            Uma indicação sai das listas quando há coautoria em publicação (procurada nos currículos dos
+                            dois lados), relação de orientação com você, com quem orienta ou com quem coorienta, ou quando
+                            se trata de uma dessas pessoas (item 13.3). Ela aparece à parte, com o motivo. O vínculo é
+                            "confirmado" quando a identificação é pelo ID Lattes ou pelo nome completo, e "provável"
+                            quando só o sobrenome e as iniciais coincidem (pode haver homonímia).
+                        </p>
+                    </section>
 
-                <section class="space-y-2" aria-labelledby="privacidadeTitulo">
-                    <h2 id="privacidadeTitulo" class="text-lg font-bold">Seus dados</h2>
-                    <p>
-                        Os currículos que você envia em "Meu TCC" são usados só na consulta e não são guardados. Os
-                        currículos da base ficam no servidor, fora da área pública do site: o navegador recebe apenas
-                        o resultado.
-                    </p>
-                </section>
+                    <section class="cartao" aria-labelledby="privacidadeTitulo">
+                        <div class="cartao-cab">
+                            <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+                            <h2 id="privacidadeTitulo" class="cartao-titulo">Seus dados</h2>
+                        </div>
+                        <p class="m-0">
+                            Os currículos que você envia em "Meu TCC" são usados só na consulta e não são guardados. Os
+                            currículos da base ficam no servidor, fora da área pública do site: o navegador recebe apenas
+                            o resultado.
+                        </p>
+                    </section>
+                </div>
             </div>
         </div>
 
         <!-- 2. Meu TCC (trecho #dissertacao) -->
         <div id="tab-dissertacao" class="tab-panel" role="tabpanel" aria-labelledby="tab-dissertacao-btn" tabindex="0" hidden>
-            <div class="max-w-3xl mx-auto space-y-4">
-                <div class="flex items-center gap-2">
-                    <h2 class="text-lg font-bold">Meu TCC</h2>
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="flex flex-wrap items-end gap-4">
+                    <div class="flex-1 min-w-0">
+                        <p class="sobretitulo">Etapa 2 de 4 no bancaZen</p>
+                        <h2 class="titulo-secao">Meu TCC</h2>
+                        <p class="texto-apoio">Conte sobre o seu trabalho. Quanto mais completos o resumo e as palavras-chave, melhor a comparação com os currículos.</p>
+                    </div>
                     <!-- Exportar/importar os dados desta seção (arquivo JSON, só no seu computador). -->
-                    <div class="ml-auto flex items-center gap-1">
-                        <button type="button" id="exportarJsonBtn" class="botao-discreto" aria-label="Exportar meus dados (arquivo JSON)" title="Exportar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-down"></i></button>
-                        <button type="button" id="importarJsonBtn" class="botao-discreto" aria-label="Importar meus dados (arquivo JSON)" title="Importar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i></button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" id="exportarJsonBtn" class="botao-redondo" aria-label="Exportar meus dados (arquivo JSON)" title="Exportar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-down"></i></button>
+                        <button type="button" id="importarJsonBtn" class="botao-redondo" aria-label="Importar meus dados (arquivo JSON)" title="Importar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i></button>
                         <input id="importarJsonInput" type="file" accept=".json,application/json" class="sr-only" tabindex="-1" aria-hidden="true">
                     </div>
                 </div>
-                <p id="jsonStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Quanto mais completos o resumo e as palavras-chave, melhor a comparação com os currículos.</p>
-                <div>
-                    <label for="nomeInput" class="block text-sm font-medium mb-1">Meu nome</label>
-                    <input id="nomeInput" type="text" autocomplete="name" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                </div>
-                <div class="envolvido space-y-1" data-papel="discente">
-                    <p class="text-sm font-medium" id="discenteRotulo">Meu currículo Lattes <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional, para a verificação de vínculos)</span></p>
-                    <div class="grid gap-2 sm:grid-cols-2">
+                <p id="jsonStatus" class="ajuda m-0" aria-live="polite"></p>
+
+                <!-- Etapas do preenchimento (estado calculado em app.js: feito, atual, pendente). -->
+                <ol id="etapasTcc" class="etapas" aria-label="Etapas do preenchimento">
+                    <li class="etapa" data-estado="atual" data-alvo="cartaoVoce"><button type="button"><span class="etapa-num" aria-hidden="true"><span class="etapa-n">1</span><i class="etapa-feito fa-solid fa-check"></i></span><span class="etapa-rotulo">Sobre você</span><span class="sr-only etapa-estado"></span></button></li>
+                    <li class="etapa" data-estado="pendente" data-alvo="cartaoTcc"><button type="button"><span class="etapa-num" aria-hidden="true"><span class="etapa-n">2</span><i class="etapa-feito fa-solid fa-check"></i></span><span class="etapa-rotulo">O TCC</span><span class="sr-only etapa-estado"></span></button></li>
+                    <li class="etapa" data-estado="pendente" data-alvo="orientacao"><button type="button"><span class="etapa-num" aria-hidden="true"><span class="etapa-n">3</span><i class="etapa-feito fa-solid fa-check"></i></span><span class="etapa-rotulo">Orientação (opcional)</span><span class="sr-only etapa-estado"></span></button></li>
+                </ol>
+
+                <section id="cartaoVoce" class="cartao" aria-labelledby="voceTitulo" tabindex="-1">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+                        <h3 id="voceTitulo" class="cartao-titulo">Sobre você</h3>
+                    </div>
+                    <div class="grade-2">
                         <div>
-                            <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
-                            <input id="discenteArquivo" type="file" accept=".xml,.zip" aria-describedby="discenteRotulo discenteStatus" class="block w-full text-sm">
+                            <label for="nomeInput" class="rotulo">Meu nome</label>
+                            <input id="nomeInput" type="text" autocomplete="name" class="w-full">
                         </div>
                         <div>
-                            <label for="discenteId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
-                            <input id="discenteId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="discenteRotulo discenteStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <label for="universidadeInput" class="rotulo">Minha Instituição Associada</label>
+                            <select id="universidadeInput" aria-describedby="universidadeAjuda" class="w-full">
+                                <option value="">Selecione…</option>
+                                <option value="__outra__">Outra (digitar)</option>
+                            </select>
+                            <label for="universidadeOutraInput" class="sr-only">Nome da Instituição Associada</label>
+                            <input id="universidadeOutraInput" type="text" autocomplete="organization" placeholder="Digite o nome da Instituição Associada" class="w-full mt-2" hidden>
                         </div>
                     </div>
-                    <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                </div>
-                <div>
-                    <label for="universidadeInput" class="block text-sm font-medium mb-1">Minha Instituição Associada</label>
-                    <select id="universidadeInput" aria-describedby="universidadeAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                        <option value="">Selecione…</option>
-                        <option value="__outra__">Outra (digitar)</option>
-                    </select>
-                    <label for="universidadeOutraInput" class="sr-only">Nome da Instituição Associada</label>
-                    <input id="universidadeOutraInput" type="text" autocomplete="organization" placeholder="Digite o nome da Instituição Associada" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 mt-2" hidden>
-                    <p id="universidadeAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Os currículos de docentes desta instituição ficam fora da busca, pois a Norma pede docentes externos à Instituição Associada (critério ajustável em Composição da banca).</p>
-                </div>
-                    <div>
-                        <label for="tituloInput" class="block text-sm font-medium mb-1">Título do TCC</label>
-                        <input id="tituloInput" type="text" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                    </div>
-                    <div>
-                        <label for="resumoInput" class="block text-sm font-medium mb-1">Resumo</label>
-                        <textarea id="resumoInput" rows="7" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400"></textarea>
-                    </div>
-                    <div>
-                        <label for="palavrasInput" class="block text-sm font-medium mb-1">Palavras-chave</label>
-                        <input id="palavrasInput" type="text" aria-describedby="palavrasAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                        <p id="palavrasAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separe por ponto e vírgula ou vírgula. Ex.: governança pública; transparência; controle social</p>
-                    </div>
-                <section id="orientacao" class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700" aria-labelledby="orientacaoTitulo">
-                    <h3 id="orientacaoTitulo" class="text-base font-bold">Orientação <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Recomendada. Informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta
-                        (o seu fica logo abaixo de "Meu nome"): eles são usados para retirar das indicações quem tem
-                        coautoria em publicações ou relação de orientação com alguma dessas pessoas, vínculos que podem
-                        representar conflito de interesses (item 13.3). Só com o nome, a verificação é parcial: procura
-                        o nome nas coautorias e orientações de cada indicação.
-                        Sem nome nem currículo, a busca funciona, mas o resultado avisa que os vínculos não foram
-                        verificados. Os arquivos enviados aqui são usados só na consulta e não são guardados.
-                    </p>
-                <div class="space-y-4">
-                            <div class="envolvido space-y-1" data-papel="orientador">
-                                <p class="text-sm font-medium" id="orientadorRotulo">Orientação <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
-                                <div>
-                                    <label for="orientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome de quem orienta</label>
-                                    <input id="orientadorNome" type="text" autocomplete="off" aria-describedby="orientadorRotulo orientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                </div>
-                                <div class="grid gap-2 sm:grid-cols-2">
-                                    <div>
-                                        <label for="orientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
-                                        <input id="orientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="orientadorRotulo orientadorStatus" class="block w-full text-sm">
-                                    </div>
-                                    <div>
-                                        <label for="orientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
-                                        <input id="orientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="orientadorRotulo orientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                    </div>
-                                </div>
-                                <p id="orientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                            </div>
-                            <div class="envolvido space-y-1" data-papel="coorientador">
-                                <p class="text-sm font-medium" id="coorientadorRotulo">Coorientação <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
-                                <div>
-                                    <label for="coorientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome de quem coorienta</label>
-                                    <input id="coorientadorNome" type="text" autocomplete="off" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                </div>
-                                <div class="grid gap-2 sm:grid-cols-2">
-                                    <div>
-                                        <label for="coorientadorArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
-                                        <input id="coorientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="coorientadorRotulo coorientadorStatus" class="block w-full text-sm">
-                                    </div>
-                                    <div>
-                                        <label for="coorientadorId" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">ou link/ID Lattes (se o currículo já está na base)</label>
-                                        <input id="coorientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                    </div>
-                                </div>
-                                <p id="coorientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
-                            </div>
+                    <p id="universidadeAjuda" class="ajuda m-0">Os currículos de docentes desta instituição ficam fora da busca, pois a Norma pede docentes externos à Instituição Associada (critério ajustável em Composição da banca).</p>
+                    <div class="envolvido" data-papel="discente">
+                        <p class="rotulo" id="discenteRotulo">Meu currículo Lattes <span class="font-normal opacity-80">(opcional, para a verificação de vínculos)</span></p>
+                        <div class="grade-2">
+                            <label class="soltar">
+                                <span class="soltar-icone" aria-hidden="true"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                                <span class="soltar-texto"><span class="soltar-titulo">Enviar XML ou ZIP do Lattes</span><span class="soltar-nome">Arraste o arquivo para cá ou clique</span></span>
+                                <input id="discenteArquivo" type="file" accept=".xml,.zip" aria-describedby="discenteRotulo discenteStatus" class="sr-only">
+                            </label>
                             <div>
-                                <label for="periodoInput" class="block text-sm mb-1">Coautorias consideradas</label>
-                                <select id="periodoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                    <option value="0">Todo o período</option>
-                                    <option value="10">Últimos 10 anos</option>
-                                    <option value="5">Últimos 5 anos</option>
-                                </select>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Relações de orientação valem em qualquer período.</p>
+                                <label for="discenteId" class="ajuda block mt-0 mb-1">ou o link do Lattes, se o currículo já está na base</label>
+                                <input id="discenteId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="discenteRotulo discenteStatus" class="w-full">
                             </div>
+                        </div>
+                        <p id="discenteStatus" class="ajuda" aria-live="polite"></p>
                     </div>
                 </section>
+
+                <section id="cartaoTcc" class="cartao" aria-labelledby="tccTitulo" tabindex="-1">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span>
+                        <h3 id="tccTitulo" class="cartao-titulo flex-1">O TCC</h3>
+                        <span id="tccContagem" class="selo">0 de 3 campos</span>
+                    </div>
+                    <div>
+                        <label for="tituloInput" class="rotulo">Título do TCC</label>
+                        <input id="tituloInput" type="text" required class="w-full font-semibold">
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <label for="resumoInput" class="rotulo flex-1">Resumo</label>
+                            <span id="resumoContagem" class="ajuda m-0">0 palavras</span>
+                        </div>
+                        <textarea id="resumoInput" rows="7" placeholder="Cole aqui o resumo do trabalho" class="w-full"></textarea>
+                    </div>
+                    <div>
+                        <label for="palavraNovaInput" class="rotulo">Palavras-chave</label>
+                        <!-- As etiquetas gravam o texto em #palavrasInput (separado por "; "), lido pela busca e pelo JSON. -->
+                        <div class="etiquetas-campo">
+                            <ul id="palavrasLista" class="etiquetas-lista" aria-label="Palavras-chave informadas"></ul>
+                            <input id="palavraNovaInput" type="text" placeholder="Digite e tecle Enter" aria-describedby="palavrasAjuda" autocomplete="off">
+                        </div>
+                        <input id="palavrasInput" type="hidden">
+                        <p id="palavrasAjuda" class="ajuda">Tecle Enter, vírgula ou ponto e vírgula para separar. Ex.: governança pública; transparência; controle social</p>
+                        <p id="palavrasAviso" class="sr-only" aria-live="polite"></p>
+                    </div>
+                    <p class="dica m-0"><i aria-hidden="true" class="fa-regular fa-lightbulb"></i><span>Dica: use os mesmos termos do resumo publicado. Palavras-chave e título pesam mais na comparação.</span></p>
+                </section>
+
+                <section id="orientacao" class="cartao" aria-labelledby="orientacaoTitulo" tabindex="-1">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco verde" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
+                        <div class="flex-1">
+                            <h3 id="orientacaoTitulo" class="cartao-titulo">Orientação <span class="opcional">(opcional)</span></h3>
+                        </div>
+                    </div>
+                    <p class="ajuda m-0">
+                        Recomendada. Informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta
+                        (o seu fica em "Sobre você"): eles são usados para retirar das indicações quem tem coautoria em
+                        publicações ou relação de orientação com alguma dessas pessoas, vínculos que podem representar
+                        conflito de interesses (item 13.3). Só com o nome, a verificação é parcial: procura o nome nas
+                        coautorias e orientações de cada indicação. Sem nome nem currículo, a busca funciona, mas o
+                        resultado avisa que os vínculos não foram verificados. Os arquivos enviados aqui são usados só
+                        na consulta e não são guardados.
+                    </p>
+                    <div class="grade-2">
+                        <div class="envolvido subcartao" data-papel="orientador">
+                            <p class="font-extrabold m-0" id="orientadorRotulo">Orientação</p>
+                            <div>
+                                <label for="orientadorNome" class="rotulo">Nome de quem orienta</label>
+                                <input id="orientadorNome" type="text" autocomplete="off" aria-describedby="orientadorRotulo orientadorStatus" class="w-full">
+                            </div>
+                            <label class="soltar">
+                                <span class="soltar-icone" aria-hidden="true"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                                <span class="soltar-texto"><span class="soltar-titulo">XML ou ZIP do Lattes</span><span class="soltar-nome">Arraste o arquivo ou clique</span></span>
+                                <input id="orientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="orientadorRotulo orientadorStatus" class="sr-only">
+                            </label>
+                            <div>
+                                <label for="orientadorId" class="ajuda block mt-0 mb-1">ou o link do Lattes, se o currículo já está na base</label>
+                                <input id="orientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="orientadorRotulo orientadorStatus" class="w-full">
+                            </div>
+                            <p id="orientadorStatus" class="ajuda m-0" aria-live="polite"></p>
+                        </div>
+                        <div class="envolvido subcartao" data-papel="coorientador">
+                            <p class="font-extrabold m-0" id="coorientadorRotulo">Coorientação</p>
+                            <div>
+                                <label for="coorientadorNome" class="rotulo">Nome de quem coorienta</label>
+                                <input id="coorientadorNome" type="text" autocomplete="off" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full">
+                            </div>
+                            <label class="soltar">
+                                <span class="soltar-icone" aria-hidden="true"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                                <span class="soltar-texto"><span class="soltar-titulo">XML ou ZIP do Lattes</span><span class="soltar-nome">Arraste o arquivo ou clique</span></span>
+                                <input id="coorientadorArquivo" type="file" accept=".xml,.zip" aria-describedby="coorientadorRotulo coorientadorStatus" class="sr-only">
+                            </label>
+                            <div>
+                                <label for="coorientadorId" class="ajuda block mt-0 mb-1">ou o link do Lattes, se o currículo já está na base</label>
+                                <input id="coorientadorId" type="text" inputmode="url" placeholder="http://lattes.cnpq.br/0000000000000000" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full">
+                            </div>
+                            <p id="coorientadorStatus" class="ajuda m-0" aria-live="polite"></p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <label for="periodoInput" class="rotulo m-0">Coautorias consideradas</label>
+                        <select id="periodoInput">
+                            <option value="0">Todo o período</option>
+                            <option value="10">Últimos 10 anos</option>
+                            <option value="5">Últimos 5 anos</option>
+                        </select>
+                        <span class="ajuda m-0">Relações de orientação valem em qualquer período.</span>
+                    </div>
+                </section>
+
                 <div class="flex justify-end">
-                    <button type="button" data-ir="bancas" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Próximo: Composição da banca <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
+                    <button type="button" data-ir="bancas" class="botao-primario botao-grande">Próximo: Composição da banca <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
                 </div>
             </div>
         </div>
 
         <!-- 3. Composição da banca (trecho #bancas) -->
         <div id="tab-bancas" class="tab-panel" role="tabpanel" aria-labelledby="tab-bancas-btn" tabindex="0" hidden>
-            <div class="max-w-3xl mx-auto space-y-6">
-                <h2 class="text-lg font-bold">Composição da banca</h2>
-                <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-2" aria-labelledby="conferenciaTitulo" role="group">
-                    <h3 id="conferenciaTitulo" class="font-semibold">Antes de buscar</h3>
-                    <ul id="conferencia" class="space-y-1 text-sm list-none p-0"></ul>
+            <div class="max-w-5xl mx-auto space-y-6">
+                <div>
+                    <p class="sobretitulo">Etapa 3 de 4 no bancaZen</p>
+                    <h2 class="titulo-secao">Composição da banca</h2>
+                    <p class="texto-apoio">Indicação de docentes para os itens 13.1 b e 13.1 c das Normas Acadêmicas. Quem orienta completa a banca (13.1 a).</p>
                 </div>
-                <form id="buscaForm" class="space-y-4" novalidate>
-                    <fieldset class="border border-gray-200 dark:border-gray-700 rounded p-4 space-y-3">
-                        <legend class="text-sm font-semibold px-1">Critérios da busca</legend>
-                        <div>
-                            <label for="excluirInput" class="block text-sm mb-1">Desconsiderar docentes desta instituição (a sua Instituição Associada; vem de "Minha Instituição Associada")</label>
-                            <input id="excluirInput" type="text" placeholder="Ex.: Universidade Federal de São Paulo" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                <div class="grade-2">
+                    <div class="cartao" aria-labelledby="conferenciaTitulo" role="group">
+                        <div class="cartao-cab">
+                            <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
+                            <h3 id="conferenciaTitulo" class="cartao-titulo">Antes de buscar</h3>
                         </div>
-                        <label class="flex items-center gap-2 text-sm">
-                            <input id="doutoresInput" type="checkbox" checked> Somente docentes com o grau de doutor
-                        </label>
-                        <label class="flex items-center gap-2 text-sm">
-                            <input id="permanentesInput" type="checkbox" checked> Somente docentes permanentes
-                        </label>
-                    </fieldset>
-                    <p id="buscaErro" class="text-sm text-red-700 dark:text-red-400 hidden" role="alert"></p>
-                    <button type="submit" id="buscarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">
-                        <i aria-hidden="true" class="fa-solid fa-magnifying-glass"></i> Indicar docentes
-                    </button>
-                </form>
+                        <ul id="conferencia" class="space-y-2 list-none p-0 m-0"></ul>
+                    </div>
+                    <form id="buscaForm" class="cartao cartao-foco" novalidate aria-labelledby="criteriosTitulo">
+                        <div class="cartao-cab">
+                            <span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
+                            <h3 id="criteriosTitulo" class="cartao-titulo">Critérios da busca</h3>
+                        </div>
+                        <div>
+                            <label for="excluirInput" class="rotulo">Desconsiderar docentes desta instituição</label>
+                            <input id="excluirInput" type="text" placeholder="Ex.: Universidade Federal de São Paulo" aria-describedby="excluirAjuda" class="w-full">
+                            <p id="excluirAjuda" class="ajuda">A sua Instituição Associada; vem de "Minha Instituição Associada".</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="opcao-pilula"><input id="doutoresInput" type="checkbox" checked> Somente docentes com o grau de doutor</label>
+                            <label class="opcao-pilula"><input id="permanentesInput" type="checkbox" checked> Somente docentes permanentes</label>
+                        </div>
+                        <p id="buscaErro" class="text-sm text-red-700 dark:text-red-400 hidden m-0" role="alert"></p>
+                        <button type="submit" id="buscarBtn" class="botao-primario">
+                            <i aria-hidden="true" class="fa-solid fa-magnifying-glass"></i> Indicar docentes
+                        </button>
+                    </form>
+                </div>
 
-                <section id="resultado" class="space-y-3 hidden" aria-labelledby="resultadoTitulo" tabindex="-1">
-                    <h3 id="resultadoTitulo" class="text-lg font-bold">Docentes com maior proximidade temática</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Duas listas, cada uma com até 10 docentes sem vínculo identificado, da maior para a menor
-                        proximidade (0 a 1): Rede PROFIAP (docente permanente credenciado da Rede PROFIAP, externo à
-                        Instituição Associada, item 13.1 b) e Programa externo à Rede PROFIAP (item 13.1 c). Quem
-                        orienta completa a banca (13.1 a).
-                    </p>
+                <section id="resultado" class="space-y-5 hidden" aria-labelledby="resultadoTitulo" tabindex="-1">
+                    <div>
+                        <h3 id="resultadoTitulo" class="cartao-titulo">Docentes com maior proximidade temática</h3>
+                        <p class="ajuda">
+                            Duas listas, cada uma com até 10 docentes sem vínculo identificado, da maior para a menor
+                            proximidade (0 a 1): Rede PROFIAP (docente permanente credenciado da Rede PROFIAP, externo à
+                            Instituição Associada, item 13.1 b) e Programa externo à Rede PROFIAP (item 13.1 c).
+                        </p>
+                    </div>
                     <div id="conformidadeResultado" aria-live="polite"></div>
-                    <div id="listas" class="space-y-8"></div>
+                    <div id="listas" class="listas-grade"></div>
+                    <div class="flex justify-end">
+                        <button type="button" data-ir="relatorio" class="botao-primario botao-grande">Próximo: Relatório <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
+                    </div>
                 </section>
             </div>
         </div>
 
         <!-- 4. Relatório (js/relatorio.js; gerado no navegador, nada vai ao servidor) -->
         <div id="tab-relatorio" class="tab-panel" role="tabpanel" aria-labelledby="tab-relatorio-btn" tabindex="0" hidden>
-            <div class="max-w-3xl mx-auto space-y-4">
-                <h2 class="text-lg font-bold">Relatório</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Gere a declaração da indicação dos membros da banca, para anexar ao pedido de aprovação ao
-                    Comitê Gestor Nacional (itens 13.6 e 13.7 das Normas Acadêmicas). Ela registra o processo de
-                    indicação, a verificação de vínculos, as indicações do bancaZen com o índice de proximidade e a
-                    composição proposta. O documento é
-                    montado no seu navegador e não é guardado no servidor.
-                </p>
-                <div id="relSemBusca" class="rounded-lg border border-gray-300 dark:border-gray-600 p-4 text-sm space-y-2">
-                    <p>Faça antes a busca em "Composição da banca": o relatório usa o resultado dela.</p>
-                    <button type="button" data-ir="bancas" class="text-brand-600 dark:text-accent-400 hover:underline font-medium">Ir para Composição da banca</button>
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <p class="sobretitulo">Etapa 4 de 4 no bancaZen</p>
+                    <h2 class="titulo-secao">Relatório</h2>
+                    <p class="texto-apoio">
+                        Gere a declaração da indicação dos membros da banca, para anexar ao pedido de aprovação ao
+                        Comitê Gestor Nacional (itens 13.6 e 13.7 das Normas Acadêmicas). Ela registra o processo de
+                        indicação, a verificação de vínculos, as indicações do bancaZen com o índice de proximidade e a
+                        composição proposta. O documento é montado no seu navegador e não é guardado no servidor.
+                    </p>
                 </div>
-                <form id="relForm" class="space-y-4" hidden>
+                <div id="relSemBusca" class="dica">
+                    <i aria-hidden="true" class="fa-solid fa-circle-info"></i>
+                    <div class="space-y-2">
+                        <p class="m-0">Faça antes a busca em "Composição da banca": o relatório usa o resultado dela.</p>
+                        <button type="button" data-ir="bancas" class="botao-secundario">Ir para Composição da banca</button>
+                    </div>
+                </div>
+                <form id="relForm" class="cartao cartao-foco" hidden aria-labelledby="relFormTitulo">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span>
+                        <h3 id="relFormTitulo" class="cartao-titulo">Dados da declaração</h3>
+                    </div>
                     <div class="grid gap-4 sm:grid-cols-3">
                         <div>
-                            <label for="relTipoInput" class="block text-sm font-medium mb-1">Banca</label>
-                            <select id="relTipoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <label for="relTipoInput" class="rotulo">Banca</label>
+                            <select id="relTipoInput" class="w-full">
                                 <option value="tcc">Banca de Defesa de TCC</option>
                                 <option value="projeto">Banca de Defesa de Projeto de TCC</option>
                             </select>
                         </div>
                         <div>
-                            <label for="relProgramaInput" class="block text-sm font-medium mb-1">Programa</label>
-                            <input id="relProgramaInput" type="text" value="Mestrado Profissional em Administração Pública em Rede Nacional (PROFIAP)" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <label for="relProgramaInput" class="rotulo">Programa</label>
+                            <input id="relProgramaInput" type="text" value="Mestrado Profissional em Administração Pública em Rede Nacional (PROFIAP)" class="w-full">
                         </div>
                         <div>
-                            <label for="relLocalInput" class="block text-sm font-medium mb-1">Local <span class="font-normal text-gray-600 dark:text-gray-400">(cidade)</span></label>
-                            <input id="relLocalInput" type="text" placeholder="Ex.: São Paulo" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <label for="relLocalInput" class="rotulo">Local <span class="font-normal opacity-80">(cidade)</span></label>
+                            <input id="relLocalInput" type="text" placeholder="Ex.: São Paulo" class="w-full">
                         </div>
                     </div>
-                    <fieldset class="space-y-2">
-                        <legend class="text-sm font-medium mb-1">Composição proposta</legend>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">Marque, entre as indicações, quem vai compor a banca e o papel de cada docente.</p>
-                        <div id="relEscolhas" class="space-y-4 text-sm"></div>
+                    <fieldset class="space-y-3 border-0 p-0 m-0">
+                        <legend class="rotulo">Composição proposta</legend>
+                        <p class="ajuda m-0">Marque, entre as indicações, quem vai compor a banca e o papel de cada docente.</p>
+                        <div id="relEscolhas" class="grade-2"></div>
                     </fieldset>
                     <div id="relAviso" class="text-sm" aria-live="polite"></div>
-                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium"><i aria-hidden="true" class="fa-solid fa-file-signature"></i> Gerar relatório</button>
+                    <div><button type="submit" class="botao-primario botao-grande"><i aria-hidden="true" class="fa-solid fa-file-signature"></i> Gerar relatório</button></div>
                 </form>
                 <div id="relAcoes" class="flex flex-wrap gap-2" hidden>
-                    <button type="button" id="relImprimirBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 font-medium"><i aria-hidden="true" class="fa-solid fa-print"></i> Imprimir ou salvar em PDF</button>
+                    <button type="button" id="relImprimirBtn" class="botao-secundario"><i aria-hidden="true" class="fa-solid fa-print"></i> Imprimir ou salvar em PDF</button>
                 </div>
                 <article id="relDocumento" class="documento" aria-label="Relatório gerado" hidden></article>
             </div>
@@ -421,8 +508,11 @@
         <!-- Engrenagem: Configurações (preferências) e Administração (js/admin.js; só consulta o servidor quando o painel é aberto) -->
         <div id="tab-config" class="tab-panel" role="tabpanel" aria-labelledby="headerConfigBtn" tabindex="0" hidden>
             <div class="max-w-5xl mx-auto space-y-8">
-                <section class="max-w-md space-y-6" aria-labelledby="preferenciasTitulo">
-                <h2 id="preferenciasTitulo" class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-gear text-brand-600 dark:text-accent-400"></i> Configurações</h2>
+                <section class="cartao max-w-xl" aria-labelledby="preferenciasTitulo">
+                <div class="cartao-cab">
+                    <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-gear"></i></span>
+                    <h2 id="preferenciasTitulo" class="cartao-titulo">Configurações</h2>
+                </div>
                 <div>
                     <label for="userNameInput" class="block text-sm font-medium mb-1">Nome:</label>
                     <input id="userNameInput" type="text" placeholder="Digite um nome"
@@ -432,7 +522,7 @@
                     </p>
                 </div>
 
-                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div>
                     <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
                         <i aria-hidden="true" class="fa-solid fa-palette text-brand-600 dark:text-accent-400"></i> Tema
                     </h3>
@@ -456,10 +546,13 @@
                     </div>
                 </div>
             </section>
-            <section id="administracao" class="space-y-6 pt-6 border-t border-gray-200 dark:border-gray-700" aria-labelledby="adminTitulo">
-                <h2 id="adminTitulo" class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-user-shield text-brand-600 dark:text-accent-400"></i> Administração</h2>
+            <section id="administracao" class="space-y-6" aria-labelledby="adminTitulo">
+                <div class="cartao-cab">
+                    <span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-user-shield"></i></span>
+                    <h2 id="adminTitulo" class="titulo-secao">Administração</h2>
+                </div>
             <!-- Entrada -->
-            <section id="entrada" class="hidden max-w-sm space-y-3" aria-labelledby="entradaTitulo">
+            <section id="entrada" class="hidden cartao max-w-md" aria-labelledby="entradaTitulo">
                 <h3 id="entradaTitulo" class="text-lg font-bold">Entrar</h3>
                 <form id="entrarForm" class="space-y-3">
                     <div>
@@ -477,7 +570,7 @@
                     <button type="button" id="sairBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded border border-brand-600 text-brand-600 dark:text-accent-400 dark:border-accent-400 hover:bg-brand-50 dark:hover:bg-gray-800 text-sm font-medium"><i aria-hidden="true" class="fa-solid fa-right-from-bracket"></i> Sair</button>
                 </div>
 
-                <section class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="envioTitulo">
+                <section class="cartao cartao-foco" aria-labelledby="envioTitulo">
                     <h3 id="envioTitulo" class="text-lg font-bold text-brand-800 dark:text-accent-400">Cadastrar docentes e currículos</h3>
                     <p class="text-sm">
                         Envie, num só lugar, a <strong>planilha de docentes</strong> (CSV) e os
@@ -545,7 +638,7 @@
                     <div id="relatorio" class="text-sm space-y-2" aria-live="polite"></div>
                 </section>
 
-                <section class="space-y-3" aria-labelledby="cfTitulo">
+                <section class="cartao" aria-labelledby="cfTitulo">
                     <h3 id="cfTitulo" class="text-lg font-bold">Conferência: currículos e planilha</h3>
                     <div class="grid gap-3 sm:grid-cols-2">
                         <div class="rounded-lg border border-gray-300 dark:border-gray-600 p-4 space-y-2">
@@ -568,7 +661,7 @@
                     </div>
                 </section>
 
-                <section class="border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-4" aria-labelledby="servidorTitulo">
+                <section class="cartao" aria-labelledby="servidorTitulo">
                     <h3 id="servidorTitulo" class="text-lg font-bold">Currículos guardados no servidor</h3>
                     <p class="text-sm">
                         Para XMLs ou ZIPs do Lattes copiados direto para a pasta de dados do servidor
@@ -595,7 +688,7 @@
                     <datalist id="instLista"></datalist>
                 </section>
 
-                <section aria-labelledby="docentesTitulo">
+                <section class="cartao" aria-labelledby="docentesTitulo">
                     <details class="secao-recolhivel space-y-3">
                     <summary class="cursor-pointer"><h3 id="docentesTitulo" class="text-lg font-bold inline">Lista de docentes <span id="docTotal" class="font-normal text-gray-600 dark:text-gray-400"></span></h3></summary>
                     <div class="space-y-2 mt-3">
@@ -610,7 +703,7 @@
                     </details>
                 </section>
 
-                <section aria-labelledby="baseTitulo">
+                <section class="cartao" aria-labelledby="baseTitulo">
                     <details class="secao-recolhivel space-y-3">
                     <summary class="cursor-pointer"><h3 id="baseTitulo" class="text-lg font-bold inline">Currículos cadastrados <span id="totalBase" class="font-normal text-gray-600 dark:text-gray-400"></span></h3></summary>
                     <div class="mt-3">
