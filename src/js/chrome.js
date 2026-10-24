@@ -22,7 +22,7 @@
         <div class="flex items-center justify-between px-4 py-3 bg-brand-600 dark:bg-gray-900 transition-colors duration-300">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded bg-white dark:bg-gradient-to-br dark:from-accent-600 dark:to-accent-900 flex items-center justify-center text-brand-600 dark:text-white font-bold transition-colors duration-300">
-                    <i aria-hidden="true" class="fa-solid fa-star"></i>
+                    <i aria-hidden="true" class="fa-solid fa-users-viewfinder"></i>
                 </div>
                 <div class="flex items-center gap-2 overflow-hidden">
                     <span id="headerAppName" class="font-bold text-white leading-none whitespace-nowrap">bancaZen</span>
@@ -32,10 +32,14 @@
                     <span id="headerUserName" class="font-bold text-white/90 dark:text-accent-400 leading-none whitespace-nowrap hidden"></span>
                 </div>
             </div>
+            <div class="flex items-center gap-3 shrink-0">
+            <!-- Logo do PROFIAP (placa branca, legível em qualquer tema). -->
+            <span class="logo-cabecalho"><img src="images/profiap.png" alt="PROFIAP" width="307" height="118"></span>
             <!-- Configurações: abre o painel na página inicial. -->
             <a href="index.html#config" title="Configurações" aria-label="Configurações" class="text-white/90 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded shrink-0">
                 <i aria-hidden="true" class="fa-solid fa-gear"></i>
             </a>
+            </div>
         </div>
         <nav class="bg-white dark:bg-gray-800 border-t border-brand-700/20 dark:border-gray-700 px-2" aria-label="Navegação">
             <div class="max-w-5xl mx-auto flex gap-1 overflow-x-auto">

@@ -8,6 +8,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Adicionado
+- Logo do PROFIAP no cabeçalho de todas as páginas, à direita, antes da
+  engrenagem, sobre placa branca; as páginas de apoio passam a usar o
+  mesmo ícone do app no cabeçalho. [issue #89](../../issues/89)
+
+## [0.0.44] - 2026-10-24
+
+### Adicionado
 - Logo do PROFIAP no cabeçalho do Relatório, centralizado acima da
   Instituição Associada e do programa, na tela e na impressão ou PDF.
   [issue #87](../../issues/87)

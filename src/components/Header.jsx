@@ -39,6 +39,9 @@ export default function Header({ appName, sigla = '', userName = '', tabs, activ
                         )}
                     </div>
                 </div>
+                <div className="flex items-center gap-3 shrink-0">
+                {/* Logo do PROFIAP (placa branca, legível em qualquer tema). */}
+                <span className="logo-cabecalho"><img src="images/profiap.png" alt="PROFIAP" width="307" height="118" /></span>
                 {onConfigClick && (
                     <button
                         type="button"
@@ -50,6 +53,7 @@ export default function Header({ appName, sigla = '', userName = '', tabs, activ
                         <i aria-hidden="true" className="fa-solid fa-gear" />
                     </button>
                 )}
+                </div>
             </div>
 
             <nav className="bg-white dark:bg-gray-800 border-t border-brand-700/20 dark:border-gray-700 px-2" role="tablist" aria-label="Seções">
