@@ -8,6 +8,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Adicionado
+- Logo do PROFIAP no cabeçalho do Relatório, centralizado acima da
+  Instituição Associada e do programa, na tela e na impressão ou PDF.
+  [issue #87](../../issues/87)
+
+## [0.0.43] - 2026-10-24
+
+### Adicionado
 - Logo do PROFIAP no Início, no cartão "A banca segundo as Normas
   Acadêmicas", sobre fundo claro próprio (legível nos temas escuros).
   [issue #85](../../issues/85)
