@@ -1,13 +1,13 @@
 /* ==========================================================================
-   bancaZen — aplicação (seções Minha Dissertação, Minha orientação e
-   Bancas sugeridas)
+   bancaZen — aplicação (seções Meu TCC, com o trecho Orientação, e
+   Composição da banca)
    --------------------------------------------------------------------------
    Os campos ficam em seções diferentes (abas) e são lidos pelo id na hora
-   da busca, feita na seção Bancas sugeridas. Erros de preenchimento levam à
+   da busca, feita na seção Composição da banca. Erros de preenchimento levam à
    seção que falta (botões data-ir, tratados em layout.js).
    O navegador só envia o formulário: a comparação com os currículos e a
    verificação de vínculos rodam no servidor (api/buscar.php), que devolve
-   duas listas (Rede PROFIAP e Externa, pelo PPG) com até 10 pessoas sem vínculo
+   duas listas (Rede PROFIAP e Programa externo à Rede PROFIAP, pelo PPG) com até 10 docentes sem vínculo
    cada, mais as retiradas por vínculo. Os currículos e o índice processado
    nunca chegam ao navegador.
    ========================================================================== */
@@ -16,8 +16,8 @@
     const ENVOLVIDOS = ['discente', 'orientador', 'coorientador'];
     const PAPEIS = {
         discente: { rotulo: 'Discente', obrigatorio: false },
-        orientador: { rotulo: 'Orientador(a)', obrigatorio: false },
-        coorientador: { rotulo: 'Coorientador(a)', obrigatorio: false },
+        orientador: { rotulo: 'Orientação', obrigatorio: false },
+        coorientador: { rotulo: 'Coorientação', obrigatorio: false },
     };
 
     function esc(s) {
@@ -69,7 +69,7 @@
     }
 
     /* -------------------------------- busca ------------------------------- */
-    // Erro na seção Bancas sugeridas, com botão para a seção a corrigir.
+    // Erro na seção Composição da banca, com botão para a seção a corrigir.
     function mostrarErro(msg, secao, rotuloSecao) {
         const erro = $('#buscaErro');
         erro.innerHTML = msg ? esc(msg) + (secao
@@ -120,8 +120,8 @@
         </li>`;
         $('#conferencia').innerHTML =
             item(Boolean(eu.nome && eu.universidade), true, 'Meus dados',
-                [eu.nome, eu.universidade].filter(Boolean).join(' · ') || 'nome e universidade não informados', 'dissertacao') +
-            item(n > 0, false, 'Minha Dissertação', n === 3 ? 'título, resumo e palavras-chave' : (n ? `${n} de 3 campos preenchidos` : 'falta preencher'), 'dissertacao') +
+                [eu.nome, eu.universidade].filter(Boolean).join(' · ') || 'nome e Instituição Associada não informados', 'dissertacao') +
+            item(n > 0, false, 'Meu TCC', n === 3 ? 'título, resumo e palavras-chave' : (n ? `${n} de 3 campos preenchidos` : 'falta preencher'), 'dissertacao') +
             ENVOLVIDOS.map((k) => {
                 const s = situacaoEnvolvido(k);
                 return item(s.ok, !PAPEIS[k].obrigatorio, PAPEIS[k].rotulo, s.texto, 'orientacao');
@@ -144,7 +144,7 @@
         ev.preventDefault();
         mostrarErro('');
         if (!dissertacaoPreenchida()) {
-            mostrarErro('Preencha ao menos o título, o resumo ou as palavras-chave.', 'dissertacao', 'Minha Dissertação');
+            mostrarErro('Preencha ao menos o título, o resumo ou as palavras-chave.', 'dissertacao', 'Meu TCC');
             return;
         }
         const fd = new FormData();
@@ -171,7 +171,7 @@
                 const msg = dados.erro || `Erro ${r.status} no servidor.`;
                 // Erros sobre os currículos da orientação levam à seção 3.
                 const daOrientacao = /Discente|Orientador|Coorientador|currículo Lattes/.test(msg);
-                mostrarErro(msg, daOrientacao ? 'orientacao' : null, 'Minha orientação');
+                mostrarErro(msg, daOrientacao ? 'orientacao' : null, 'Orientação');
                 return;
             }
             for (const k of ENVOLVIDOS) {
@@ -253,11 +253,11 @@
             </li>`;
         }).join('');
         return `<div class="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-gray-800 p-4 space-y-2">
-            <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Retiradas por vínculo (conformidade ética)</h4>
+            <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Retiradas por vínculo (conflito de interesses, item 13.3)</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-                Estas pessoas teriam proximidade suficiente para a lista, mas têm vínculo com a pessoa discente
-                ou com a orientação. Vínculo "provável" foi identificado só pelo nome em citação e pode ser
-                homônimo: confira no Lattes antes de descartar.
+                Estas indicações teriam proximidade suficiente para a lista, mas têm vínculo com você ou com a
+                orientação. Vínculo "provável" foi identificado só pelo nome em citação e pode ser homonímia:
+                confira no Lattes antes de descartar.
             </p>
             <ul class="space-y-3">${itens}</ul>
         </div>`;
@@ -270,10 +270,10 @@
         const considerados = (c && c.considerados) || [];
         if (!considerados.length) {
             caixa.innerHTML = `<div class="rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-gray-800 p-4 space-y-2">
-                <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Conformidade ética não verificada</h4>
-                <p class="text-sm">"Minha orientação" não foi preenchida: as listas podem incluir pessoas com coautoria ou relação de
-                orientação com você ou com a sua orientação. Para retirá-las, informe os currículos e busque de novo.</p>
-                <button type="button" data-ir="orientacao" class="text-sm text-brand-600 dark:text-accent-400 hover:underline font-medium">Preencher Minha orientação</button>
+                <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Vínculos não verificados</h4>
+                <p class="text-sm">"Orientação" não foi preenchida: as listas podem incluir docentes com coautoria ou relação de
+                orientação com você ou com a orientação (item 13.3). Para fazer essa verificação, informe os currículos e busque de novo.</p>
+                <button type="button" data-ir="orientacao" class="text-sm text-brand-600 dark:text-accent-400 hover:underline font-medium">Preencher Orientação</button>
             </div>`;
             return;
         }
@@ -282,12 +282,12 @@
             ? `<a href="https://lattes.cnpq.br/${esc(p.id)}" target="_blank" rel="noopener" class="text-brand-600 dark:text-accent-400 hover:underline">${esc(p.nome)}</a>`
             : esc(p.nome)}${p.soNome ? ' <span class="text-gray-600 dark:text-gray-400">(só pelo nome: sem o currículo, as produções desta pessoa não foram conferidas)</span>' : ''}</li>`).join('');
         caixa.innerHTML = `<div class="rounded-lg border border-brand-100 dark:border-gray-700 bg-brand-50 dark:bg-gray-800 p-4 space-y-2">
-            <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Conformidade ética verificada</h4>
+            <h4 class="font-semibold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-scale-balanced"></i> Vínculos verificados</h4>
             <p class="text-sm">Vínculos (coautoria, orientação ou mesma pessoa) conferidos com os currículos de:</p>
             <ul class="text-sm list-disc list-inside">${pessoas}</ul>
             <p class="text-sm">${retirados
-                ? `${retirados} pessoa(s) com vínculo retirada(s) das listas; aparecem à parte, com o motivo, ao fim de cada lista.`
-                : 'Nenhuma pessoa com vínculo entre as mais próximas do tema.'}</p>
+                ? `${retirados} ${retirados === 1 ? 'indicação com vínculo retirada' : 'indicações com vínculo retiradas'} das listas; aparecem à parte, com o motivo, ao fim de cada lista.`
+                : 'Nenhum vínculo entre os currículos com maior proximidade temática.'}</p>
         </div>`;
     }
 
@@ -296,11 +296,11 @@
         sec.classList.remove('hidden');
         const eu = discente();
         $('#resultadoTitulo').textContent = eu.nome || eu.universidade
-            ? `Pessoas mais próximas do tema: sugestões para ${[eu.nome, eu.universidade].filter(Boolean).join(' · ')}`
-            : 'Pessoas mais próximas do tema';
+            ? `Docentes com maior proximidade temática: indicações para ${[eu.nome, eu.universidade].filter(Boolean).join(' · ')}`
+            : 'Docentes com maior proximidade temática';
         $('#listas').innerHTML = listas.map((l, n) => {
             const resumo = l.resultados.length
-                ? `${l.resultados.length} pessoa(s) entre ${l.total} currículo(s) desta lista.`
+                ? `${l.resultados.length} ${l.resultados.length === 1 ? 'indicação' : 'indicações'} entre ${l.total} currículo(s) desta lista.`
                 : (l.total
                     ? `Nenhum dos ${l.total} currículo(s) desta lista tem termos em comum com o trabalho sem ter vínculo identificado.`
                     : 'Nenhum currículo cadastrado nesta lista.');
@@ -314,7 +314,7 @@
         sec.focus();
     }
 
-    // Dados de Minha Dissertação usados no Relatório.
+    // Dados de Meu TCC usados no Relatório.
     function dadosDissertacao() {
         return {
             nome: $('#nomeInput').value.trim(),
@@ -326,7 +326,7 @@
     }
     window.BancaZen = { dadosDissertacao };
 
-    /* ------------------------- Minha universidade -------------------------- */
+    /* -------------------- Minha Instituição Associada ---------------------- */
     // Caixa de seleção com as universidades da base (api/universidades.php) e
     // "Outra (digitar)", que mostra um campo de texto.
     const OUTRA = '__outra__';
@@ -374,7 +374,7 @@
     }
 
     /* ------------------- exportar/importar (arquivo JSON) ------------------ */
-    // Os dados de Minha Dissertação (com Minha orientação e os critérios da
+    // Os dados de Meu TCC (com Orientação e os critérios da
     // busca) num arquivo JSON, só no computador da pessoa: nada vai ao
     // servidor. Os arquivos XML/ZIP do Lattes não entram (só links/IDs).
     const CAMPOS_JSON = {

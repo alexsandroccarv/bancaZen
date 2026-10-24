@@ -398,8 +398,8 @@ function bb_carregar_docentes(): array { return bb_carregar_json('docentes.json'
 function bb_alterar_docentes(callable $fn) { return bb_alterar_json('docentes.json', $fn); }
 
 // Listas da banca. O grupo vem só do PPG (campo padronizado): PPG = PROFIAP
-// -> Rede PROFIAP; qualquer outro PPG -> Externa.
-const BB_GRUPOS = ['profiap' => 'Rede PROFIAP', 'outro' => 'Externa'];
+// -> Rede PROFIAP; qualquer outro PPG -> Programa externo à Rede PROFIAP.
+const BB_GRUPOS = ['profiap' => 'Rede PROFIAP', 'outro' => 'Programa externo à Rede PROFIAP'];
 const BB_PPG_REDE = 'PROFIAP';
 
 function bb_grupo_do_ppg(string $ppg): string

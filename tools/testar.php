@@ -191,10 +191,10 @@ $erro = '';
 try { bb_programa('PPG', 'Inst', 'Diretor'); } catch (RuntimeException $e) { $erro = $e->getMessage(); }
 confere($erro !== '', 'situação inválida recusada');
 
-/* ---------------- lista da banca pelo PPG (Rede PROFIAP / Externa) -------- */
+/* ------- lista da banca pelo PPG (Rede PROFIAP / programa externo) -------- */
 foreach (['PROFIAP', 'profiap', ' Profiap ', 'PRÓFIAP'] as $ppg) confere(bb_grupo_do_ppg($ppg) === 'profiap', "PPG \"$ppg\" -> Rede PROFIAP");
-foreach (['PPG em Administração', 'PROFIAP-UFX', 'Rede', ''] as $ppg) confere(bb_grupo_do_ppg($ppg) === 'outro', "PPG \"$ppg\" -> Externa");
-confere(BB_GRUPOS === ['profiap' => 'Rede PROFIAP', 'outro' => 'Externa'], 'rótulos das listas');
+foreach (['PPG em Administração', 'PROFIAP-UFX', 'Rede', ''] as $ppg) confere(bb_grupo_do_ppg($ppg) === 'outro', "PPG \"$ppg\" -> programa externo");
+confere(BB_GRUPOS === ['profiap' => 'Rede PROFIAP', 'outro' => 'Programa externo à Rede PROFIAP'], 'rótulos das listas (Normas Acadêmicas, 13.1 b e c)');
 // Registros de versões anteriores, com "grupo" gravado, seguem o PPG.
 $antigo = ['id' => '0000000000000002', 'nome' => 'X', 'instituicao' => 'Inst. do Lattes', 'programa' => ['grupo' => 'outro', 'ppg' => 'PROFIAP', 'instituicao' => '']];
 confere(bb_grupo($antigo) === 'profiap', 'grupo gravado antes é ignorado: vale o PPG');

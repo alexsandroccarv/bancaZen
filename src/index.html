@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bancaZen</title>
-    <meta name="description" content="Indica, a partir de currículos Lattes, as pessoas com maior proximidade temática a um trabalho de mestrado, para convite como membro externo da banca de defesa.">
+    <meta name="description" content="Indica, a partir de currículos Lattes, docentes com proximidade temática ao TCC para as Bancas de Defesa de Projeto de TCC e de Defesa de TCC do PROFIAP.">
 
     <!-- Compartilhamento (Open Graph / Twitter). O %SITE_URL% é substituído
          pelo build.mjs pela URL real (env/variável SITE_URL) — deixando og:url
@@ -13,12 +13,12 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="%SITE_URL%/">
     <meta property="og:title" content="bancaZen">
-    <meta property="og:description" content="Indicação de membros externos de banca a partir de currículos Lattes.">
+    <meta property="og:description" content="Indicação de docentes para bancas do PROFIAP a partir de currículos Lattes.">
     <meta property="og:image" content="%SITE_URL%/logo.svg">
     <meta property="og:locale" content="pt_BR">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="bancaZen">
-    <meta name="twitter:description" content="Indicação de membros externos de banca a partir de currículos Lattes.">
+    <meta name="twitter:description" content="Indicação de docentes para bancas do PROFIAP a partir de currículos Lattes.">
     <meta name="twitter:image" content="%SITE_URL%/logo.svg">
 
     <!-- Favicon: sempre o logo do projeto, em SVG. Troque src/logo.svg pela
@@ -86,11 +86,11 @@
                 <button id="tab-inicio-btn" aria-controls="tab-inicio" aria-label="Início" title="Início" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="true" data-tab="inicio">
                     <i aria-hidden="true" class="fa-solid fa-house"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Início</span>
                 </button>
-                <button id="tab-dissertacao-btn" aria-controls="tab-dissertacao" aria-label="Minha Dissertação" title="Minha Dissertação" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="dissertacao">
-                    <i aria-hidden="true" class="fa-solid fa-book-open"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Minha Dissertação</span>
+                <button id="tab-dissertacao-btn" aria-controls="tab-dissertacao" aria-label="Meu TCC" title="Meu TCC" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="dissertacao">
+                    <i aria-hidden="true" class="fa-solid fa-book-open"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Meu TCC</span>
                 </button>
-                <button id="tab-bancas-btn" aria-controls="tab-bancas" aria-label="Bancas sugeridas" title="Bancas sugeridas" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="bancas">
-                    <i aria-hidden="true" class="fa-solid fa-users-viewfinder"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Bancas sugeridas</span>
+                <button id="tab-bancas-btn" aria-controls="tab-bancas" aria-label="Composição da banca" title="Composição da banca" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="bancas">
+                    <i aria-hidden="true" class="fa-solid fa-users-viewfinder"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Composição da banca</span>
                 </button>
                 <button id="tab-relatorio-btn" aria-controls="tab-relatorio" aria-label="Relatório" title="Relatório" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="relatorio">
                     <i aria-hidden="true" class="fa-solid fa-file-signature"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Relatório</span>
@@ -101,28 +101,69 @@
 
     <!-- ============================ CONTEÚDO ============================ -->
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
-        <!-- 1. Início: apresentação e funcionamento -->
+        <!-- 1. Início: apresentação e processo (Normas Acadêmicas do PROFIAP, item 13) -->
         <div id="tab-inicio" class="tab-panel" role="tabpanel" aria-labelledby="tab-inicio-btn" tabindex="0">
             <div class="max-w-3xl mx-auto space-y-6">
                 <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-3">
-                    <h2 class="text-xl font-bold text-brand-800 dark:text-accent-400">Encontre membros externos para a sua banca de defesa</h2>
+                    <h2 class="text-xl font-bold text-brand-800 dark:text-accent-400">Indicação de docentes para a sua banca</h2>
                     <p>
-                        O bancaZen ajuda discentes do PROFIAP a encontrar pessoas com proximidade temática com a
-                        dissertação para convidar como membros externos da banca de defesa. A comparação usa os
-                        currículos Lattes cadastrados pela administração do programa e respeita a conformidade
-                        ética: quem tem vínculo com você ou com a sua orientação não é indicado.
+                        O bancaZen apoia a composição das Bancas de Defesa de Projeto de TCC e de Defesa de TCC do
+                        PROFIAP. A partir do título, do resumo e das palavras-chave do seu TCC, compara o trabalho com
+                        os currículos Lattes cadastrados pela coordenação e indica docentes com proximidade temática,
+                        sem vínculos que possam representar conflito de interesses com você ou com a orientação.
                     </p>
                     <p id="corpusStatus" class="text-sm text-gray-600 dark:text-gray-400" aria-live="polite">Consultando a base de currículos…</p>
                     <div><button type="button" data-ir="dissertacao" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Começar <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button></div>
                 </div>
 
+                <section class="space-y-3" aria-labelledby="normaTitulo">
+                    <h2 id="normaTitulo" class="text-lg font-bold">A banca segundo as Normas Acadêmicas</h2>
+                    <p>
+                        Pelo item 13 das Normas Acadêmicas Nacionais do PROFIAP, as Bancas de Defesa de Projeto de TCC
+                        e de Defesa de TCC têm, no mínimo, 3 docentes permanentes com o grau de doutor:
+                    </p>
+                    <ol class="alineas list-none p-0 space-y-1 pl-4">
+                        <li>a) quem orienta o trabalho;</li>
+                        <li>b) docente permanente credenciado da Rede PROFIAP, externo à Instituição Associada;</li>
+                        <li>c) docente permanente de um programa externo à Rede PROFIAP.</li>
+                    </ol>
+                    <p>
+                        Os membros da banca devem ter publicações ou orientações na área temática do trabalho (13.2).
+                        É vedada a participação de quem tem parentesco de 1º grau entre si ou com você, de quem foi
+                        orientanda ou orientando de quem orienta o trabalho e de quem tem outros vínculos que possam
+                        representar conflito de interesses (13.3). A mesma composição não se repete para discentes
+                        diferentes no mesmo quadriênio (13.4), e a participação de docentes de universidades
+                        estrangeiras é recomendável (13.5).
+                    </p>
+                    <p>
+                        A Instituição Associada submete os nomes ao Comitê Gestor Nacional, com o formulário, o TCC e a
+                        comprovação da produção intelectual (13.6 e 13.7). A resposta vem em até 10 dias úteis; sem
+                        manifestação nesse prazo, a banca está aprovada (13.8 a 13.10).
+                        <a href="ajuda.html" class="text-brand-600 dark:text-accent-400 underline">Texto do item 13 na Ajuda</a>.
+                    </p>
+                </section>
+
                 <section class="space-y-3" aria-labelledby="comoTitulo">
                     <h2 id="comoTitulo" class="text-lg font-bold">Como funciona</h2>
                     <ol class="space-y-3 list-none p-0">
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Minha Dissertação</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe o título, o resumo e as palavras-chave do seu trabalho. Na mesma seção, em "Minha orientação" (opcional, para a conformidade ética), envie o seu currículo Lattes e o da sua orientação (orientador(a) e, se houver, coorientador(a)), em XML ou ZIP, ou informe o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></div></li>
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Bancas sugeridas</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 pessoas, da maior para a menor proximidade: Rede PROFIAP (docentes do PPG PROFIAP) e Externa (docentes de outros PPGs, para o segundo membro externo).</p></div></li>
-                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span><div><p class="font-semibold">Relatório</p><p class="text-sm text-gray-600 dark:text-gray-400">Marque as pessoas escolhidas e gere a declaração da indicação da banca, com as indicações, o índice de proximidade e os critérios éticos aplicados, para anexar ao pedido de defesa ou de exame de qualificação.</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><div><p class="font-semibold">Meu TCC</p><p class="text-sm text-gray-600 dark:text-gray-400">Informe a sua Instituição Associada e o título, o resumo e as palavras-chave do TCC (Dissertação ou Artigo Científico). Em "Orientação" (opcional, para a verificação de vínculos), informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta, em XML ou ZIP, ou o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><div><p class="font-semibold">Composição da banca</p><p class="text-sm text-gray-600 dark:text-gray-400">Receba duas listas, cada uma com até 10 docentes, da maior para a menor proximidade temática: Rede PROFIAP (13.1 b) e Programa externo à Rede PROFIAP (13.1 c).</p></div></li>
+                        <li class="flex gap-3"><span class="passo" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span><div><p class="font-semibold">Relatório</p><p class="text-sm text-gray-600 dark:text-gray-400">Marque quem vai compor a banca e gere a declaração da indicação, com as indicações, o índice de proximidade e a verificação de vínculos, para anexar ao pedido de aprovação da banca ao Comitê Gestor Nacional.</p></div></li>
                     </ol>
+                </section>
+
+                <section class="space-y-2" aria-labelledby="conferenciaNormaTitulo">
+                    <h2 id="conferenciaNormaTitulo" class="text-lg font-bold">O que o bancaZen confere</h2>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Proximidade temática com publicações, orientações e bancas avaliadas (apoio ao item 13.2).</li>
+                        <li>Coautoria, relação de orientação e identidade de pessoa com você, com quem orienta e com quem coorienta (apoio ao item 13.3, alíneas b e c).</li>
+                        <li>Docentes externos à sua Instituição Associada e com o grau de doutor, pelos critérios da busca (13.1).</li>
+                    </ul>
+                    <p>
+                        Ficam com você e com a orientação: a situação de docente permanente (exibida quando consta da
+                        planilha de docentes), o parentesco, os vínculos sem registro no Lattes, a repetição de
+                        composição no quadriênio e o pedido ao Comitê Gestor Nacional.
+                    </p>
                 </section>
 
                 <section class="space-y-2" aria-labelledby="calculoTitulo">
@@ -130,50 +171,49 @@
                     <p>
                         Cada currículo é descrito pelos termos do resumo, das linhas de pesquisa, das áreas do
                         conhecimento, das palavras-chave, dos títulos da formação, dos projetos (nome e descrição),
-                        dos artigos e demais produções, das orientações e dos trabalhos que a pessoa avaliou em
-                        bancas de mestrado, doutorado e qualificação. Artigos e bancas pesam mais que as demais
-                        produções. O seu trabalho é descrito da mesma forma, com peso maior para as palavras-chave
-                        e o título.
+                        dos artigos e demais produções, das orientações e dos trabalhos avaliados em bancas de
+                        mestrado, doutorado e qualificação. Artigos e bancas pesam mais que as demais produções. O seu
+                        TCC é descrito da mesma forma, com peso maior para as palavras-chave e o título.
                     </p>
                     <p>
                         A pontuação segue o modelo BM25: termos raros entre os currículos valem mais do que termos
-                        comuns a todos, repetir o mesmo termo rende cada vez menos e currículos muito extensos não
-                        levam vantagem só pelo volume. Produções com mais de 10 anos pesam menos. A proximidade, de 0
-                        a 1, é a pontuação dividida pelo máximo que o seu trabalho poderia alcançar: 0 indica nenhum
-                        termo em comum. Quando duas ou mais pessoas têm a mesma proximidade exibida (por exemplo,
-                        0,12), as de sexo feminino, conforme o currículo Lattes, aparecem primeiro. Esse dado não é
-                        exibido.
-                        A lista ajuda a encontrar nomes; a escolha da banca segue as regras do seu programa.
+                        comuns a todos, repetir o mesmo termo rende cada vez menos e currículos extensos não levam
+                        vantagem só pelo volume. Produções com mais de 10 anos pesam menos. A proximidade, de 0 a 1, é
+                        a pontuação dividida pelo máximo que o seu trabalho poderia alcançar: 0 indica nenhum termo em
+                        comum. Quando dois ou mais currículos têm a mesma proximidade exibida (por exemplo, 0,12), os
+                        de sexo feminino, conforme o currículo Lattes, aparecem primeiro. Esse dado não é exibido.
+                        As listas apoiam a escolha; a composição da banca segue as Normas Acadêmicas e depende da
+                        aprovação do Comitê Gestor Nacional.
                     </p>
                 </section>
 
                 <section class="space-y-2" aria-labelledby="eticaTitulo">
-                    <h2 id="eticaTitulo" class="text-lg font-bold">Conformidade ética</h2>
+                    <h2 id="eticaTitulo" class="text-lg font-bold">Vínculos e conflito de interesses</h2>
                     <p>
-                        A pessoa é retirada das listas quando há coautoria em publicação (procurada nos currículos dos
-                        dois lados), relação de orientação com você, com o(a) orientador(a) ou com o(a)
-                        coorientador(a), ou quando é uma dessas pessoas. Ela aparece à parte, com o motivo. O vínculo é
-                        "confirmado" quando a pessoa é identificada pelo ID Lattes ou pelo nome completo, e "provável"
-                        quando só o sobrenome e as iniciais coincidem (pode ser homônimo).
+                        Uma indicação sai das listas quando há coautoria em publicação (procurada nos currículos dos
+                        dois lados), relação de orientação com você, com quem orienta ou com quem coorienta, ou quando
+                        se trata de uma dessas pessoas (item 13.3). Ela aparece à parte, com o motivo. O vínculo é
+                        "confirmado" quando a identificação é pelo ID Lattes ou pelo nome completo, e "provável"
+                        quando só o sobrenome e as iniciais coincidem (pode haver homonímia).
                     </p>
                 </section>
 
                 <section class="space-y-2" aria-labelledby="privacidadeTitulo">
                     <h2 id="privacidadeTitulo" class="text-lg font-bold">Seus dados</h2>
                     <p>
-                        Os currículos que você envia em "Minha orientação" são usados só na consulta e não são
-                        guardados. Os currículos da base ficam no servidor, fora da área pública do site: o navegador
-                        recebe apenas o resultado.
+                        Os currículos que você envia em "Meu TCC" são usados só na consulta e não são guardados. Os
+                        currículos da base ficam no servidor, fora da área pública do site: o navegador recebe apenas
+                        o resultado.
                     </p>
                 </section>
             </div>
         </div>
 
-        <!-- 2. Minha Dissertação -->
+        <!-- 2. Meu TCC (trecho #dissertacao) -->
         <div id="tab-dissertacao" class="tab-panel" role="tabpanel" aria-labelledby="tab-dissertacao-btn" tabindex="0" hidden>
             <div class="max-w-3xl mx-auto space-y-4">
                 <div class="flex items-center gap-2">
-                    <h2 class="text-lg font-bold">Minha Dissertação</h2>
+                    <h2 class="text-lg font-bold">Meu TCC</h2>
                     <!-- Exportar/importar os dados desta seção (arquivo JSON, só no seu computador). -->
                     <div class="ml-auto flex items-center gap-1">
                         <button type="button" id="exportarJsonBtn" class="botao-discreto" aria-label="Exportar meus dados (arquivo JSON)" title="Exportar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-down"></i></button>
@@ -188,7 +228,7 @@
                     <input id="nomeInput" type="text" autocomplete="name" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                 </div>
                 <div class="envolvido space-y-1" data-papel="discente">
-                    <p class="text-sm font-medium" id="discenteRotulo">Meu currículo Lattes <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional, para a conformidade ética)</span></p>
+                    <p class="text-sm font-medium" id="discenteRotulo">Meu currículo Lattes <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional, para a verificação de vínculos)</span></p>
                     <div class="grid gap-2 sm:grid-cols-2">
                         <div>
                             <label for="discenteArquivo" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Arquivo XML ou ZIP do Lattes</label>
@@ -202,17 +242,17 @@
                     <p id="discenteStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                 </div>
                 <div>
-                    <label for="universidadeInput" class="block text-sm font-medium mb-1">Minha universidade</label>
+                    <label for="universidadeInput" class="block text-sm font-medium mb-1">Minha Instituição Associada</label>
                     <select id="universidadeInput" aria-describedby="universidadeAjuda" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                         <option value="">Selecione…</option>
                         <option value="__outra__">Outra (digitar)</option>
                     </select>
-                    <label for="universidadeOutraInput" class="sr-only">Nome da universidade</label>
-                    <input id="universidadeOutraInput" type="text" autocomplete="organization" placeholder="Digite o nome da universidade" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 mt-2" hidden>
-                    <p id="universidadeAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Pessoas desta instituição são desconsideradas como membro externo (critério ajustável em Bancas sugeridas).</p>
+                    <label for="universidadeOutraInput" class="sr-only">Nome da Instituição Associada</label>
+                    <input id="universidadeOutraInput" type="text" autocomplete="organization" placeholder="Digite o nome da Instituição Associada" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400 mt-2" hidden>
+                    <p id="universidadeAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Os currículos de docentes desta instituição ficam fora da busca, pois a Norma pede docentes externos à Instituição Associada (critério ajustável em Composição da banca).</p>
                 </div>
                     <div>
-                        <label for="tituloInput" class="block text-sm font-medium mb-1">Título do trabalho</label>
+                        <label for="tituloInput" class="block text-sm font-medium mb-1">Título do TCC</label>
                         <input id="tituloInput" type="text" required class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                     </div>
                     <div>
@@ -225,20 +265,21 @@
                         <p id="palavrasAjuda" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separe por ponto e vírgula ou vírgula. Ex.: governança pública; transparência; controle social</p>
                     </div>
                 <section id="orientacao" class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700" aria-labelledby="orientacaoTitulo">
-                    <h3 id="orientacaoTitulo" class="text-base font-bold">Minha orientação <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></h3>
+                    <h3 id="orientacaoTitulo" class="text-base font-bold">Orientação <span class="font-normal text-gray-600 dark:text-gray-400">(opcional)</span></h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Recomendada. Informe o nome e o currículo Lattes da orientação (o seu fica logo abaixo de
-                        "Meu nome"): eles são usados para retirar das sugestões quem tem coautoria em publicações ou
-                        relação de orientação com alguma dessas pessoas (conformidade ética). Só com o nome, a
-                        verificação é parcial: procura o nome nas coautorias e orientações de cada pessoa indicada.
+                        Recomendada. Informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta
+                        (o seu fica logo abaixo de "Meu nome"): eles são usados para retirar das indicações quem tem
+                        coautoria em publicações ou relação de orientação com alguma dessas pessoas, vínculos que podem
+                        representar conflito de interesses (item 13.3). Só com o nome, a verificação é parcial: procura
+                        o nome nas coautorias e orientações de cada indicação.
                         Sem nome nem currículo, a busca funciona, mas o resultado avisa que os vínculos não foram
                         verificados. Os arquivos enviados aqui são usados só na consulta e não são guardados.
                     </p>
                 <div class="space-y-4">
                             <div class="envolvido space-y-1" data-papel="orientador">
-                                <p class="text-sm font-medium" id="orientadorRotulo">Orientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                                <p class="text-sm font-medium" id="orientadorRotulo">Orientação <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
                                 <div>
-                                    <label for="orientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome do(a) orientador(a)</label>
+                                    <label for="orientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome de quem orienta</label>
                                     <input id="orientadorNome" type="text" autocomplete="off" aria-describedby="orientadorRotulo orientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                                 </div>
                                 <div class="grid gap-2 sm:grid-cols-2">
@@ -254,9 +295,9 @@
                                 <p id="orientadorStatus" class="text-xs text-gray-600 dark:text-gray-400" aria-live="polite"></p>
                             </div>
                             <div class="envolvido space-y-1" data-papel="coorientador">
-                                <p class="text-sm font-medium" id="coorientadorRotulo">Coorientador(a) <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
+                                <p class="text-sm font-medium" id="coorientadorRotulo">Coorientação <span class="text-gray-500 dark:text-gray-400 font-normal">(opcional)</span></p>
                                 <div>
-                                    <label for="coorientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome do(a) coorientador(a)</label>
+                                    <label for="coorientadorNome" class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Nome de quem coorienta</label>
                                     <input id="coorientadorNome" type="text" autocomplete="off" aria-describedby="coorientadorRotulo coorientadorStatus" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                                 </div>
                                 <div class="grid gap-2 sm:grid-cols-2">
@@ -283,41 +324,43 @@
                     </div>
                 </section>
                 <div class="flex justify-end">
-                    <button type="button" data-ir="bancas" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Próximo: Bancas sugeridas <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
+                    <button type="button" data-ir="bancas" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">Próximo: Composição da banca <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Bancas sugeridas -->
+        <!-- 3. Composição da banca (trecho #bancas) -->
         <div id="tab-bancas" class="tab-panel" role="tabpanel" aria-labelledby="tab-bancas-btn" tabindex="0" hidden>
             <div class="max-w-3xl mx-auto space-y-6">
-                <h2 class="text-lg font-bold">Bancas sugeridas</h2>
+                <h2 class="text-lg font-bold">Composição da banca</h2>
                 <div class="bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-lg p-5 space-y-2" aria-labelledby="conferenciaTitulo" role="group">
                     <h3 id="conferenciaTitulo" class="font-semibold">Antes de buscar</h3>
                     <ul id="conferencia" class="space-y-1 text-sm list-none p-0"></ul>
                 </div>
                 <form id="buscaForm" class="space-y-4" novalidate>
                     <fieldset class="border border-gray-200 dark:border-gray-700 rounded p-4 space-y-3">
-                        <legend class="text-sm font-semibold px-1">Critérios para membro externo</legend>
+                        <legend class="text-sm font-semibold px-1">Critérios da busca</legend>
                         <div>
-                            <label for="excluirInput" class="block text-sm mb-1">Desconsiderar pessoas desta instituição (a do seu programa; vem de "Minha universidade")</label>
+                            <label for="excluirInput" class="block text-sm mb-1">Desconsiderar docentes desta instituição (a sua Instituição Associada; vem de "Minha Instituição Associada")</label>
                             <input id="excluirInput" type="text" placeholder="Ex.: Universidade Federal de São Paulo" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
                         </div>
                         <label class="flex items-center gap-2 text-sm">
-                            <input id="doutoresInput" type="checkbox" checked> Somente pessoas com doutorado concluído
+                            <input id="doutoresInput" type="checkbox" checked> Somente docentes com o grau de doutor
                         </label>
                     </fieldset>
                     <p id="buscaErro" class="text-sm text-red-700 dark:text-red-400 hidden" role="alert"></p>
                     <button type="submit" id="buscarBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-600 hover:bg-brand-700 text-white font-medium disabled:opacity-50">
-                        <i aria-hidden="true" class="fa-solid fa-magnifying-glass"></i> Indicar membros externos
+                        <i aria-hidden="true" class="fa-solid fa-magnifying-glass"></i> Indicar docentes
                     </button>
                 </form>
 
                 <section id="resultado" class="space-y-3 hidden" aria-labelledby="resultadoTitulo" tabindex="-1">
-                    <h3 id="resultadoTitulo" class="text-lg font-bold">Pessoas mais próximas do tema</h3>
+                    <h3 id="resultadoTitulo" class="text-lg font-bold">Docentes com maior proximidade temática</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Duas listas, cada uma com até 10 pessoas sem vínculo identificado, da maior para a menor
-                        proximidade (0 a 1): Rede PROFIAP (PPG PROFIAP) e Externa (outros PPGs, para o segundo membro externo).
+                        Duas listas, cada uma com até 10 docentes sem vínculo identificado, da maior para a menor
+                        proximidade (0 a 1): Rede PROFIAP (docente permanente credenciado da Rede PROFIAP, externo à
+                        Instituição Associada, item 13.1 b) e Programa externo à Rede PROFIAP (item 13.1 c). Quem
+                        orienta completa a banca (13.1 a).
                     </p>
                     <div id="conformidadeResultado" aria-live="polite"></div>
                     <div id="listas" class="space-y-8"></div>
@@ -330,22 +373,23 @@
             <div class="max-w-3xl mx-auto space-y-4">
                 <h2 class="text-lg font-bold">Relatório</h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Gere a declaração da indicação da banca, para anexar ao pedido de defesa ou de exame de
-                    qualificação. Ela registra o processo de indicação, os critérios éticos aplicados, as
-                    indicações do bancaZen com o índice de proximidade e as pessoas escolhidas. O documento é
+                    Gere a declaração da indicação dos membros da banca, para anexar ao pedido de aprovação ao
+                    Comitê Gestor Nacional (itens 13.6 e 13.7 das Normas Acadêmicas). Ela registra o processo de
+                    indicação, a verificação de vínculos, as indicações do bancaZen com o índice de proximidade e a
+                    composição proposta. O documento é
                     montado no seu navegador e não é guardado no servidor.
                 </p>
                 <div id="relSemBusca" class="rounded-lg border border-gray-300 dark:border-gray-600 p-4 text-sm space-y-2">
-                    <p>Faça antes a busca em "Bancas sugeridas": o relatório usa o resultado dela.</p>
-                    <button type="button" data-ir="bancas" class="text-brand-600 dark:text-accent-400 hover:underline font-medium">Ir para Bancas sugeridas</button>
+                    <p>Faça antes a busca em "Composição da banca": o relatório usa o resultado dela.</p>
+                    <button type="button" data-ir="bancas" class="text-brand-600 dark:text-accent-400 hover:underline font-medium">Ir para Composição da banca</button>
                 </div>
                 <form id="relForm" class="space-y-4" hidden>
                     <div class="grid gap-4 sm:grid-cols-3">
                         <div>
-                            <label for="relTipoInput" class="block text-sm font-medium mb-1">Pedido</label>
+                            <label for="relTipoInput" class="block text-sm font-medium mb-1">Banca</label>
                             <select id="relTipoInput" class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                                <option value="defesa">Defesa</option>
-                                <option value="qualificacao">Exame de qualificação</option>
+                                <option value="tcc">Banca de Defesa de TCC</option>
+                                <option value="projeto">Banca de Defesa de Projeto de TCC</option>
                             </select>
                         </div>
                         <div>
@@ -358,8 +402,8 @@
                         </div>
                     </div>
                     <fieldset class="space-y-2">
-                        <legend class="text-sm font-medium mb-1">Pessoas escolhidas para a banca</legend>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">Marque, entre as indicações, quem foi escolhido e o papel na banca.</p>
+                        <legend class="text-sm font-medium mb-1">Composição proposta</legend>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Marque, entre as indicações, quem vai compor a banca e o papel de cada docente.</p>
                         <div id="relEscolhas" class="space-y-4 text-sm"></div>
                     </fieldset>
                     <div id="relAviso" class="text-sm" aria-live="polite"></div>
@@ -436,10 +480,10 @@
                     <p class="text-sm">
                         Envie, num só lugar, a <strong>planilha de docentes</strong> (CSV) e os
                         <strong>currículos Lattes</strong> (XML exportado pela Plataforma Lattes ou o ZIP que a
-                        plataforma entrega). Os dados de cada pessoa (universidade, PPG e situação) vêm da planilha,
+                        plataforma entrega). Os dados de cada docente (universidade, PPG e situação) vêm da planilha,
                         pelo ID Lattes. Tudo fica guardado no servidor, fora da área pública do site. A lista da banca
                         vem do <strong>PPG</strong>: PPG <code>PROFIAP</code> entra em <strong>Rede PROFIAP</strong>;
-                        qualquer outro PPG entra em <strong>Externa</strong>.
+                        qualquer outro PPG entra em <strong>Programa externo à Rede PROFIAP</strong>.
                     </p>
                     <form id="envioForm" class="space-y-4">
                         <ul class="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
@@ -469,7 +513,7 @@
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>lattes_id</code></td><td class="py-2 pr-3">sim</td><td class="py-2 pr-3">ID Lattes com 16 dígitos ou o link do Lattes; aceita também a coluna <code>lattes_url</code> (com as duas, se divergirem, vale o link)</td><td class="py-2 font-mono">1234567890123456 ou http://lattes.cnpq.br/1234567890123456</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>universidade</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">instituição do docente no programa</td><td class="py-2">Universidade Federal Exemplo</td></tr>
                                     <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>categoria</code></td><td class="py-2 pr-3">recomendada</td><td class="py-2 pr-3">situação no programa: Permanente, Colaborador ou Visitante</td><td class="py-2">Permanente</td></tr>
-                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, PROFIAP (PROFIAP → Rede PROFIAP; outro → Externa)</td><td class="py-2">PROFIAP</td></tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700"><td class="py-2 pr-3"><code>ppg</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">nome do programa; sem a coluna, PROFIAP (PROFIAP → Rede PROFIAP; outro → Programa externo à Rede PROFIAP)</td><td class="py-2">PROFIAP</td></tr>
                                     <tr><td class="py-2 pr-3"><code>email</code></td><td class="py-2 pr-3">não</td><td class="py-2 pr-3">e-mail de contato; fica só na Administração, nunca nas sugestões públicas</td><td class="py-2">maria@exemplo.br</td></tr>
                                 </tbody>
                             </table>

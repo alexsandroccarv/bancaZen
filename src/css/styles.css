@@ -341,4 +341,4 @@ html.high-contrast.high-contrast button {
 }
 
 /* Ajuda: alíneas das normas já trazem a letra (a, b, c). */
-.normas ol { list-style: none; padding-left: 1rem; }
+.normas ol, ol.alineas { list-style: none; padding-left: 1rem; }

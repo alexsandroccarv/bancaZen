@@ -1,15 +1,23 @@
 # Projeto: bancaZen (PROFIAP)
 
 ## Visão geral
-Aplicação web (site estático + backend PHP) que indica membros externos
-para banca de defesa de mestrado: a administração cadastra, num formulário
+Aplicação web (site estático + backend PHP) que indica docentes para as
+Bancas de Defesa de Projeto de TCC e de Defesa de TCC do PROFIAP: a administração cadastra, num formulário
 único só de arquivos, a planilha de docentes (CSV, com universidade, PPG e
 situação; linha sem PPG = PROFIAP) e os currículos Lattes (XML/ZIP); a partir do título, resumo e palavras-chave do
-trabalho, mostra duas listas de até 10 pessoas com maior proximidade temática
+TCC, mostra duas listas de até 10 docentes com maior proximidade temática
 (0 a 1, ordem decrescente), sem vínculo com discente/orientação: **Rede
-PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
+PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
+(qualquer outro PPG; item 13.1 c). Base: templateZen.
+- **Linguagem:** a do item 13 das Normas Acadêmicas Nacionais do PROFIAP
+  (texto na Ajuda): TCC, Banca de Defesa de Projeto de TCC / de Defesa de
+  TCC, Instituição Associada, docente permanente, grau de doutor, Comitê
+  Gestor Nacional, conflito de interesses. Linguagem não discriminatória:
+  "discente", "docente", "orientação"/"quem orienta", "coorientação"/"quem
+  coorienta"; nada de "orientador(a)" nem masculino genérico. A citação da
+  Norma na Ajuda fica literal.
 - **O grupo da banca vem só do PPG** (`bb_grupo_do_ppg`: PROFIAP, sem
-  diferenciar maiúsculas/acentos/espaços, → Rede PROFIAP; outro → Externa).
+  diferenciar maiúsculas/acentos/espaços, → Rede PROFIAP; outro → Programa externo à Rede PROFIAP).
   Não há campo "grupo" nos formulários; um "grupo" gravado por versões
   anteriores é ignorado.
 
@@ -57,8 +65,8 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
 - Conformidade ética: pessoa com vínculo (coautoria, orientação, mesma
   pessoa) nunca entra nas listas; aparece à parte com o motivo.
   "Confirmado" = ID Lattes ou nome completo; "provável" = sobrenome + ao
-  menos duas iniciais. "Minha orientação" é opcional (discente, orientador e
-  coorientador): o resultado mostra quem foi considerado (`conformidade` em
+  menos duas iniciais. "Orientação" é opcional (discente, orientação e
+  coorientação): o resultado mostra quem foi considerado (`conformidade` em
   `buscar.php`) ou avisa que a verificação não foi feita. Sem currículo, o
   nome (`<papel>Nome`) vira registro mínimo e a verificação é parcial
   (`soNome`): só os currículos indicados são conferidos.
@@ -67,7 +75,7 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   `pessoas/` e em `indice/meta.json` `sexos`); nunca exibir nem enviar o
   sexo ao navegador (`bb_publico` não o inclui).
 - `api/universidades.php` (público): nomes das universidades da planilha e
-  dos currículos, para a caixa de seleção "Minha universidade" (com "Outra").
+  dos currículos, para a caixa de seleção "Minha Instituição Associada" (com "Outra").
 - Ao mudar o backend, rodar `php tools/testar.php` (currículos fictícios em
   `tools/fixtures/`; discente e orientadora em `tools/fixtures/envolvidos/`).
   Currículos reais não entram em `tools/fixtures/`.
@@ -83,13 +91,13 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
 
 ## Padrões de UI
 - Página principal em seções (abas com ícone na barra superior, nome visível
-  a partir de 640px): `#inicio` (apresentação e funcionamento),
-  `#dissertacao` (nome e universidade da discente, que preenche o critério
+  a partir de 640px): `#inicio` (processo da banca segundo o item 13 e funcionamento),
+  `#dissertacao` (Meu TCC: nome e Instituição Associada da discente, que preenche o critério
   de instituição a desconsiderar sem sobrescrever o digitado; título, resumo,
-  palavras-chave e, no trecho `#orientacao`, Minha orientação (opcional);
+  palavras-chave e, no trecho `#orientacao`, Orientação (opcional);
   nada disso é gravado no servidor; botões só com ícone exportam/importam
   esses dados num JSON local, `CAMPOS_JSON` em `app.js`, sem os arquivos
-  XML/ZIP), `#bancas` (conferência, critérios, busca e
+  XML/ZIP), `#bancas` (Composição da banca: conferência, critérios, busca e
   listas), `#relatorio` (`js/relatorio.js`: declaração da indicação a partir
   do evento `busca:resultado`; a declaração ética segue o que a busca
   verificou: currículos, só nome ou nada; imprimir/PDF no navegador, nada

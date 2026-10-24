@@ -13,7 +13,7 @@
      GET  docentes   -> lista de docentes dos programas, com currículo enviado ou não
      POST importar-docentes   arquivo (CSV); ppg (padrão das linhas sem a coluna,
                               senão PROFIAP) e substituir (padrão 1) opcionais
-   O grupo da banca (Rede PROFIAP ou Externa) vem do PPG: bb_grupo_do_ppg.
+   O grupo da banca (Rede PROFIAP ou Programa externo à Rede PROFIAP) vem do PPG: bb_grupo_do_ppg.
      GET  modelo-docentes     -> modelo do CSV da lista de docentes (download;
                                  sem dados da base, não exige sessão)
      POST remover    id

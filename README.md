@@ -1,7 +1,9 @@
 # bancaZen
 
-Aplicação web que indica **membros externos para banca de defesa de
-mestrado** a partir de currículos Lattes.
+Aplicação web que indica **docentes para as Bancas de Defesa de Projeto de
+TCC e de Defesa de TCC do PROFIAP** a partir de currículos Lattes. Os termos
+seguem o item 13 das Normas Acadêmicas Nacionais do PROFIAP (19/02/2026), em
+linguagem não discriminatória (discente, docente, orientação, quem orienta).
 
 1. Na **Administração**, no ícone de engrenagem (com senha), um formulário único recebe a **lista de
    docentes** (planilha CSV com nome, universidade, situação no programa,
@@ -11,26 +13,29 @@ mestrado** a partir de currículos Lattes.
    Lattes. Currículo de quem não está na planilha fica guardado sem dados e
    fora da busca; a conferência mostra esses currículos e os docentes da
    planilha ainda sem XML. A lista da banca vem do PPG:
-   **PROFIAP → Rede PROFIAP**; qualquer outro PPG → **Externa**.
+   **PROFIAP → Rede PROFIAP**; qualquer outro PPG → **Programa externo à Rede PROFIAP**.
 2. Se o mesmo ID Lattes já existir, fica o currículo com a data de
    atualização mais recente. A tabela de docentes mostra quem ainda não tem
    currículo enviado.
 3. A página principal é dividida em seções, com ícones na barra superior:
-   **Início** (apresentação e funcionamento), **Minha Dissertação** (com
-   **Minha orientação**, opcional, e botões para exportar e importar os dados
-   num arquivo JSON), **Bancas sugeridas**, **Relatório** (declaração da
-   indicação da banca para o pedido de defesa ou de qualificação, com as
-   indicações, o índice, os critérios éticos aplicados, as pessoas
-   escolhidas, a data de geração e a referência para citar o bancaZen;
+   **Início** (processo de composição da banca segundo o item 13 das Normas
+   Acadêmicas e funcionamento), **Meu TCC** (com **Orientação**, opcional, e
+   botões para exportar e importar os dados num arquivo JSON),
+   **Composição da banca**, **Relatório** (declaração da indicação dos
+   membros da Banca de Defesa de Projeto de TCC ou de Defesa de TCC, para o
+   pedido de aprovação ao Comitê Gestor Nacional, com as indicações, o
+   índice, a verificação de vínculos, a composição proposta, a data de
+   geração e a referência para citar o bancaZen;
    impressa ou salva em PDF pelo navegador); a **Administração** fica no
    ícone de engrenagem, junto das configurações. A pessoa discente
-   informa **nome**, **universidade** (pessoas da mesma instituição são
-   desconsideradas como membro externo), **título**, **resumo** e
-   **palavras-chave** do trabalho e, opcionalmente, o próprio
-   currículo Lattes e o da orientação, e recebe **duas listas de até 10 pessoas** com maior
+   informa **nome**, **Instituição Associada** (docentes da mesma
+   instituição ficam fora da busca, item 13.1 b), **título**, **resumo** e
+   **palavras-chave** do TCC e, opcionalmente, o próprio currículo Lattes e
+   os de quem orienta e coorienta, e recebe **duas listas de até 10 docentes** com maior
    proximidade temática, numa escala de **0 a 1**, em ordem decrescente:
-   - **Rede PROFIAP** (docentes do PPG PROFIAP);
-   - **Externa** (docentes de outros PPGs, para o segundo membro externo).
+   - **Rede PROFIAP** (docente permanente credenciado da Rede PROFIAP,
+     externo à Instituição Associada, item 13.1 b);
+   - **Programa externo à Rede PROFIAP** (item 13.1 c).
    Cada pessoa aparece com **Nome, Universidade, PPG, Situação no programa e
    Link do Lattes** (da lista de docentes, quando a pessoa está nela), além
    de titulação, bancas de mestrado registradas e os termos em comum.

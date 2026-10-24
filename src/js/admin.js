@@ -7,7 +7,7 @@
    da planilha); conferência XML x planilha; inclusão na busca dos XMLs copiados direto para
    o servidor (rsync/FTP), em lotes; tabelas da lista e da base; correção
    e remoção.
-   A lista da banca vem do PPG (PROFIAP -> Rede PROFIAP; outro -> Externa).
+   A lista da banca vem do PPG (PROFIAP -> Rede PROFIAP; outro -> Programa externo à Rede PROFIAP).
    Toda a regra (mesmo ID, guarda fora da área pública) fica no servidor:
    api/admin.php.
    ========================================================================== */
@@ -19,7 +19,7 @@
     const LOTE_ARQUIVOS = 15;
     const LOTE_BYTES = 6 * 1024 * 1024;
     // Lista da banca, calculada do PPG (a mesma regra de bb_grupo_do_ppg).
-    const BANCAS = { profiap: 'Rede PROFIAP', outro: 'Externa' };
+    const BANCAS = { profiap: 'Rede PROFIAP', outro: 'Programa externo à Rede PROFIAP' };
     const bancaDoPpg = (ppg) => semAcento(String(ppg || '').trim()) === 'profiap' ? 'profiap' : 'outro';
 
     let csrf = null;
@@ -352,7 +352,7 @@
             caixa.innerHTML = `<p class="py-3 text-gray-500 dark:text-gray-400">${docentes.length ? 'Nenhum docente corresponde ao filtro.' : 'Envie a planilha (CSV) para ver a lista aqui.'}</p>`;
             return;
         }
-        // Agrupa por banca (Rede PROFIAP, depois Externa) e, em cada uma, por
+        // Agrupa por banca (Rede PROFIAP, depois programa externo) e, em cada uma, por
         // universidade: o que é comum ao grupo vai no título, não em cada linha.
         const porNome = (a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' });
         caixa.innerHTML = Object.keys(BANCAS).map((g) => {
@@ -373,7 +373,7 @@
         }).join('');
     }
     function linhaDocente(d, grupo) {
-        // Na Rede PROFIAP o PPG é sempre PROFIAP: só aparece na Externa.
+        // Na Rede PROFIAP o PPG é sempre PROFIAP: só aparece no programa externo.
         const ppg = grupo === 'outro' && d.ppg ? `<span class="doc-ppg">${esc(d.ppg)}</span>` : '';
         const situacao = d.situacao ? `<span class="doc-situacao">${esc(d.situacao)}</span>` : '';
         // Situação do currículo só com ícone, no início da linha; o texto fica

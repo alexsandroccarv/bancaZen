@@ -3,7 +3,7 @@
    bancaZen — GET api/universidades.php  (público)
    Nomes das universidades conhecidas pela base (planilha de docentes e
    instituições dos currículos), sem repetição e em ordem alfabética, para a
-   caixa de seleção "Minha universidade". Só nomes de instituições: nenhum
+   caixa de seleção "Minha Instituição Associada". Só nomes de instituições: nenhum
    dado de pessoas.
    ========================================================================== */
 require_once __DIR__ . '/lib/base.php';

@@ -11,7 +11,7 @@
        <papel>Id       link ou ID Lattes de currículo que já está na base
        <papel>Nome     nome; sem currículo, a verificação é só pelo nome
                        (coautorias e orientações nos currículos indicados)
-   Devolve duas listas (Rede PROFIAP e Externa, pelo PPG), cada uma com as 10
+   Devolve duas listas (Rede PROFIAP e Programa externo à Rede PROFIAP, pelo PPG), cada uma com as 10
    pessoas mais próximas SEM vínculo e as retiradas por vínculo, só com os
    campos de exibição (bb_publico), e 'conformidade' (verificada ou não, e
    quem foi considerado: papel, nome e ID Lattes). O índice completo e os XML
@@ -22,8 +22,8 @@ require_once __DIR__ . '/lib/base.php';
 const LIMITE = 10;
 const ENVOLVIDOS = [
     ['chave' => 'discente', 'papel' => 'Discente'],
-    ['chave' => 'orientador', 'papel' => 'Orientador(a)'],
-    ['chave' => 'coorientador', 'papel' => 'Coorientador(a)'],
+    ['chave' => 'orientador', 'papel' => 'Orientação'],
+    ['chave' => 'coorientador', 'papel' => 'Coorientação'],
 ];
 
 bb_exigir_metodo('POST');
@@ -78,7 +78,7 @@ foreach (ENVOLVIDOS as $env) {
     if ($pessoa) {
         $envolvidos[] = ['papel' => $env['papel'], 'pessoa' => $pessoa];
         $avisos[$env['chave']] = $soNome ? ['nome' => $pessoa['nome'], 'soNome' => true] : $pessoa['nome'];
-        $considerados[] = ['papel' => $env['papel'], 'nome' => $pessoa['nome'], 'id' => vinc_id_lattes($pessoa['id'] ?? ''), 'soNome' => $soNome];
+        $considerados[] = ['chave' => $env['chave'], 'papel' => $env['papel'], 'nome' => $pessoa['nome'], 'id' => vinc_id_lattes($pessoa['id'] ?? ''), 'soNome' => $soNome];
     }
 }
 
