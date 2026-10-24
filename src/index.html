@@ -95,9 +95,6 @@
                 <button id="tab-relatorio-btn" aria-controls="tab-relatorio" aria-label="Relatório" title="Relatório" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="relatorio">
                     <i aria-hidden="true" class="fa-solid fa-file-signature"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Relatório</span>
                 </button>
-                <button id="tab-administracao-btn" aria-controls="tab-administracao" aria-label="Administração" title="Administração" class="tab-btn px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-accent-400 whitespace-nowrap" role="tab" aria-selected="false" data-tab="administracao">
-                    <i aria-hidden="true" class="fa-solid fa-user-shield"></i><span class="tab-rotulo ml-1 hidden sm:inline" aria-hidden="true">Administração</span>
-                </button>
             </div>
         </nav>
     </header>
@@ -375,10 +372,46 @@
             </div>
         </div>
 
-        <!-- 5. Administração (js/admin.js; só consulta o servidor quando a seção é aberta) -->
-        <div id="tab-administracao" class="tab-panel" role="tabpanel" aria-labelledby="tab-administracao-btn" tabindex="0" hidden>
-            <div class="max-w-5xl mx-auto space-y-6">
-                <h2 class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-user-shield text-brand-600 dark:text-accent-400"></i> Administração</h2>
+        <!-- Engrenagem: Configurações (preferências) e Administração (js/admin.js; só consulta o servidor quando o painel é aberto) -->
+        <div id="tab-config" class="tab-panel" role="tabpanel" aria-labelledby="headerConfigBtn" tabindex="0" hidden>
+            <div class="max-w-5xl mx-auto space-y-8">
+                <section class="max-w-md space-y-6" aria-labelledby="preferenciasTitulo">
+                <h2 id="preferenciasTitulo" class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-gear text-brand-600 dark:text-accent-400"></i> Configurações</h2>
+                <div>
+                    <label for="userNameInput" class="block text-sm font-medium mb-1">Nome:</label>
+                    <input id="userNameInput" type="text" placeholder="Digite um nome"
+                        class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Aparece no cabeçalho, ao lado do nome do aplicativo.
+                    </p>
+                </div>
+
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
+                        <i aria-hidden="true" class="fa-solid fa-palette text-brand-600 dark:text-accent-400"></i> Tema
+                    </h3>
+                    <div class="space-y-2">
+                        <label for="themeSelect" class="block text-sm">Escolha um tema</label>
+                        <select id="themeSelect"
+                            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
+                            <option value="catppuccin-latte" style="font-family:'Nunito',system-ui,sans-serif">Catppuccin Latte</option>
+                            <option value="catppuccin-mocha" style="font-family:'Nunito',system-ui,sans-serif">Catppuccin Mocha</option>
+                            <option value="dracula" style="font-family:'Fira Sans',system-ui,sans-serif">Drácula</option>
+                            <option value="github-light" style="font-family:system-ui,sans-serif">GitHub Light</option>
+                            <option value="github-dark" style="font-family:system-ui,sans-serif">GitHub Dark</option>
+                            <option value="govbr" style="font-family:'Rawline',system-ui,sans-serif">gov.br (padrão)</option>
+                            <option value="rose-pine-dawn" style="font-family:'Quicksand',system-ui,sans-serif">Rosé Pine Dawn</option>
+                            <option value="solarized-light" style="font-family:'Source Sans 3',system-ui,sans-serif">Solarized Light</option>
+                            <option value="solarized-dark" style="font-family:'Source Sans 3',system-ui,sans-serif">Solarized Dark</option>
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            O tema é aplicado a todo o site e fica salvo no seu navegador.
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <section id="administracao" class="space-y-6 pt-6 border-t border-gray-200 dark:border-gray-700" aria-labelledby="adminTitulo">
+                <h2 id="adminTitulo" class="text-lg font-bold flex items-center gap-2"><i aria-hidden="true" class="fa-solid fa-user-shield text-brand-600 dark:text-accent-400"></i> Administração</h2>
             <!-- Entrada -->
             <section id="entrada" class="hidden max-w-sm space-y-3" aria-labelledby="entradaTitulo">
                 <h3 id="entradaTitulo" class="text-lg font-bold">Entrar</h3>
@@ -579,42 +612,7 @@
                     <div id="limparRelatorio" class="text-sm" aria-live="polite"></div>
                 </section>
             </div>
-            </div>
-        </div>
-        <div id="tab-config" class="tab-panel" role="tabpanel" aria-labelledby="headerConfigBtn" tabindex="0" hidden>
-            <div class="max-w-md space-y-6">
-                <div>
-                    <label for="userNameInput" class="block text-sm font-medium mb-1">Nome:</label>
-                    <input id="userNameInput" type="text" placeholder="Digite um nome"
-                        class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Aparece no cabeçalho, ao lado do nome do aplicativo.
-                    </p>
-                </div>
-
-                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
-                        <i aria-hidden="true" class="fa-solid fa-palette text-brand-600 dark:text-accent-400"></i> Tema
-                    </h3>
-                    <div class="space-y-2">
-                        <label for="themeSelect" class="block text-sm">Escolha um tema</label>
-                        <select id="themeSelect"
-                            class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400">
-                            <option value="catppuccin-latte" style="font-family:'Nunito',system-ui,sans-serif">Catppuccin Latte</option>
-                            <option value="catppuccin-mocha" style="font-family:'Nunito',system-ui,sans-serif">Catppuccin Mocha</option>
-                            <option value="dracula" style="font-family:'Fira Sans',system-ui,sans-serif">Drácula</option>
-                            <option value="github-light" style="font-family:system-ui,sans-serif">GitHub Light</option>
-                            <option value="github-dark" style="font-family:system-ui,sans-serif">GitHub Dark</option>
-                            <option value="govbr" style="font-family:'Rawline',system-ui,sans-serif">gov.br (padrão)</option>
-                            <option value="rose-pine-dawn" style="font-family:'Quicksand',system-ui,sans-serif">Rosé Pine Dawn</option>
-                            <option value="solarized-light" style="font-family:'Source Sans 3',system-ui,sans-serif">Solarized Light</option>
-                            <option value="solarized-dark" style="font-family:'Source Sans 3',system-ui,sans-serif">Solarized Dark</option>
-                        </select>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                            O tema é aplicado a todo o site e fica salvo no seu navegador.
-                        </p>
-                    </div>
-                </div>
+            </section>
             </div>
         </div>
     </main>

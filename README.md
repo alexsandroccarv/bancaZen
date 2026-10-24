@@ -3,7 +3,7 @@
 Aplicação web que indica **membros externos para banca de defesa de
 mestrado** a partir de currículos Lattes.
 
-1. Na seção **Administração**, um formulário único recebe a **lista de
+1. Na **Administração**, no ícone de engrenagem (com senha), um formulário único recebe a **lista de
    docentes** (planilha CSV com nome, universidade, situação no programa,
    PPG, Lattes e, opcionalmente, e-mail, visível só na Administração) e os **currículos** (XML exportado
    pela Plataforma Lattes, ou o ZIP que o contém), só com a escolha dos
@@ -22,7 +22,8 @@ mestrado** a partir de currículos Lattes.
    indicação da banca para o pedido de defesa ou de qualificação, com as
    indicações, o índice, os critérios éticos aplicados, as pessoas
    escolhidas, a data de geração e a referência para citar o bancaZen;
-   impressa ou salva em PDF pelo navegador) e **Administração**. A pessoa discente
+   impressa ou salva em PDF pelo navegador); a **Administração** fica no
+   ícone de engrenagem, junto das configurações. A pessoa discente
    informa **nome**, **universidade** (pessoas da mesma instituição são
    desconsideradas como membro externo), **título**, **resumo** e
    **palavras-chave** do trabalho e, opcionalmente, o próprio

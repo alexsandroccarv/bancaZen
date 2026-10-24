@@ -93,10 +93,12 @@ PROFIAP** (PPG = PROFIAP) e **Externa** (qualquer outro PPG). Base: templateZen.
   listas), `#relatorio` (`js/relatorio.js`: declaração da indicação a partir
   do evento `busca:resultado`; a declaração ética segue o que a busca
   verificou: currículos, só nome ou nada; imprimir/PDF no navegador, nada
-  vai ao servidor) e `#administracao` (`js/admin.js`, só consulta o servidor ao abrir).
+  vai ao servidor). A Administração (`js/admin.js`, senha incluída) fica no
+  painel da engrenagem (`#tab-config`, trecho `#administracao`, depois das
+  preferências de nome e tema); só consulta o servidor quando o painel abre.
   O endereço da seção fica na URL; botões `data-ir="<seção ou trecho>"`
   trocam de seção (`irPara` em `layout.js`; um trecho abre a aba que o
-  contém). `admin.html` só redireciona para `#administracao`.
+  contém). `admin.html` só redireciona para `#administracao` (abre a engrenagem).
 - Cabeçalho/rodapé (site estático HTML+JS): fonte única em `src/js/chrome.js`
   (injeta em `#app-header`/`#app-footer`). Não recriar por página. O `index.html`
   tem seu próprio cabeçalho (com abas); as páginas de apoio usam o `chrome.js`.
