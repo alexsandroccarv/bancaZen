@@ -191,6 +191,14 @@ $erro = '';
 try { bb_programa('PPG', 'Inst', 'Diretor'); } catch (RuntimeException $e) { $erro = $e->getMessage(); }
 confere($erro !== '', 'situação inválida recusada');
 
+/* ---------------- docente permanente (Normas, 13.1) ----------------------- */
+$pp = ['id' => '0000000000000077', 'programa' => ['ppg' => 'PROFIAP', 'instituicao' => 'X', 'situacao' => '']];
+confere(!bb_permanente($pp), 'sem situação: não conta como permanente');
+confere(bb_permanente($pp, ['0000000000000077' => ['ppg' => 'PROFIAP', 'universidade' => 'X', 'situacao' => 'Permanente']]), 'situação da lista de docentes: permanente');
+confere(!bb_permanente($pp, ['0000000000000077' => ['ppg' => 'PROFIAP', 'universidade' => 'X', 'situacao' => 'Colaborador']]), 'colaborador não é permanente');
+$pp['programa']['situacao'] = 'permanente';
+confere(bb_permanente($pp), 'situação gravada com o XML, sem diferenciar maiúsculas');
+
 /* ------- lista da banca pelo PPG (Rede PROFIAP / programa externo) -------- */
 foreach (['PROFIAP', 'profiap', ' Profiap ', 'PRÓFIAP'] as $ppg) confere(bb_grupo_do_ppg($ppg) === 'profiap', "PPG \"$ppg\" -> Rede PROFIAP");
 foreach (['PPG em Administração', 'PROFIAP-UFX', 'Rede', ''] as $ppg) confere(bb_grupo_do_ppg($ppg) === 'outro', "PPG \"$ppg\" -> programa externo");

@@ -153,6 +153,7 @@
         fd.append('palavrasChave', $('#palavrasInput').value);
         fd.append('excluirInstituicao', $('#excluirInput').value);
         fd.append('somenteDoutores', $('#doutoresInput').checked ? '1' : '0');
+        fd.append('somentePermanentes', $('#permanentesInput').checked ? '1' : '0');
         fd.append('periodo', $('#periodoInput').value);
         for (const k of ENVOLVIDOS) {
             const arq = $(`#${k}Arquivo`).files[0];
@@ -187,6 +188,7 @@
                 criterios: {
                     excluirInstituicao: $('#excluirInput').value.trim(),
                     somenteDoutores: $('#doutoresInput').checked,
+                    somentePermanentes: $('#permanentesInput').checked,
                     periodo: Number($('#periodoInput').value) || 0,
                 },
                 dissertacao: dadosDissertacao(),
@@ -299,11 +301,12 @@
             ? `Docentes com maior proximidade temática: indicações para ${[eu.nome, eu.universidade].filter(Boolean).join(' · ')}`
             : 'Docentes com maior proximidade temática';
         $('#listas').innerHTML = listas.map((l, n) => {
-            const resumo = l.resultados.length
+            const resumo = (l.resultados.length
                 ? `${l.resultados.length} ${l.resultados.length === 1 ? 'indicação' : 'indicações'} entre ${l.total} currículo(s) desta lista.`
                 : (l.total
                     ? `Nenhum dos ${l.total} currículo(s) desta lista tem termos em comum com o trabalho sem ter vínculo identificado.`
-                    : 'Nenhum currículo cadastrado nesta lista.');
+                    : 'Nenhum currículo cadastrado nesta lista.'))
+                + (l.foraSituacao ? ` ${l.foraSituacao} currículo(s) fora da busca por não constar como docente permanente.` : '');
             return `<section class="space-y-3" aria-labelledby="lista-${l.grupo}">
                 <h3 id="lista-${l.grupo}" class="text-base font-bold">${n + 1}. ${esc(l.titulo)}</h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">${esc(resumo)}</p>
@@ -383,7 +386,7 @@
             discente: '#discenteId', orientadorNome: '#orientadorNome', orientador: '#orientadorId',
             coorientadorNome: '#coorientadorNome', coorientador: '#coorientadorId', periodo: '#periodoInput',
         },
-        criterios: { excluirInstituicao: '#excluirInput', somenteDoutores: '#doutoresInput' },
+        criterios: { excluirInstituicao: '#excluirInput', somenteDoutores: '#doutoresInput', somentePermanentes: '#permanentesInput' },
     };
     function exportarJson() {
         const dados = { app: 'bancaZen', formato: 1, exportadoEm: new Date().toISOString() };

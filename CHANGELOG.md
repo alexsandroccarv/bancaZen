@@ -7,6 +7,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Critério "Somente docentes permanentes" na Composição da banca, marcado
+  por padrão (Normas Acadêmicas, 13.1). Sem a situação Permanente (da
+  planilha de docentes ou dos dados do XML), o currículo fica fora; cada
+  lista informa quantos saíram por esse critério. Entra no JSON exportado e
+  no Relatório. [issue #75](../../issues/75)
+
+## [0.0.37] - 2026-10-24
+
 ### Alterado
 - Linguagem do app alinhada ao item 13 das Normas Acadêmicas do PROFIAP,
   em linguagem não discriminatória: abas "Meu TCC" e "Composição da banca";
