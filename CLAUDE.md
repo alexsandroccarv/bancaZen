@@ -134,6 +134,15 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
   em `app.js` mantém o indicador de etapas de Meu TCC.
 - Acessibilidade: manter landmarks, foco visível, um `<h1>` por página,
   rótulos (`aria-label`) em botões só-ícone e `prefers-reduced-motion`.
+  Meta WCAG 2.2 AA (issue #83): texto em cinza ou na cor de destaque usa
+  `--bz-muted`/`--bz-acento-texto` (nunca `--tz-muted`/`--tz-accent` direto
+  sobre cartões), texto sobre tintas usa `--bz-texto-tinta`, sem `opacity`
+  em texto; alvos de toque >= 24 px (44 px no rodapé e botões principais);
+  links no texto corrido sublinhados; regiões com rolagem horizontal com
+  `tabindex="0"` e rótulo; nada passa da largura em 320 px nem com a fonte
+  em 200%. `tools/contrast-check.mjs` confere também os tons `--bz-*`.
+  Troca de seção feita pela pessoa usa `pushState` (o "voltar" do celular
+  retorna à seção anterior); `popstate` reabre a seção do endereço.
 
 ## Onboarding (novo projeto)
 - `node scripts/setup.mjs` — troca os placeholders (nome, repo, autor,
