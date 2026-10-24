@@ -45,7 +45,7 @@
     }
 
     // Vai para uma seção (aba) ou para um trecho dentro de uma aba (ex.:
-    // #orientacao, dentro de Minha Dissertação). Devolve false se não existe.
+    // #orientacao, dentro de Meu TCC). Devolve false se não existe.
     function irPara(nome, opts) {
         if ($('#tab-' + nome)) { switchTab(nome, opts); window.scrollTo(0, 0); return true; }
         const trecho = nome && document.getElementById(nome);

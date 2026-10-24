@@ -3,7 +3,7 @@
    bancaZen — Conformidade ética: vínculos com a discente e a orientação
    --------------------------------------------------------------------------
    Verifica se uma pessoa indicada para a banca tem vínculo com a pessoa
-   discente, com o(a) orientador(a) ou com o(a) coorientador(a), a partir
+   discente, com quem orienta ou com quem coorienta, a partir
    dos currículos Lattes de cada uma:
 
      coautoria     publicação com autoria em comum, procurada nos dois

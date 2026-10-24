@@ -8,6 +8,20 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Não lançado]
 
 ### Alterado
+- Linguagem do app alinhada ao item 13 das Normas Acadêmicas do PROFIAP,
+  em linguagem não discriminatória: abas "Meu TCC" e "Composição da banca";
+  Banca de Defesa de Projeto de TCC e Banca de Defesa de TCC; Instituição
+  Associada; docentes com o grau de doutor; lista "Programa externo à Rede
+  PROFIAP" (antes "Externa"); "Orientação" e "Coorientação" (antes
+  "Orientador(a)" e "Coorientador(a)"); vínculos como conflito de
+  interesses (13.3). O Início descreve o processo da Norma e o que o
+  bancaZen confere. O Relatório cita o item 13, mostra a composição
+  proposta com a orientação e declara também a ausência de parentesco de
+  1º grau. [issue #73](../../issues/73)
+
+## [0.0.36] - 2026-10-24
+
+### Alterado
 - Ajuda: o conteúdo de exemplo do template dá lugar ao item 13 das Normas
   Acadêmicas Nacionais do PROFIAP (composição das bancas, publicado em
   19/02/2026), com a fonte, e a uma nota sobre como o bancaZen se relaciona

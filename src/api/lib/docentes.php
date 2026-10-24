@@ -6,7 +6,7 @@
    programa (Permanente, Colaborador, Visitante), e pode ser importada antes
    dos XMLs do Lattes. Quando a pessoa está na lista, os dados da lista valem
    para a exibição e para separar as listas de sugestões pelo PPG (Rede
-   PROFIAP ou Externa: bb_programa_efetivo e bb_grupo_do_ppg, em base.php).
+   PROFIAP ou programa externo: bb_programa_efetivo e bb_grupo_do_ppg, em base.php).
 
    Formato aceito (ex.: a planilha "docentes PROFIAP 2025"): CSV separado por
    ";", "," ou tabulação, com ou sem BOM, com cabeçalho (maiúsculas, acentos,
