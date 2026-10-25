@@ -17,7 +17,8 @@
      GET  modelo-docentes     -> modelo do CSV da lista de docentes (download;
                                  sem dados da base, não exige sessão)
      POST remover    id
-     POST indexar    -> refaz o índice de busca, se a base mudou (bb_indice_garantir)
+     POST indexar    -> refaz o índice de busca e a visão, se a base mudou
+                     (bb_indice_garantir, bb_visao_garantir; base grande: cli/indexar.php)
      POST limpar     curriculos (1/0), docentes (1/0), confirmacao = LIMPAR
                      -> apaga índice e arquivos de <dados>/xml/ e/ou a lista
                      de docentes (bb_limpar); a senha fica
@@ -165,6 +166,7 @@ try {
             bb_exigir_admin();
             @ini_set('memory_limit', '512M');
             $meta = bb_indice_garantir();
+            bb_visao_garantir($meta);
             bb_json(['curriculos' => $meta['N'], 'criadoEm' => $meta['criadoEm']]);
 
         case 'limpar':

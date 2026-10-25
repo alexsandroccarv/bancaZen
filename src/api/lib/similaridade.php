@@ -188,7 +188,8 @@ function sim_criar_indice(array $pessoas, ?int $anoAtual = null): array
 // $consulta = ['titulo', 'resumo', 'palavrasChave' => string[]]
 // $opcoes   = ['limite', 'excluirInstituicao', 'somenteDoutores']
 // Busca no índice em memória (sim_criar_indice): usada nos testes e como
-// referência; o site usa sim_buscar_partes, com o mesmo cálculo.
+// referência; o site usa o índice gravado (sim_pontuar_postagens), com o
+// mesmo cálculo.
 function sim_buscar(array $indice, array $consulta, array $opcoes = []): array
 {
     [$tf, $formas] = sim_consulta($consulta);
@@ -202,15 +203,87 @@ function sim_buscar(array $indice, array $consulta, array $opcoes = []): array
     return sim_pontuar($tf, $formas, $termo, $docs, $indice['media'], $opcoes);
 }
 
-// Busca no índice gravado em partes: $termo($t) devolve [idf, [doc =>
-// frequência]] (ou null, se o termo não aparece em nenhum currículo),
-// $docs[doc] = ['pessoa' => registro (leve basta), 'comprimento'] e $media é
-// o comprimento médio. Só os termos da consulta são lidos: a memória não
-// cresce com a base.
-function sim_buscar_partes(array $consulta, array $opcoes, callable $termo, array $docs, float $media): array
+// Busca no índice gravado (lib/indice.php): $termo($t) devolve [idf,
+// postagens] (string com pack('VV', doc, frequência × 10000) por currículo,
+// em ordem de doc) ou null; $comprimento($doc) e $aceita($doc) (filtros) vêm
+// do índice. Só os currículos com algum termo da consulta são avaliados, e
+// as postagens são lidas em trechos: a memória não cresce com a base.
+// Devolve os pontos (doc => soma BM25), o máximo possível da consulta e o
+// necessário para sim_termos_comuns.
+function sim_pontuar_postagens(array $tf, callable $termo, callable $comprimento, callable $aceita, float $media): array
 {
-    [$tf, $formas] = sim_consulta($consulta);
-    return sim_pontuar($tf, $formas, $termo, $docs, $media, $opcoes);
+    $k1 = SIM_BM25_K1;
+    $b = SIM_BM25_B;
+    $q = [];
+    $maximo = 0.0;
+    $postagens = [];
+    foreach ($tf as $t => $f) {
+        $info = $termo((string) $t);
+        if (!$info || $info[0] <= 0) continue;
+        $q[$t] = (1 + log($f)) * $info[0];
+        $maximo += $q[$t] * ($k1 + 1);
+        $postagens[$t] = $info[1];
+    }
+    $pontos = [];
+    $ok = [];
+    $ajustes = [];
+    foreach ($q as $t => $qw) {
+        $pk = $postagens[$t];
+        $n = strlen($pk);
+        for ($o = 0; $o < $n; $o += 65536) {
+            $v = unpack('V*', substr($pk, $o, 65536));
+            for ($i = 1, $m = count($v); $i < $m; $i += 2) {
+                $d = $v[$i];
+                if (!($ok[$d] ??= $aceita($d))) continue;
+                $aj = $ajustes[$d] ??= ($media > 0 ? 1 - $b + $b * ($comprimento($d) / $media) : 1.0);
+                $f = $v[$i + 1] / 10000;
+                $pontos[$d] = ($pontos[$d] ?? 0.0) + $qw * ($f * ($k1 + 1)) / ($f + $k1 * $aj);
+            }
+        }
+    }
+    return ['pontos' => $pontos, 'maximo' => $maximo, 'q' => $q, 'postagens' => $postagens];
+}
+// Frequência de um currículo nas postagens de um termo (busca binária).
+function sim_postagem(string $pk, int $doc): ?float
+{
+    $lo = 0;
+    $hi = intdiv(strlen($pk), 8) - 1;
+    while ($lo <= $hi) {
+        $meio = ($lo + $hi) >> 1;
+        [, $d, $f] = unpack('V2', substr($pk, $meio * 8, 8));
+        if ($d === $doc) return $f / 10000;
+        if ($d < $doc) $lo = $meio + 1;
+        else $hi = $meio - 1;
+    }
+    return null;
+}
+// Termos em comum de um currículo do resultado de sim_pontuar_postagens.
+function sim_termos_comuns(array $r, array $formas, int $doc, float $comprimento, float $media): array
+{
+    $k1 = SIM_BM25_K1;
+    $b = SIM_BM25_B;
+    $ajuste = $media > 0 ? 1 - $b + $b * ($comprimento / $media) : 1.0;
+    $c = [];
+    foreach ($r['q'] as $t => $qw) {
+        $f = sim_postagem($r['postagens'][$t], $doc);
+        if ($f !== null) $c[$t] = $qw * ($f * ($k1 + 1)) / ($f + $k1 * $ajuste);
+    }
+    return sim_termos($c, $formas);
+}
+// Termos em comum que mais pesaram (até 6, sem repetir a palavra de um
+// bigrama já listado), na forma escrita na consulta.
+function sim_termos(array $c, array $formas): array
+{
+    arsort($c);
+    $termos = [];
+    foreach (array_keys($c) as $t) {
+        $f = $formas[(string) $t] ?? '';
+        if ($f === '') continue;
+        foreach ($termos as $x) if (str_contains($x, $f) || str_contains($f, $x)) continue 2;
+        $termos[] = $f;
+        if (count($termos) >= 6) break;
+    }
+    return $termos;
 }
 
 // Ordem das sugestões: proximidade como exibida (2 casas), decrescente; no
@@ -280,18 +353,7 @@ function sim_pontuar(array $tf, array $formas, callable $termo, array $docs, flo
         $prod = $produto[$k] ?? 0.0;
         if ($prod <= 0) continue;
         $score = min(1.0, $prod / $maximo);
-        $c = $contrib[$k];
-        arsort($c);
-        // Termos em comum que mais pesaram (sem repetir a palavra de um bigrama já listado).
-        $termos = [];
-        foreach (array_keys($c) as $t) {
-            $f = $formas[(string) $t] ?? '';
-            if ($f === '') continue;
-            foreach ($termos as $x) if (str_contains($x, $f) || str_contains($f, $x)) continue 2;
-            $termos[] = $f;
-            if (count($termos) >= 6) break;
-        }
-        $resultados[] = ['pessoa' => $p, 'score' => $score, 'termos' => $termos];
+        $resultados[] = ['pessoa' => $p, 'score' => $score, 'termos' => sim_termos($contrib[$k], $formas)];
     }
 
     usort($resultados, fn($a, $b) => ($b['score'] <=> $a['score'])

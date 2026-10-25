@@ -257,23 +257,50 @@ file_put_contents("$tmpR/pessoas/0000000000000001.json", json_encode($velho));
 $relido = bb_carregar_pessoa($leves['0000000000000001']);
 confere(count($relido['bancas']) === 3 && $relido['programa']['ppg'] === 'PROFIAP', 'registro antigo relido do XML (títulos das bancas), programa mantido');
 confere(json_decode(file_get_contents("$tmpR/pessoas/0000000000000001.json"), true)['versao'] === LATTES_VERSAO, 'registro relido regravado na versão atual');
-// Índice em partes no disco: mesmo ranking da busca em memória.
+// Índice gravado (formato 2, lib/indice.php): mesmo ranking da busca em memória.
 $meta = bb_indice_garantir();
-confere($meta['N'] === count($leves) && is_dir("$tmpR/indice/termos"), 'índice de busca gravado em partes');
+confere($meta['N'] === count($leves) && $meta['formato'] === BB_INDICE_FORMATO && is_file("$tmpR/indice/postagens.bin") && is_file("$tmpR/indice/docs.bin"), 'índice gravado: dicionário por termo e postagens binárias');
+$visao = bb_visao_garantir($meta);
+confere($visao['comDados'] === count($leves) && $visao['N'] === $meta['N'] && is_dir("$tmpR/visao/leves"), 'visão da busca: contagem e registros leves');
 $consultaT = ['titulo' => 'Governança pública e transparência', 'resumo' => 'controle social nos municípios', 'palavrasChave' => ['accountability']];
-$docsT = [];
-foreach ($meta['ids'] as $k => $id) $docsT[$k] = ['pessoa' => $leves[$id], 'comprimento' => $meta['comprimentos'][$k]];
-$disco = sim_buscar_partes($consultaT, ['limite' => INF], bb_indice_leitor(), $docsT, $meta['media']);
-$memoria = sim_buscar(sim_criar_indice(array_map('bb_carregar_pessoa', array_values($leves))), $consultaT, ['limite' => INF]);
-$resumoR = fn($r) => array_map(fn($x) => $x['pessoa']['id'] . ':' . round($x['score'], 4) . ':' . implode(',', $x['termos']), $r['resultados']);
-confere($resumoR($disco) === $resumoR($memoria) && count($disco['resultados']) > 0, 'busca no índice em partes = busca em memória (ordem, proximidade e termos)');
-confere(bb_indice_garantir()['criadoEm'] === $meta['criadoEm'], 'índice não é refeito sem mudança no corpus');
-$sexoIdx = array_combine($meta['ids'], $meta['sexos']);
-confere($sexoIdx['0000000000000001'] === 'F' && $sexoIdx['0000000000000002'] === 'M', 'índice guarda o sexo de cada currículo, na ordem dos ids');
-// Ana (F) e Elisa (não informado) empatam em 0,75: Ana primeiro.
-$emp = sim_ordenar($disco['resultados'], fn($p) => ($sexoIdx[$p['id']] ?? '') === 'F');
-$ids2 = array_map(fn($x) => $x['pessoa']['id'], array_slice($emp, 0, 2));
-confere($ids2[0] === '0000000000000001', 'empate Ana x Elisa: a de sexo feminino primeiro');
+$completos = array_map('bb_carregar_pessoa', array_values($leves));
+$indMem = sim_criar_indice($completos);
+$ordemMem = fn(array $op) => sim_ordenar(sim_buscar($indMem, $consultaT, ['limite' => INF] + $op)['resultados'], fn($p) => ($p['sexo'] ?? '') === 'F');
+$resumoR = fn(array $rs) => array_map(fn($x) => $x['pessoa']['id'] . ':' . round($x['score'], 4) . ':' . implode(',', $x['termos']), $rs);
+$disco = iterator_to_array(bb_buscar($meta, $visao, $consultaT), false);
+confere($resumoR($disco) === $resumoR($ordemMem([])) && count($disco) > 0, 'busca no índice gravado = busca em memória (ordem exibida, proximidade e termos)');
+confere(bb_indice_garantir()['criadoEm'] === $meta['criadoEm'] && bb_visao_garantir($meta)['criadoEm'] === $visao['criadoEm'], 'índice e visão não são refeitos sem mudança');
+// Filtros: os mesmos da busca em memória (instituição do Lattes, doutorado).
+$instUm = $completos[0]['instituicao'];
+confere($resumoR(iterator_to_array(bb_buscar($meta, $visao, $consultaT, ['excluirInstituicao' => $instUm]), false)) === $resumoR($ordemMem(['excluirInstituicao' => $instUm])), 'filtro de instituição igual ao da busca em memória');
+confere($resumoR(iterator_to_array(bb_buscar($meta, $visao, $consultaT, ['somenteDoutores' => true]), false)) === $resumoR($ordemMem(['somenteDoutores' => true])), 'filtro de doutorado igual ao da busca em memória');
+$perm = iterator_to_array(bb_buscar($meta, $visao, $consultaT, ['somentePermanentes' => true]), false);
+confere(count($perm) < count($disco) && !array_filter($perm, fn($x) => !bb_permanente($x['pessoa'])), 'filtro de docentes permanentes');
+// Sexo no índice (nunca no registro exibido) e empate: a de sexo feminino primeiro.
+$ix = bb_indice_abrir();
+$sexoIdx = [];
+for ($k = 0; $k < $meta['N']; $k++) $sexoIdx[$ix['id']($k)] = $ix['sexo']($k);
+confere($sexoIdx['0000000000000001'] === 'F' && $sexoIdx['0000000000000002'] === 'M', 'índice guarda o sexo de cada currículo');
+confere($disco[0]['pessoa']['id'] === '0000000000000001' && !isset($disco[0]['pessoa']['sexo']), 'empate Ana x Elisa: a de sexo feminino primeiro; sexo fora do registro exibido');
+// Registro leve por ID, com o programa efetivo (lista de docentes > envio).
+$lv = bb_leve_por_id('http://lattes.cnpq.br/0000000000000001');
+confere($lv && $lv['programa']['ppg'] === 'PROFIAP' && $lv['nome'] === $leves['0000000000000001']['nome'] && bb_leve_por_id('9999999999999999') === null, 'registro leve por ID na visão');
+// Mudança só na lista de docentes: a visão é refeita, o índice não.
+$docentesAntes = bb_carregar_docentes();
+bb_alterar_docentes(function ($d) { $d['0000000000000002'] = ['id' => '0000000000000002', 'nome' => 'X', 'universidade' => 'Univ. Nova', 'ppg' => 'PROFIAP', 'situacao' => 'Permanente']; return [$d, null]; });
+$visao2 = bb_visao_garantir(bb_indice_garantir());
+$okVisao = bb_indice_garantir()['criadoEm'] === $meta['criadoEm'] && $visao2['assinatura'] !== $visao['assinatura'] && bb_leve_por_id('0000000000000002')['programa']['ppg'] === 'PROFIAP' && in_array('Univ. Nova', $visao2['universidades'], true);
+confere($okVisao, 'lista de docentes nova: só a visão é refeita');
+bb_alterar_docentes(fn($d) => [$docentesAntes, null]);
+// Busca na web com base grande e sem índice: erro que pede a indexação.
+bb_apagar_pasta("$tmpR/indice");
+$grande = str_repeat(' ', BB_INDICE_WEB_MAX + 1);
+file_put_contents("$tmpR/corpus.json", rtrim((string) file_get_contents("$tmpR/corpus.json")) . $grande);
+$erroWeb = '';
+try { bb_indice_garantir(true); } catch (RuntimeException $e) { $erroWeb = $e->getMessage(); }
+confere(str_contains($erroWeb, 'indexar'), 'base grande sem índice: a busca pede a indexação');
+$meta = bb_indice_garantir();
+confere($meta['N'] === count($leves) && isset(bb_indice_garantir(true)['N']), 'indexação fora da busca; depois a busca usa o índice');
 
 // Zona de risco: limpar a base (a senha fica).
 file_put_contents("$tmpR/admin.json", '{"hash":"x"}');

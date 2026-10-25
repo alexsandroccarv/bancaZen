@@ -18,8 +18,11 @@
                     (o grupo da banca vem do PPG: bb_grupo_do_ppg)
      pessoas/<id>.json  registro completo (produções, coautores, orientações),
                     lido só quando preciso (vínculos e índice de busca)
-     indice/        índice de busca pré-calculado, em 256 partes por termo
-                    (bb_indice_construir); refeito quando o corpus.json muda
+     indice/        índice de busca (lib/indice.php): dicionário por termo e
+                    postagens binárias; refeito quando o corpus.json muda
+     visao/         filtros compactos e registros leves com o programa
+                    efetivo; refeita quando o índice, o corpus ou a lista
+                    de docentes mudam
      docentes.json  lista de docentes dos programas { id Lattes: docente }
                     (lib/docentes.php), importada de CSV, sem e-mails
      admin.json     hash da senha da administração (php api/cli/definir-senha.php)
@@ -46,6 +49,7 @@ register_shutdown_function(function () {
 });
 
 require_once __DIR__ . '/lattes.php';
+require_once __DIR__ . '/indice.php';
 require_once __DIR__ . '/similaridade.php';
 require_once __DIR__ . '/vinculos.php';
 require_once __DIR__ . '/docentes.php';
@@ -246,143 +250,9 @@ function bb_json_registros(string $arq, callable $fn): int
 }
 
 /* --------------------------- índice de busca ----------------------------- */
-// Pré-calculado a partir dos registros completos (dois passes, um currículo
-// por vez) e gravado em indice/: meta.json (modelo, ids, comprimento de cada
-// currículo, comprimento médio, assinatura) e termos/<2 hex>.json ({ termo:
-// [idf, { doc: frequência }] }), o que o BM25 usa (sim_pontuar). A busca lê
-// só as partes dos termos da consulta.
-function bb_indice_assinatura(): string
-{
-    $a = bb_dir_dados() . '/corpus.json';
-    return is_file($a) ? (string) md5_file($a) : '';
-}
-function bb_indice_meta(): ?array
-{
-    $m = bb_dir_dados() . '/indice/meta.json';
-    $d = is_file($m) ? json_decode((string) file_get_contents($m), true) : null;
-    return is_array($d) ? $d : null;
-}
-function bb_indice_parte(string $termo): string
-{
-    return substr(md5($termo), 0, 2);
-}
-// Devolve o meta do índice, refazendo-o se o corpus mudou.
-function bb_indice_garantir(): array
-{
-    bb_migrar_corpus();
-    $m = bb_indice_meta();
-    if (bb_indice_valido($m, bb_indice_assinatura())) return $m;
-    return bb_indice_construir();
-}
-// Índice do mesmo corpus, do mesmo ano (peso da recência) e do mesmo modelo.
-function bb_indice_valido(?array $m, string $assinatura): bool
-{
-    return $m && ($m['assinatura'] ?? '') === $assinatura && ($m['ano'] ?? 0) === (int) date('Y')
-        && ($m['modelo'] ?? '') === SIM_MODELO;
-}
-function bb_indice_construir(): array
-{
-    $dir = bb_preparar_dados();
-    $trava = fopen("$dir/indice.lock", 'c');
-    flock($trava, LOCK_EX);
-    try {
-        $assinatura = bb_indice_assinatura();
-        $m = bb_indice_meta();
-        if (bb_indice_valido($m, $assinatura)) return $m; // outro processo já fez
-        @set_time_limit(600);
-        $corpus = bb_carregar_json('corpus.json');
-        $ano = (int) date('Y');
-        $sexos = [];
-        $tfDe = function (array $leve) use ($ano, &$sexos): ?array {
-            $p = bb_carregar_pessoa($leve);
-            if (!$p) return null;
-            $sexos[] = $p['sexo'] ?? '';
-            return sim_tf_curriculo($p, $ano);
-        };
-        // 1º passe: em quantos currículos cada termo aparece. Os termos de
-        // cada currículo vão para um arquivo temporário (uma linha por
-        // currículo), lido no 2º passe sem recalcular.
-        $df = [];
-        $ids = [];
-        $tmpTf = "$dir/indice.tf-" . bin2hex(random_bytes(4));
-        $htf = fopen($tmpTf, 'wb');
-        foreach ($corpus as $id => $leve) {
-            $tf = $tfDe($leve);
-            if ($tf === null) continue;
-            $ids[] = (string) $id;
-            foreach ($tf as $t => $_) $df[$t] = ($df[$t] ?? 0) + 1;
-            fwrite($htf, json_encode($tf, JSON_UNESCAPED_UNICODE) . "\n");
-        }
-        fclose($htf);
-        $N = count($ids);
-        $idf = [];
-        foreach ($df as $t => $n) $idf[$t] = sim_idf($N, $n);
-        unset($df);
-        // 2º passe: frequências e comprimentos; as postagens vão para arquivos
-        // por parte.
-        $novo = "$dir/indice.novo-" . bin2hex(random_bytes(4));
-        @mkdir("$novo/termos", 0750, true);
-        $buffers = [];
-        $comprimentos = [];
-        $descarregar = function (string $parte) use (&$buffers, $novo) {
-            file_put_contents("$novo/termos/$parte.tsv", $buffers[$parte], FILE_APPEND);
-            $buffers[$parte] = '';
-        };
-        $htf = fopen($tmpTf, 'rb');
-        foreach ($ids as $k => $id) {
-            $tf = json_decode((string) fgets($htf), true) ?: [];
-            foreach ($tf as $t => $f) {
-                $f = round($f, 4);
-                if ($f <= 0) continue;
-                $parte = bb_indice_parte((string) $t);
-                $buffers[$parte] = ($buffers[$parte] ?? '') . "$t\t$k\t$f\n";
-                if (strlen($buffers[$parte]) > 65536) $descarregar($parte);
-            }
-            $comprimentos[$k] = round(array_sum($tf), 4);
-        }
-        fclose($htf);
-        @unlink($tmpTf);
-        foreach (array_keys($buffers) as $parte) $descarregar($parte);
-        foreach (glob("$novo/termos/*.tsv") ?: [] as $tsv) {
-            $termos = [];
-            $h = fopen($tsv, 'rb');
-            while (($linha = fgets($h)) !== false) {
-                [$t, $k, $f] = explode("\t", rtrim($linha, "\n"));
-                $termos[$t] ??= [round($idf[$t], 6), []];
-                $termos[$t][1][(int) $k] = (float) $f;
-            }
-            fclose($h);
-            file_put_contents(substr($tsv, 0, -4) . '.json', json_encode($termos, JSON_UNESCAPED_UNICODE));
-            unlink($tsv);
-        }
-        $meta = ['modelo' => SIM_MODELO, 'assinatura' => $assinatura, 'ano' => $ano, 'N' => $N, 'ids' => $ids,
-            'comprimentos' => $comprimentos, 'media' => $N ? array_sum($comprimentos) / $N : 0.0,
-            'sexos' => $sexos, 'criadoEm' => date('c')];
-        file_put_contents("$novo/meta.json", json_encode($meta));
-        // Troca atômica da pasta do índice.
-        $velho = "$dir/indice.velho-" . bin2hex(random_bytes(4));
-        if (is_dir("$dir/indice")) rename("$dir/indice", $velho);
-        rename($novo, "$dir/indice");
-        if (is_dir($velho)) bb_apagar_pasta($velho);
-        return $meta;
-    } finally {
-        flock($trava, LOCK_UN);
-        fclose($trava);
-    }
-}
-// Leitor de termos para sim_buscar_partes: abre cada parte uma vez só.
-function bb_indice_leitor(): callable
-{
-    $partes = [];
-    $dir = bb_dir_dados() . '/indice/termos';
-    return function (string $termo) use (&$partes, $dir): ?array {
-        $parte = bb_indice_parte($termo);
-        if (!array_key_exists($parte, $partes)) {
-            $partes[$parte] = is_file("$dir/$parte.json") ? (json_decode((string) file_get_contents("$dir/$parte.json"), true) ?: []) : [];
-        }
-        return $partes[$parte][$termo] ?? null;
-    };
-}
+// Em lib/indice.php (formato 3: dicionário por termo, postagens binárias e
+// visão compacta para os filtros).
+
 function bb_apagar_pasta(string $dir): int
 {
     $n = 0;
@@ -569,6 +439,7 @@ function bb_limpar(bool $curriculos, bool $docentes): array
             }
             bb_apagar_pasta("$dir/pessoas");
             bb_apagar_pasta("$dir/indice");
+            bb_apagar_pasta("$dir/visao");
             return [[], count($corpus)];
         });
     }
