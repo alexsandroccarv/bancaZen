@@ -28,15 +28,20 @@ const ENVOLVIDOS = [
 ];
 
 bb_exigir_metodo('POST');
-// Refazer o índice (primeira busca depois de uma carga) pode levar alguns
-// segundos; a busca em si lê só as partes do índice dos termos da consulta.
+// Base pequena: o índice é refeito aqui depois de uma carga (alguns
+// segundos). Base grande: vale o índice da última indexação (Administração
+// ou api/cli/indexar.php). A busca lê só os termos da consulta (lib/indice.php):
+// nem o corpus nem a lista de docentes são carregados inteiros.
 @set_time_limit(600);
-$docentes = bb_carregar_docentes();
+try {
+    $indice = bb_indice_garantir(true);
+    $visao = bb_visao_garantir($indice);
+} catch (RuntimeException $e) {
+    bb_erro($e->getMessage(), 503);
+}
 // Currículo sem dados (fora da lista de docentes e sem PPG no envio) fica
 // fora da busca até a lista trazer a pessoa.
-$todos = bb_carregar_corpus();
-$corpus = array_filter($todos, fn($p) => bb_tem_dados($p, $docentes));
-if (!$corpus) bb_erro('Nenhum currículo cadastrado ainda. Procure a administração do programa.', 503);
+if (!$visao['comDados']) bb_erro('Nenhum currículo cadastrado ainda. Procure a administração do programa.', 503);
 
 $texto = fn($k) => trim((string) ($_POST[$k] ?? ''));
 $consulta = [
@@ -64,7 +69,8 @@ foreach (ENVOLVIDOS as $env) {
         }
     } elseif (($id = vinc_id_lattes(preg_match('/\d{16}/', $texto($env['chave'] . 'Id'), $m) ? $m[0] : '')) !== '') {
         // Qualquer currículo guardado serve, mesmo sem dados de programa.
-        $pessoa = isset($todos[$id]) ? bb_carregar_pessoa($todos[$id]) : null;
+        $leve = bb_leve_por_id($id);
+        $pessoa = $leve ? bb_carregar_pessoa($leve) : null;
         if (!$pessoa) bb_erro("{$env['papel']}: currículo não encontrado na base. Envie o arquivo XML ou ZIP do Lattes.");
     } elseif ($texto($env['chave'] . 'Id') !== '') {
         bb_erro("{$env['papel']}: informe um link ou ID Lattes válido (16 dígitos).");
@@ -83,56 +89,41 @@ foreach (ENVOLVIDOS as $env) {
     }
 }
 
-// Um só índice para toda a base (o IDF considera todos os currículos), e o
-// ranking é separado por grupo depois. Quem está sem dados fica de fora aqui.
-$meta = bb_indice_garantir();
-$docs = [];
-foreach ($meta['ids'] as $k => $id) {
-    if (isset($corpus[$id])) $docs[$k] = ['pessoa' => $corpus[$id], 'comprimento' => $meta['comprimentos'][$k] ?? 0];
-}
-$busca = sim_buscar_partes($consulta, [
-    'limite' => INF,
+// Um só índice para toda a base (o IDF considera todos os currículos); o
+// ranking vem na ordem exibida e é separado por lista. Filtros: instituição
+// (do Lattes ou do programa), doutorado e situação Permanente (13.1).
+$somentePermanentes = $texto('somentePermanentes') === '1';
+$ranking = bb_buscar($indice, $visao, $consulta, [
     'excluirInstituicao' => $texto('excluirInstituicao'),
     'somenteDoutores' => $texto('somenteDoutores') === '1',
-], bb_indice_leitor(), $docs, (float) ($meta['media'] ?? 0));
-// Empate na proximidade exibida: pessoas de sexo feminino primeiro (o sexo
-// fica só no índice; não vai para a resposta).
-$sexoDe = [];
-foreach ($meta['ids'] as $k => $id) $sexoDe[$id] = $meta['sexos'][$k] ?? '';
-$busca['resultados'] = sim_ordenar($busca['resultados'], fn($p) => ($sexoDe[$p['id']] ?? '') === 'F');
-// O filtro de instituição também vale para a instituição do programa.
-$excluir = trim(sim_sem_acento($texto('excluirInstituicao')));
-
-// Só docentes permanentes (13.1): quem não tem a situação Permanente fica
-// fora; cada lista informa quantos currículos saíram por esse critério.
-$somentePermanentes = $texto('somentePermanentes') === '1';
+    'somentePermanentes' => $somentePermanentes,
+]);
 
 $periodo = (int) $texto('periodo');
 $desdeAno = in_array($periodo, [5, 10], true) ? (int) date('Y') - $periodo + 1 : 0;
 $listas = [];
 foreach (BB_GRUPOS as $grupo => $titulo) {
     $listas[$grupo] = ['grupo' => $grupo, 'titulo' => $titulo, 'resultados' => [], 'retirados' => [],
-        'total' => count(array_filter($corpus, fn($p) => bb_grupo($p, $docentes) === $grupo)),
-        'foraSituacao' => $somentePermanentes
-            ? count(array_filter($corpus, fn($p) => bb_grupo($p, $docentes) === $grupo && !bb_permanente($p, $docentes))) : 0];
+        'total' => $visao['totais'][$grupo] ?? 0,
+        'foraSituacao' => $somentePermanentes ? ($visao['foraSituacao'][$grupo] ?? 0) : 0];
 }
-// Percorre o ranking completo: quem tem vínculo sai da lista do seu grupo (e
-// é exibido à parte) até cada lista ter 10 pessoas sem vínculo.
-foreach ($busca['resultados'] as $r) {
-    $p = $r['pessoa'];
-    if ($excluir !== '' && str_contains(sim_sem_acento(bb_programa_efetivo($p, $docentes)['instituicao']), $excluir)) continue;
-    if ($somentePermanentes && !bb_permanente($p, $docentes)) continue;
-    $l = &$listas[bb_grupo($p, $docentes)];
+// Percorre o ranking: quem tem vínculo sai da lista do seu grupo (e é
+// exibido à parte) até cada lista ter 10 pessoas sem vínculo.
+foreach ($ranking as $r) {
+    $l = &$listas[$r['grupo']];
     if (count($l['resultados']) < LIMITE) {
-        $item = ['pessoa' => bb_publico($p, $docentes), 'score' => round($r['score'], 4), 'termos' => $r['termos']];
+        $item = ['pessoa' => bb_publico($r['pessoa']), 'score' => round($r['score'], 4), 'termos' => $r['termos']];
         // Vínculos pedem o registro completo (produções e coautores), lido só
         // para quem chega à lista.
-        $completo = $envolvidos ? bb_carregar_pessoa($p) : null;
+        $completo = $envolvidos ? bb_carregar_pessoa($r['pessoa']) : null;
         $vinculos = $completo ? vinc_verificar($completo, $envolvidos, $desdeAno) : [];
         if ($vinculos) $l['retirados'][] = $item + ['vinculos' => $vinculos];
         else $l['resultados'][] = $item;
     }
     unset($l);
+    $completas = true;
+    foreach ($listas as $x) if (count($x['resultados']) < LIMITE) $completas = false;
+    if ($completas) break;
 }
 
 bb_json([

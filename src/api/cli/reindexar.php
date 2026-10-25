@@ -54,4 +54,14 @@ if ($rel['organizados']) {
 }
 foreach ($rel['erros'] as $e) fwrite(STDERR, "  erro: $e\n");
 fwrite(STDOUT, ($simular ? 'Currículos no índice após a gravação: ' : 'Currículos no índice: ') . "{$rel['total']}\n");
+// Índice de busca e visão já atualizados (sem esperar a primeira busca).
+if (!$simular) {
+    try {
+        $indice = bb_indice_garantir();
+        bb_visao_garantir($indice);
+        fwrite(STDOUT, "Índice de busca atualizado: {$indice['N']} currículos.\n");
+    } catch (Throwable $e) {
+        fwrite(STDERR, 'Índice de busca não atualizado: ' . $e->getMessage() . " (rode php api/cli/indexar.php)\n");
+    }
+}
 exit($rel['erros'] ? 1 : 0);

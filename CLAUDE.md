@@ -29,10 +29,18 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
 - **Memória (hospedagem com 128 MB):** `corpus.json` é leve (`bb_leve`:
   exibição, filtro, programa); o registro completo fica em
   `pessoas/<id>.json` (`bb_carregar_pessoa`, só para vínculos). A busca usa
-  o índice pré-calculado em `indice/` (256 partes por termo;
-  `bb_indice_garantir`/`bb_indice_leitor` + `sim_buscar_partes`, que dá o
-  mesmo resultado de `sim_buscar`). Nunca carregar todos os registros
-  completos de uma vez num endpoint. Base antiga é convertida em trechos
+  o índice em `lib/indice.php` (formato 3, issue #91): `indice/` (dicionário
+  em 4096 partes, postagens binárias `pack('VV', doc, freq×10000)`,
+  `docs.bin` com ID, comprimento e sexo) e `visao/` (filtros compactos por
+  currículo, totais, universidades e registros leves com o programa efetivo
+  em `leves/<xx>.jsonl`, lidos por ID com `bb_leve_por_id`). `bb_buscar`
+  (gerador, na ordem de `sim_ordenar`) + `sim_pontuar_postagens` dá o mesmo
+  resultado de `sim_buscar` (teste). Endpoints públicos não carregam
+  `corpus.json` nem `docentes.json`. Corpus acima de `BB_INDICE_WEB_MAX`
+  (2 MB): o índice não é refeito na busca; `php api/cli/indexar.php` (cron)
+  ou Administração. Medido com 100 mil currículos sintéticos: indexação
+  ~9 min e 78 MB; busca < 1 s abaixo de 128 MB. Nunca carregar todos os
+  registros completos de uma vez num endpoint. Base antiga é convertida em trechos
   (`bb_migrar_corpus`). Erro fatal do PHP sai como JSON (tratador em
   `base.php`).
 - Backend PHP 8 sem dependências em `src/api/`: extrator
@@ -76,7 +84,7 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
   XML; sem situação, fica fora). Cada lista traz `foraSituacao`.
 - Ordem das sugestões (`sim_ordenar`): proximidade exibida (2 casas)
   decrescente; no empate, sexo feminino primeiro (`SEXO` do Lattes, em
-  `pessoas/` e em `indice/meta.json` `sexos`); nunca exibir nem enviar o
+  `pessoas/` e em `indice/docs.bin`); nunca exibir nem enviar o
   sexo ao navegador (`bb_publico` não o inclui).
 - `api/universidades.php` (público): nomes das universidades da planilha e
   dos currículos, para a caixa de seleção "Minha Instituição Associada" (com "Outra").
@@ -195,6 +203,8 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
 - `bash .github/scripts/validar.sh` — validação completa (a mesma da CI).
 - `php tools/testar.php` — testa extrator, proximidade, vínculos e a regra
   do mesmo ID.
+- `php api/cli/indexar.php [--forcar]` — monta o índice de busca e a visão
+  (base grande; no servidor, com `BANCAZEN_DADOS`).
 - `php -S localhost:8000 -t dist` — servidor local (após o build).
 - `node scripts/setup.mjs` — setup do novo projeto (placeholders).
 - `node tools/contrast-check.mjs` — audita o contraste (WCAG) dos temas.

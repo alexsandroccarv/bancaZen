@@ -7,5 +7,10 @@
 require_once __DIR__ . '/lib/base.php';
 
 bb_exigir_metodo('GET');
-$docentes = bb_carregar_docentes();
-bb_json(['curriculos' => count(array_filter(bb_carregar_corpus(), fn($p) => bb_tem_dados($p, $docentes)))]);
+// Contagem pré-calculada na visão da busca (lib/indice.php).
+try {
+    $n = bb_visao_garantir(bb_indice_garantir(true))['comDados'];
+} catch (RuntimeException $e) {
+    $n = 0;
+}
+bb_json(['curriculos' => $n]);

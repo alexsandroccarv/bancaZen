@@ -7,6 +7,20 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Alterado
+- Novo índice de busca (formato 3), para bases de 100 mil currículos ou
+  mais com memória fixa: dicionário por termo em 4096 partes, postagens
+  binárias e visão compacta com os filtros, os totais e os registros leves
+  com o programa efetivo. A busca, a contagem e a lista de universidades
+  não carregam mais a base inteira. Mesmo ranking de antes (conferido nos
+  testes). Base grande é indexada por `php api/cli/indexar.php` (cron) ou
+  pela Administração; `reindexar.php` atualiza o índice ao terminar.
+  Medido com 100 mil currículos sintéticos: indexação em ~10 min com
+  78 MB; busca em ~0,3 s abaixo de 128 MB. [issue #92](../../issues/92)
+  (parte de [#91](../../issues/91))
+
+## [0.0.45] - 2026-10-24
+
 ### Adicionado
 - Logo do PROFIAP no cabeçalho de todas as páginas, à direita, antes da
   engrenagem, sobre placa branca; as páginas de apoio passam a usar o

@@ -256,6 +256,28 @@ BANCAZEN_DADOS=~/dados/bancaZen php api/cli/reindexar.php --ppg=PROFIAP
 - Cada currículo é gravado como `<ID>.xml`. Os arquivos originais com outro
   nome continuam lá; `--organizar` apaga essas cópias depois de gravadas.
 - Pode ser repetido (por exemplo, depois de copiar novos XMLs).
+- Ao terminar, atualiza o índice de busca.
+
+**Índice de busca em base grande.** Até cerca de 3 mil currículos
+(`corpus.json` com até 2 MB), a própria busca refaz o índice depois de uma
+carga. Acima disso, a busca usa o índice da última indexação, e o índice é
+montado por este comando (ou pelo botão da Administração, se o servidor
+permitir requisições longas):
+
+```bash
+BANCAZEN_DADOS=~/dados/bancaZen php api/cli/indexar.php           # refaz se mudou
+BANCAZEN_DADOS=~/dados/bancaZen php api/cli/indexar.php --forcar  # refaz tudo
+```
+
+No *cron*, uma vez por dia (só refaz o que mudou):
+
+```cron
+17 3 * * * cd ~/public_html/labs/bancaZen && BANCAZEN_DADOS=~/dados/bancaZen php api/cli/indexar.php --silencioso
+```
+
+Medido com 100 mil currículos sintéticos: cerca de 9 minutos e 80 MB de
+memória para indexar; índice com cerca de 1,6 GB; busca em menos de 1 s,
+abaixo de 128 MB.
 
 O comando lê `BANCAZEN_DADOS` do ambiente; sem ela, usa a pasta gravada no
 build (`api/lib/config-dados.php`), a mesma do site.
@@ -279,15 +301,16 @@ arquivos e 6 MB, compatíveis com o padrão do PHP (`max_file_uploads = 20`,
 site (que o deploy preserva).
 
 **Backup.** Copie a pasta `bancazen-dados` (`xml/`, `corpus.json`,
-`pessoas/`, `docentes.json` e `admin.json`). A pasta `indice/` é refeita
-sozinha e não precisa de cópia.
+`pessoas/`, `docentes.json` e `admin.json`). As pastas `indice/` e `visao/`
+são refeitas (`api/cli/indexar.php`) e não precisam de cópia.
 
-**Memória do PHP.** A busca lê só o índice leve (`corpus.json`), as partes
-do índice de busca (`indice/`) dos termos da consulta e o registro completo
-(`pessoas/<id>.json`) de quem passa pela verificação de vínculos; funciona
-com o `memory_limit` comum de hospedagem (128 MB). O índice de busca é
-montado pela Administração ao abrir e depois de cada carga (cerca de 10 a
-30 s para 600 currículos). Uma base gravada por versões anteriores
+**Memória do PHP.** A busca lê só os termos da consulta no índice
+(`indice/`), os filtros compactos (`visao/docs.bin`), os registros leves de
+quem aparece no resultado e o registro completo (`pessoas/<id>.json`) de
+quem passa pela verificação de vínculos; funciona com o `memory_limit`
+comum de hospedagem (128 MB), também com 100 mil currículos. O índice de
+busca é montado pela Administração ao abrir e depois de cada carga, ou por
+`api/cli/indexar.php` em base grande. Uma base gravada por versões anteriores
 (`corpus.json` com os registros completos) é convertida na primeira leitura.
 Se o PHP parar por falta de memória ou tempo, a resposta diz isso em vez de
 "Erro 200".
