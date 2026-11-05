@@ -89,6 +89,11 @@ foreach (ENVOLVIDOS as $env) {
     }
 }
 
+// Quem orienta faz parte da banca (13.1 a): nome ou currículo obrigatório.
+if (!array_filter($considerados, fn($c) => $c['chave'] === 'orientador')) {
+    bb_erro('Orientação: informe o nome de quem orienta (obrigatório).');
+}
+
 // Um só índice para toda a base (o IDF considera todos os currículos); o
 // ranking vem na ordem exibida e é separado por lista. Filtros: instituição
 // (do Lattes ou do programa), doutorado e situação Permanente (13.1).

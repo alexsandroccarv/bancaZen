@@ -7,6 +7,30 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Composição da banca: botão "Baixar resultado (PDF)", com as duas listas
+  completas (índice, universidade, PPG, situação, termos em comum), as
+  retiradas por vínculo com o motivo, os critérios e a verificação de
+  vínculos, para quem orienta conferir. [issue #97](../../issues/97)
+- O preenchimento de "Meu TCC" e os critérios da busca ficam guardados no
+  navegador (sem os XML/ZIP) e voltam ao abrir o site; botão de lixeira
+  apaga; aviso no resultado para salvar o PDF ou gerar o Relatório.
+  [issue #98](../../issues/98)
+
+### Alterado
+- Início: diz para quem é o site (discentes do PROFIAP e quem os orienta);
+  "Como funciona" antes das normas, que ficam recolhidas; título da página
+  e subtítulo do cabeçalho com "indicação de docentes para bancas do
+  PROFIAP". [issue #95](../../issues/95)
+- Nome de quem orienta obrigatório (13.1 a), no navegador e no servidor;
+  o currículo Lattes continua opcional e recomendado.
+  [issue #96](../../issues/96)
+- Bloqueio pelo ModSecurity da hospedagem (HTTP 403/406) mostra uma
+  mensagem clara; DEPLOY.md explica como excluir só a regra disparada para
+  `api/buscar.php`. [issue #94](../../issues/94)
+
+## [0.0.46] - 2026-10-25
+
 ### Alterado
 - Novo índice de busca (formato 3), para bases de 100 mil currículos ou
   mais com memória fixa: dicionário por termo em 4096 partes, postagens

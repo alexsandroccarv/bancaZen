@@ -73,8 +73,9 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
 - Conformidade ética: pessoa com vínculo (coautoria, orientação, mesma
   pessoa) nunca entra nas listas; aparece à parte com o motivo.
   "Confirmado" = ID Lattes ou nome completo; "provável" = sobrenome + ao
-  menos duas iniciais. "Orientação" é opcional (discente, orientação e
-  coorientação): o resultado mostra quem foi considerado (`conformidade` em
+  menos duas iniciais. Nome de quem orienta obrigatório (13.1 a; issue #96: navegador e
+  `buscar.php`); currículos da discente, da orientação e da coorientação
+  opcionais: o resultado mostra quem foi considerado (`conformidade` em
   `buscar.php`) ou avisa que a verificação não foi feita. Sem currículo, o
   nome (`<papel>Nome`) vira registro mínimo e a verificação é parcial
   (`soNome`): só os currículos indicados são conferidos.
@@ -106,7 +107,7 @@ PROFIAP** (PPG = PROFIAP; item 13.1 b) e **Programa externo à Rede PROFIAP**
   a partir de 640px): `#inicio` (processo da banca segundo o item 13 e funcionamento),
   `#dissertacao` (Meu TCC: nome e Instituição Associada da discente, que preenche o critério
   de instituição a desconsiderar sem sobrescrever o digitado; título, resumo,
-  palavras-chave e, no trecho `#orientacao`, Orientação (opcional);
+  palavras-chave e, no trecho `#orientacao`, Orientação (nome de quem orienta obrigatório);
   nada disso é gravado no servidor; botões só com ícone exportam/importam
   esses dados num JSON local, `CAMPOS_JSON` em `app.js`, sem os arquivos
   XML/ZIP), `#bancas` (Composição da banca: conferência, critérios, busca e

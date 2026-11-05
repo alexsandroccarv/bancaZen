@@ -126,13 +126,7 @@
         const agora = new Date();
         const marcadas = new Map(lista.map((x) => [chave(x.pessoa), x]));
         const retirados = resultado.listas.reduce((n, l) => n + (l.retirados || []).length, 0);
-        const cr = resultado.criterios;
-        const criterios = [
-            cr.excluirInstituicao ? 'desconsiderados os currículos de docentes da Instituição Associada' : '',
-            cr.somenteDoutores ? 'somente docentes com o grau de doutor' : '',
-            cr.somentePermanentes ? 'somente docentes permanentes' : '',
-            cr.periodo ? `coautorias dos últimos ${cr.periodo} anos` : 'coautorias de todo o período',
-        ].filter(Boolean);
+        const criterios = textoCriterios(resultado.criterios);
         const faltando = [!d.nome && 'o seu nome', !d.titulo && 'o título do trabalho', !orientador && 'o nome de quem orienta'].filter(Boolean);
         aviso.innerHTML = [
             faltando.length ? `<p class="text-amber-800 dark:text-amber-300">Faltam ${juntar(faltando)} (em Meu TCC); o documento sai com espaço em branco.</p>` : '',
@@ -197,6 +191,92 @@
         doc.scrollIntoView({ block: 'start' });
     }
 
+    function textoCriterios(cr) {
+        return [
+            cr.excluirInstituicao ? 'desconsiderados os currículos de docentes da Instituição Associada' : '',
+            cr.somenteDoutores ? 'somente docentes com o grau de doutor' : '',
+            cr.somentePermanentes ? 'somente docentes permanentes' : '',
+            cr.periodo ? `coautorias dos últimos ${cr.periodo} anos` : 'coautorias de todo o período',
+        ].filter(Boolean);
+    }
+
+    /* ------------------ resultado da busca em PDF (issue #97) ------------------ */
+    // As duas listas completas e as retiradas por vínculo, com o motivo, para
+    // quem orienta conferir. Montado no navegador e impresso ou salvo em PDF;
+    // nada vai ao servidor.
+    function tabelaResultado(l) {
+        const alinea = l.grupo === 'profiap' ? '13.1, alínea b' : '13.1, alínea c';
+        const linhas = l.resultados.map((r, i) => {
+            const p = r.pessoa;
+            return `<tr><td>${i + 1}</td><td>${esc(p.nome)}</td><td>${esc(p.universidade || p.instituicao || '')}</td>
+                <td>${esc(p.ppg || '')}</td><td>${esc(p.situacao || '')}</td><td class="doc-num">${fmt.format(r.score)}</td>
+                <td>${esc((r.termos || []).join(', '))}</td></tr>`;
+        }).join('');
+        const descrever = (window.BancaZen && window.BancaZen.descreverVinculo) || ((v) => `${v.papel}: ${v.tipo}`);
+        const retirados = (l.retirados || []).map((r) => `<tr><td>${esc(r.pessoa.nome)}</td><td>${esc(r.pessoa.universidade || r.pessoa.instituicao || '')}</td>
+            <td class="doc-num">${fmt.format(r.score)}</td>
+            <td>${r.vinculos.map((v) => `${esc(v.certeza)}: ${esc(descrever(v))}`).join('<br>')}</td></tr>`).join('');
+        return `<h4 class="doc-subtitulo">${esc(l.titulo)} (item ${alinea})</h4>
+            <p class="doc-nota">${l.resultados.length} ${l.resultados.length === 1 ? 'indicação' : 'indicações'} entre ${l.total} currículo(s) desta lista${l.foraSituacao ? `; ${l.foraSituacao} fora da busca por não constar como docente permanente` : ''}.</p>
+            ${linhas ? `<table class="doc-tabela"><caption class="sr-only">${esc(l.titulo)}</caption>
+                <thead><tr><th scope="col">Nº</th><th scope="col">Nome</th><th scope="col">Universidade</th><th scope="col">PPG</th><th scope="col">Situação</th><th scope="col">Índice</th><th scope="col">Termos em comum</th></tr></thead>
+                <tbody>${linhas}</tbody></table>` : '<p>Sem indicações.</p>'}
+            ${retirados ? `<table class="doc-tabela"><caption>Retiradas por vínculo (conflito de interesses, item 13.3)</caption>
+                <thead><tr><th scope="col">Nome</th><th scope="col">Universidade</th><th scope="col">Índice</th><th scope="col">Vínculo</th></tr></thead>
+                <tbody>${retirados}</tbody></table>` : ''}`;
+    }
+    function gerarResultado() {
+        if (!resultado) return;
+        const atual = window.BancaZen ? window.BancaZen.dadosDissertacao() : {};
+        const d = Object.fromEntries(Object.keys({ ...resultado.dissertacao, ...atual }).map((k) => [k, atual[k] || resultado.dissertacao[k] || '']));
+        const considerados = resultado.conformidade.considerados || [];
+        const nomeDe = (papel) => d[papel] || (considerados.find((p) => p.chave === papel) || {}).nome || '';
+        const agora = new Date();
+        const versao = (window.APP_CONFIG && window.APP_CONFIG.version) || '';
+        const verificados = considerados.length
+            ? `conferidos com ${juntar(considerados.map((p) => `${p.papel.toLowerCase()}, ${p.nome}${p.soNome ? ' (só pelo nome)' : ' (currículo Lattes)'}`))}`
+            : 'não verificados (nenhum currículo nem nome informado)';
+        const doc = $('#resultadoDoc');
+        doc.innerHTML = `
+            <div class="doc-cabecalho">
+                <img class="doc-logo" src="images/profiap.png" alt="PROFIAP" width="307" height="118">
+                <p>bancaZen: indicação de docentes para bancas do PROFIAP</p>
+            </div>
+            <h3 class="doc-titulo">Resultado da busca de docentes para a banca</h3>
+            <dl class="doc-identificacao">
+                <dt>Discente</dt><dd>${esc(d.nome || 'não informado')}</dd>
+                ${d.universidade ? `<dt>Instituição Associada</dt><dd>${esc(d.universidade)}</dd>` : ''}
+                <dt>TCC</dt><dd>${esc(d.titulo || 'não informado')}</dd>
+                ${d.palavrasChave ? `<dt>Palavras-chave</dt><dd>${esc(d.palavrasChave)}</dd>` : ''}
+                <dt>Orientação</dt><dd>${esc(nomeDe('orientador') || 'não informada')}</dd>
+                ${nomeDe('coorientador') ? `<dt>Coorientação</dt><dd>${esc(nomeDe('coorientador'))}</dd>` : ''}
+            </dl>
+            <p>Busca realizada em ${esc(dataHora(resultado.em))}. Critérios da busca: ${esc(textoCriterios(resultado.criterios).join('; '))}.
+                Vínculos (coautoria, orientação ou mesma pessoa): ${esc(verificados)}. Índice de proximidade temática de 0 a 1
+                (modelo BM25), em ordem decrescente.</p>
+            ${resultado.listas.map(tabelaResultado).join('')}
+            <div class="doc-rodape">
+                <p>Documento gerado em ${esc(dataHora(agora))} pelo bancaZen ${esc(versao)} (${esc(enderecoSite())}). O resultado
+                    não fica guardado no servidor. A composição da banca segue as Normas Acadêmicas do PROFIAP e depende da
+                    aprovação do Comitê Gestor Nacional.</p>
+            </div>`;
+        imprimir('resultadoDoc');
+    }
+    // Imprime (ou salva em PDF) só o documento indicado (CSS @media print).
+    function imprimir(alvo) {
+        const el = document.getElementById(alvo);
+        const oculto = el.hidden;
+        document.body.dataset.imprimir = alvo;
+        el.hidden = false;
+        const fim = () => {
+            delete document.body.dataset.imprimir;
+            el.hidden = oculto;
+            window.removeEventListener('afterprint', fim);
+        };
+        window.addEventListener('afterprint', fim);
+        window.print();
+    }
+
     /* -------------------------------- início ------------------------------ */
     function init() {
         document.addEventListener('busca:resultado', (e) => {
@@ -209,7 +289,8 @@
             renderEscolhas();
         });
         $('#relForm').addEventListener('submit', gerar);
-        $('#relImprimirBtn').addEventListener('click', () => window.print());
+        $('#relImprimirBtn').addEventListener('click', () => imprimir('relDocumento'));
+        $('#resultadoPdfBtn').addEventListener('click', gerarResultado);
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bancaZen</title>
+    <title>bancaZen: indicação de docentes para bancas do PROFIAP</title>
     <meta name="description" content="Indica, a partir de currículos Lattes, docentes com proximidade temática ao TCC para as Bancas de Defesa de Projeto de TCC e de Defesa de TCC do PROFIAP.">
 
     <!-- Compartilhamento (Open Graph / Twitter). O %SITE_URL% é substituído
@@ -59,6 +59,7 @@
                 </div>
                 <div class="flex items-center gap-2 overflow-hidden">
                     <h1 id="headerAppName" class="font-bold text-white leading-none whitespace-nowrap">bancaZen</h1>
+                    <span class="subtitulo-cabecalho">Indicação de docentes para bancas do PROFIAP</span>
                     <span class="text-xl text-white/30 dark:text-gray-700 font-light hidden">|</span>
                     <span id="headerSigla" class="font-bold text-white/90 dark:text-accent-400 leading-none whitespace-nowrap hidden"></span>
                     <!-- Nome definido pelo usuário na aba Configurações (| nome) -->
@@ -107,7 +108,8 @@
                         <p class="sobretitulo">Etapa 1 de 4 no bancaZen</p>
                         <h2 class="titulo-secao">Indicação de docentes para a sua banca</h2>
                         <p class="texto-apoio">
-                            O bancaZen apoia a composição das Bancas de Defesa de Projeto de TCC e de Defesa de TCC do
+                            <strong class="publico">Para discentes do PROFIAP e quem os orienta</strong>, na preparação do
+                            pedido de aprovação da banca. O bancaZen apoia a composição das Bancas de Defesa de Projeto de TCC e de Defesa de TCC do
                             PROFIAP. A partir do título, do resumo e das palavras-chave do seu TCC, compara o trabalho com
                             os currículos Lattes cadastrados pela coordenação e indica docentes com proximidade temática,
                             sem vínculos que possam representar conflito de interesses com você ou com a orientação.
@@ -119,6 +121,18 @@
                     </div>
                 </div>
 
+                <section class="cartao" aria-labelledby="comoTitulo">
+                    <div class="cartao-cab">
+                        <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-route"></i></span>
+                        <h2 id="comoTitulo" class="cartao-titulo">Como funciona</h2>
+                    </div>
+                    <ol class="grade-2 list-none p-0 m-0">
+                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><p class="font-bold m-0">2. Meu TCC</p><p class="ajuda m-0">Informe a sua Instituição Associada e o título, o resumo e as palavras-chave do TCC (Dissertação ou Artigo Científico). Em "Orientação", informe o nome de quem orienta (obrigatório) e, para a verificação de vínculos, o currículo Lattes de quem orienta e, se houver, de quem coorienta, em XML ou ZIP, ou o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></li>
+                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><p class="font-bold m-0">3. Composição da banca</p><p class="ajuda m-0">Receba duas listas, cada uma com até 10 docentes, da maior para a menor proximidade temática: Rede PROFIAP (13.1 b) e Programa externo à Rede PROFIAP (13.1 c).</p></li>
+                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span><p class="font-bold m-0">4. Relatório</p><p class="ajuda m-0">Marque quem vai compor a banca e gere a declaração da indicação, com as indicações, o índice de proximidade e a verificação de vínculos, para anexar ao pedido de aprovação da banca ao Comitê Gestor Nacional.</p></li>
+                    </ol>
+                </section>
+
                 <section class="cartao" aria-labelledby="normaTitulo">
                     <div class="cartao-cab flex-wrap">
                         <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-scale-balanced"></i></span>
@@ -126,6 +140,10 @@
                         <!-- Logo do PROFIAP: fundo claro próprio, pois o texto do logo é escuro e sumiria nos temas escuros. -->
                         <span class="logo-profiap"><img src="images/profiap.png" alt="PROFIAP" width="307" height="118"></span>
                     </div>
+                    <p class="m-0">A banca tem quem orienta e dois docentes permanentes externos: um da Rede PROFIAP e um de programa externo à Rede.</p>
+                    <details class="regras">
+                    <summary>Ver as regras do item 13 (composição, vedações e prazos)</summary>
+                    <div class="space-y-3 mt-3">
                     <p class="m-0">
                         Pelo item 13 das Normas Acadêmicas Nacionais do PROFIAP, as Bancas de Defesa de Projeto de TCC
                         e de Defesa de TCC têm, no mínimo, 3 docentes permanentes com o grau de doutor:
@@ -149,18 +167,8 @@
                         manifestação nesse prazo, a banca está aprovada (13.8 a 13.10).
                         <a href="ajuda.html" class="text-brand-600 dark:text-accent-400 underline">Texto do item 13 na Ajuda</a>.
                     </p>
-                </section>
-
-                <section class="cartao" aria-labelledby="comoTitulo">
-                    <div class="cartao-cab">
-                        <span class="icone-bloco" aria-hidden="true"><i class="fa-solid fa-route"></i></span>
-                        <h2 id="comoTitulo" class="cartao-titulo">Como funciona</h2>
                     </div>
-                    <ol class="grade-2 list-none p-0 m-0">
-                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span><p class="font-bold m-0">2. Meu TCC</p><p class="ajuda m-0">Informe a sua Instituição Associada e o título, o resumo e as palavras-chave do TCC (Dissertação ou Artigo Científico). Em "Orientação" (opcional, para a verificação de vínculos), informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta, em XML ou ZIP, ou o link do Lattes de quem já está na base. Os dados podem ser exportados e importados num arquivo JSON, para continuar depois.</p></li>
-                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-users-viewfinder"></i></span><p class="font-bold m-0">3. Composição da banca</p><p class="ajuda m-0">Receba duas listas, cada uma com até 10 docentes, da maior para a menor proximidade temática: Rede PROFIAP (13.1 b) e Programa externo à Rede PROFIAP (13.1 c).</p></li>
-                        <li class="subcartao"><span class="icone-bloco cheio" aria-hidden="true"><i class="fa-solid fa-file-signature"></i></span><p class="font-bold m-0">4. Relatório</p><p class="ajuda m-0">Marque quem vai compor a banca e gere a declaração da indicação, com as indicações, o índice de proximidade e a verificação de vínculos, para anexar ao pedido de aprovação da banca ao Comitê Gestor Nacional.</p></li>
-                    </ol>
+                    </details>
                 </section>
 
                 <section class="cartao" aria-labelledby="conferenciaNormaTitulo">
@@ -221,7 +229,8 @@
                             <h2 id="privacidadeTitulo" class="cartao-titulo">Seus dados</h2>
                         </div>
                         <p class="m-0">
-                            Os currículos que você envia em "Meu TCC" são usados só na consulta e não são guardados. Os
+                            O preenchimento de "Meu TCC" fica guardado só neste navegador, para você continuar depois; o
+                            botão de lixeira em "Meu TCC" apaga. Os currículos que você envia são usados só na consulta e não são guardados. Os
                             currículos da base ficam no servidor, fora da área pública do site: o navegador recebe apenas
                             o resultado.
                         </p>
@@ -244,6 +253,7 @@
                         <button type="button" id="exportarJsonBtn" class="botao-redondo" aria-label="Exportar meus dados (arquivo JSON)" title="Exportar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-down"></i></button>
                         <button type="button" id="importarJsonBtn" class="botao-redondo" aria-label="Importar meus dados (arquivo JSON)" title="Importar meus dados (arquivo JSON)"><i aria-hidden="true" class="fa-solid fa-file-arrow-up"></i></button>
                         <input id="importarJsonInput" type="file" accept=".json,application/json" class="sr-only" tabindex="-1" aria-hidden="true">
+                        <button type="button" id="apagarLocalBtn" class="botao-redondo" aria-label="Apagar meus dados deste navegador" title="Apagar meus dados deste navegador"><i aria-hidden="true" class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
                 <p id="jsonStatus" class="ajuda m-0" aria-live="polite"></p>
@@ -252,7 +262,7 @@
                 <ol id="etapasTcc" class="etapas" aria-label="Etapas do preenchimento">
                     <li class="etapa" data-estado="atual" data-alvo="cartaoVoce"><button type="button"><span class="etapa-num" aria-hidden="true"><span class="etapa-n">1</span><i class="etapa-feito fa-solid fa-check"></i></span><span class="etapa-rotulo">Sobre você</span><span class="sr-only etapa-estado"></span></button></li>
                     <li class="etapa" data-estado="pendente" data-alvo="cartaoTcc"><button type="button"><span class="etapa-num" aria-hidden="true"><span class="etapa-n">2</span><i class="etapa-feito fa-solid fa-check"></i></span><span class="etapa-rotulo">O TCC</span><span class="sr-only etapa-estado"></span></button></li>
-                    <li class="etapa" data-estado="pendente" data-alvo="orientacao"><button type="button"><span class="etapa-num" aria-hidden="true"><span class="etapa-n">3</span><i class="etapa-feito fa-solid fa-check"></i></span><span class="etapa-rotulo">Orientação (opcional)</span><span class="sr-only etapa-estado"></span></button></li>
+                    <li class="etapa" data-estado="pendente" data-alvo="orientacao"><button type="button"><span class="etapa-num" aria-hidden="true"><span class="etapa-n">3</span><i class="etapa-feito fa-solid fa-check"></i></span><span class="etapa-rotulo">Orientação</span><span class="sr-only etapa-estado"></span></button></li>
                 </ol>
 
                 <section id="cartaoVoce" class="cartao" aria-labelledby="voceTitulo" tabindex="-1">
@@ -328,24 +338,24 @@
                     <div class="cartao-cab">
                         <span class="icone-bloco verde" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
                         <div class="flex-1">
-                            <h3 id="orientacaoTitulo" class="cartao-titulo">Orientação <span class="opcional">(opcional)</span></h3>
+                            <h3 id="orientacaoTitulo" class="cartao-titulo">Orientação</h3>
                         </div>
                     </div>
                     <p class="ajuda m-0">
-                        Recomendada. Informe o nome e o currículo Lattes de quem orienta e, se houver, de quem coorienta
-                        (o seu fica em "Sobre você"): eles são usados para retirar das indicações quem tem coautoria em
-                        publicações ou relação de orientação com alguma dessas pessoas, vínculos que podem representar
-                        conflito de interesses (item 13.3). Só com o nome, a verificação é parcial: procura o nome nas
-                        coautorias e orientações de cada indicação. Sem nome nem currículo, a busca funciona, mas o
-                        resultado avisa que os vínculos não foram verificados. Os arquivos enviados aqui são usados só
-                        na consulta e não são guardados.
+                        O nome de quem orienta é obrigatório: a Norma inclui quem orienta na banca (13.1 a), e a
+                        declaração do Relatório traz esse nome. O currículo Lattes de quem orienta e, se houver, de quem
+                        coorienta (o seu fica em "Sobre você") é opcional, mas recomendado: com ele, saem das indicações
+                        as pessoas com coautoria em publicações ou relação de orientação com alguma dessas pessoas,
+                        vínculos que podem representar conflito de interesses (item 13.3). Só com o nome, a verificação
+                        é parcial: procura o nome nas coautorias e orientações de cada indicação. Os arquivos enviados
+                        aqui são usados só na consulta e não são guardados.
                     </p>
                     <div class="grade-2">
                         <div class="envolvido subcartao" data-papel="orientador">
                             <p class="font-extrabold m-0" id="orientadorRotulo">Orientação</p>
                             <div>
-                                <label for="orientadorNome" class="rotulo">Nome de quem orienta</label>
-                                <input id="orientadorNome" type="text" autocomplete="off" aria-describedby="orientadorRotulo orientadorStatus" class="w-full">
+                                <label for="orientadorNome" class="rotulo">Nome de quem orienta <span class="font-normal">(obrigatório)</span></label>
+                                <input id="orientadorNome" type="text" autocomplete="off" required aria-required="true" aria-describedby="orientadorRotulo orientadorStatus" class="w-full">
                             </div>
                             <label class="soltar">
                                 <span class="soltar-icone" aria-hidden="true"><i class="fa-solid fa-cloud-arrow-up"></i></span>
@@ -439,11 +449,15 @@
                             Instituição Associada, item 13.1 b) e Programa externo à Rede PROFIAP (item 13.1 c).
                         </p>
                     </div>
+                    <p class="dica m-0"><i aria-hidden="true" class="fa-solid fa-floppy-disk"></i><span>O resultado não fica guardado: baixe o PDF do resultado ou gere o Relatório antes de sair. O preenchimento de Meu TCC fica guardado só neste navegador.</span></p>
                     <div id="conformidadeResultado" aria-live="polite"></div>
                     <div id="listas" class="listas-grade"></div>
-                    <div class="flex justify-end">
+                    <div class="flex flex-wrap justify-end gap-3">
+                        <button type="button" id="resultadoPdfBtn" class="botao-secundario"><i aria-hidden="true" class="fa-solid fa-file-pdf"></i> Baixar resultado (PDF)</button>
                         <button type="button" data-ir="relatorio" class="botao-primario botao-grande">Próximo: Relatório <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></button>
                     </div>
+                    <!-- Resultado completo para imprimir ou salvar em PDF (js/relatorio.js). -->
+                    <article id="resultadoDoc" class="documento" aria-label="Resultado da busca para impressão" hidden></article>
                 </section>
             </div>
         </div>

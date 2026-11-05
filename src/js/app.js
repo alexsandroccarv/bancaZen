@@ -16,7 +16,7 @@
     const ENVOLVIDOS = ['discente', 'orientador', 'coorientador'];
     const PAPEIS = {
         discente: { rotulo: 'Discente', obrigatorio: false },
-        orientador: { rotulo: 'Orientação', obrigatorio: false },
+        orientador: { rotulo: 'Orientação', obrigatorio: true },
         coorientador: { rotulo: 'Coorientação', obrigatorio: false },
     };
 
@@ -137,6 +137,11 @@
             return JSON.parse(texto);
         } catch (_) {
             const trecho = texto.replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
+            // Bloqueio do firewall da hospedagem (ModSecurity, issue #94): não é
+            // um erro do bancaZen nem uma avaliação dos dados informados.
+            if ([403, 406].includes(r.status) && /mod_?security|not acceptable/i.test(trecho)) {
+                return { erro: `O sistema de segurança da hospedagem bloqueou o envio (HTTP ${r.status}) antes de ele chegar ao bancaZen. Não tem relação com os nomes nem com a orientação informada: algum trecho do texto foi confundido com um ataque. Avise a administração do bancaZen, informando o horário da tentativa, para que a regra seja ajustada.` };
+            }
             return { erro: `Resposta inesperada do servidor (HTTP ${r.status})${trecho ? `: ${trecho}` : '.'}` };
         }
     }
@@ -147,6 +152,11 @@
         mostrarErro('');
         if (!dissertacaoPreenchida()) {
             mostrarErro('Preencha ao menos o título, o resumo ou as palavras-chave.', 'dissertacao', 'Meu TCC');
+            return;
+        }
+        // Quem orienta faz parte da banca (13.1 a): nome obrigatório (issue #96).
+        if (!situacaoEnvolvido('orientador').ok) {
+            mostrarErro('Informe o nome de quem orienta (obrigatório).', 'orientacao', 'Orientação');
             return;
         }
         const fd = new FormData();
@@ -173,7 +183,7 @@
             if (!r.ok || dados.erro) {
                 const msg = dados.erro || `Erro ${r.status} no servidor.`;
                 // Erros sobre os currículos da orientação levam à seção 3.
-                const daOrientacao = /Discente|Orientador|Coorientador|currículo Lattes/.test(msg);
+                const daOrientacao = /Discente|Orientação|Coorientação|currículo Lattes/.test(msg);
                 mostrarErro(msg, daOrientacao ? 'orientacao' : null, 'Orientação');
                 return;
             }
@@ -335,7 +345,7 @@
             coorientador: $('#coorientadorNome').value.trim(),
         };
     }
-    window.BancaZen = { dadosDissertacao };
+    window.BancaZen = { dadosDissertacao, descreverVinculo };
 
     /* -------------------- Minha Instituição Associada ---------------------- */
     // Caixa de seleção com as universidades da base (api/universidades.php) e
@@ -396,7 +406,7 @@
         },
         criterios: { excluirInstituicao: '#excluirInput', somenteDoutores: '#doutoresInput', somentePermanentes: '#permanentesInput' },
     };
-    function exportarJson() {
+    function coletarDados() {
         const dados = { app: 'bancaZen', formato: 1, exportadoEm: new Date().toISOString() };
         for (const [grupo, campos] of Object.entries(CAMPOS_JSON)) {
             dados[grupo] = {};
@@ -406,6 +416,30 @@
             }
         }
         dados.dissertacao.universidade = valorUniversidade();
+        return dados;
+    }
+    function aplicarDados(dados) {
+        if (!dados || typeof dados !== 'object' || (dados.app && dados.app !== 'bancaZen') || !dados.dissertacao) {
+            throw new Error('o arquivo não é uma exportação do bancaZen');
+        }
+        for (const [grupo, campos] of Object.entries(CAMPOS_JSON)) {
+            for (const [chave, sel] of Object.entries(campos)) {
+                const v = dados[grupo] && dados[grupo][chave];
+                if (v === undefined || v === null) continue;
+                const el = $(sel);
+                if (el.type === 'checkbox') el.checked = Boolean(v);
+                else el.value = String(v);
+                // Avisa os ouvintes (ex.: universidade -> critério de instituição).
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+        if (typeof dados.dissertacao.universidade === 'string') definirUniversidade(dados.dissertacao.universidade);
+        renderConferencia();
+        atualizarEtapas();
+    }
+    function exportarJson() {
+        const dados = coletarDados();
         const nome = semAcento(dados.dissertacao.nome).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'dissertacao';
         const url = URL.createObjectURL(new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }));
         const a = document.createElement('a');
@@ -422,29 +456,42 @@
     async function importarJson(arquivo) {
         const status = $('#jsonStatus');
         try {
-            const dados = JSON.parse(await arquivo.text());
-            if (!dados || typeof dados !== 'object' || (dados.app && dados.app !== 'bancaZen') || !dados.dissertacao) {
-                throw new Error('o arquivo não é uma exportação do bancaZen');
-            }
-            for (const [grupo, campos] of Object.entries(CAMPOS_JSON)) {
-                for (const [chave, sel] of Object.entries(campos)) {
-                    const v = dados[grupo] && dados[grupo][chave];
-                    if (v === undefined || v === null) continue;
-                    const el = $(sel);
-                    if (el.type === 'checkbox') el.checked = Boolean(v);
-                    else el.value = String(v);
-                    // Avisa os ouvintes (ex.: universidade -> critério de instituição).
-                    el.dispatchEvent(new Event('input', { bubbles: true }));
-                    el.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            }
-            if (typeof dados.dissertacao.universidade === 'string') definirUniversidade(dados.dissertacao.universidade);
-            renderConferencia();
-            atualizarEtapas();
+            aplicarDados(JSON.parse(await arquivo.text()));
             status.textContent = `Dados importados de ${arquivo.name}.`;
         } catch (e) {
             status.textContent = `Não foi possível importar ${arquivo.name}: ${e.message}.`;
         }
+    }
+
+    /* ---------------- preenchimento guardado no navegador ---------------- */
+    // Os mesmos campos do JSON de exportação (sem os arquivos XML/ZIP) ficam
+    // no localStorage deste navegador, para continuar depois (issue #98);
+    // nada vai ao servidor. "Apagar meus dados" limpa tudo.
+    const CHAVE_LOCAL = 'bancazen.meuTcc';
+    let restaurando = false;
+    let espera = null;
+    function salvarLocal() {
+        if (restaurando) return;
+        clearTimeout(espera);
+        espera = setTimeout(() => {
+            try { localStorage.setItem(CHAVE_LOCAL, JSON.stringify(coletarDados())); } catch (_) { /* armazenamento indisponível */ }
+        }, 400);
+    }
+    function restaurarLocal() {
+        let dados = null;
+        try { dados = JSON.parse(localStorage.getItem(CHAVE_LOCAL) || 'null'); } catch (_) { dados = null; }
+        if (!dados) return;
+        restaurando = true;
+        try {
+            aplicarDados(dados);
+            $('#jsonStatus').textContent = 'Recuperamos o preenchimento salvo neste navegador. Para apagá-lo, use o botão de lixeira ao lado.';
+        } catch (_) { /* dado antigo ou inválido: ignora */ }
+        restaurando = false;
+    }
+    function apagarLocal() {
+        if (!window.confirm('Apagar o preenchimento de Meu TCC guardado neste navegador? Os campos ficarão em branco.')) return;
+        try { localStorage.removeItem(CHAVE_LOCAL); } catch (_) { /* nada a apagar */ }
+        location.reload();
     }
 
     /* ------------- Meu TCC: etiquetas, arquivos e etapas -------------- */
@@ -525,7 +572,7 @@
     function atualizarEtapas() {
         const eu = discente();
         const n = dissertacaoPreenchida();
-        const feitas = [Boolean(eu.nome && eu.universidade), n === 3, ['orientador', 'coorientador'].some((k) => situacaoEnvolvido(k).ok)];
+        const feitas = [Boolean(eu.nome && eu.universidade), n === 3, situacaoEnvolvido('orientador').ok];
         const atual = feitas.indexOf(false);
         document.querySelectorAll('#etapasTcc .etapa').forEach((li, i) => {
             const estado = feitas[i] ? 'feito' : (i === atual ? 'atual' : 'pendente');
@@ -581,6 +628,12 @@
         iniciarPalavras();
         iniciarSoltar();
         iniciarEtapas();
+        restaurarLocal();
+        for (const sel of ['#tab-dissertacao', '#buscaForm']) {
+            $(sel).addEventListener('input', salvarLocal);
+            $(sel).addEventListener('change', salvarLocal);
+        }
+        $('#apagarLocalBtn').addEventListener('click', apagarLocal);
         renderConferencia();
         carregarStatus();
     }

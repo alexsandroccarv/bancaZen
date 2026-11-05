@@ -300,6 +300,25 @@ arquivos e 6 MB, compatíveis com o padrão do PHP (`max_file_uploads = 20`,
 2 MB) exige aumentar esse limite no `php.ini` ou no `.user.ini` da pasta do
 site (que o deploy preserva).
 
+**ModSecurity (HTTP 403/406 na busca).** O firewall de aplicação da
+hospedagem pode bloquear a busca quando o resumo do TCC contém trechos que
+as regras confundem com ataques (falso positivo); a página mostra "O sistema
+de segurança da hospedagem bloqueou o envio". Para corrigir sem desligar a
+proteção do site inteiro:
+
+1. Anote o horário da tentativa bloqueada.
+2. Peça ao suporte da hospedagem o **ID da regra** registrada no log do
+   ModSecurity (*audit log*) nesse horário, para o endereço
+   `…/api/buscar.php`. Em alguns painéis, o cPanel mostra os eventos em
+   "Segurança › ModSecurity" (ou "ModSecurity Tools").
+3. Peça a exclusão **só dessa regra** e **só para** `api/buscar.php`
+   (ex.: `SecRuleRemoveById <ID>` num `LocationMatch` da configuração do
+   servidor). Desligar o ModSecurity do domínio inteiro, na mesma tela do
+   cPanel, também resolve, mas retira a proteção de todo o site.
+
+Numa VPS, a mesma exclusão vai na configuração do ModSecurity/Apache
+(ou do Nginx), limitada ao caminho da busca.
+
 **Backup.** Copie a pasta `bancazen-dados` (`xml/`, `corpus.json`,
 `pessoas/`, `docentes.json` e `admin.json`). As pastas `indice/` e `visao/`
 são refeitas (`api/cli/indexar.php`) e não precisam de cópia.
