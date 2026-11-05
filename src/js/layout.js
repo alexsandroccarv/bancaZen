@@ -210,7 +210,8 @@
         // Páginas de apoio podem definir <body data-page-title="..."> para
         // compor o título (ex.: "MeuApp — Termo de uso").
         const pageTitle = (document.body && document.body.dataset && document.body.dataset.pageTitle) || '';
-        document.title = pageTitle ? `${baseTitle} — ${pageTitle}` : baseTitle;
+        // Sem título de página (página principal): nome + descrição do app.
+        document.title = pageTitle ? `${baseTitle} — ${pageTitle}` : (cfg.descricao ? `${baseTitle}: ${cfg.descricao}` : baseTitle);
 
         const nameEl = $('#headerAppName');
         if (nameEl) nameEl.textContent = cfg.name || '';
